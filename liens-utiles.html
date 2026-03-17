@@ -3,9 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mes Liens</title>
+    <title>Dashboard</title>
     <style>
-      /* ── Reset & Base ── */
       *,
       *::before,
       *::after {
@@ -28,37 +27,63 @@
         text-decoration: none;
         color: inherit;
       }
-
-      /* ── Layout ── */
-      .container {
-        max-width: 720px;
-        margin: 0 auto;
-        padding: 60px 20px 80px;
+      button {
+        font-family: inherit;
+        cursor: pointer;
+        border: none;
+        background: none;
+      }
+      input,
+      select {
+        font-family: inherit;
       }
 
-      /* ── Header ── */
+      /* ── Layout deux colonnes ── */
+      .shell {
+        display: flex;
+        min-height: 100vh;
+      }
+      .panel {
+        flex: 1;
+        padding: 60px 36px 80px;
+        overflow-y: auto;
+      }
+      .panel-left {
+        border-right: 1px solid #e7e5e4;
+      }
+      .inner {
+        max-width: 520px;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 860px) {
+        .shell {
+          flex-direction: column;
+        }
+        .panel-left {
+          border-right: none;
+          border-bottom: 1px solid #e7e5e4;
+        }
+      }
+
+      /* ── Typo commune ── */
       h1 {
         font-size: 2.2rem;
         font-weight: 700;
         letter-spacing: -0.02em;
         line-height: 1;
       }
-      h1 span {
+      .accent {
         color: #f97316;
       }
       .subtitle {
         font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
-        font-size: 0.75rem;
-        letter-spacing: 0.1em;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
         color: #a8a29e;
         margin-top: 4px;
-        margin-bottom: 48px;
-      }
-
-      /* ── Sections ── */
-      section {
-        margin-bottom: 36px;
+        margin-bottom: 40px;
       }
       h2 {
         font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
@@ -67,13 +92,205 @@
         text-transform: uppercase;
         margin-bottom: 10px;
       }
+
+      /* ══════════════════════════════════
+       PANEL GAUCHE — Tâches
+       ══════════════════════════════════ */
+
+      /* Barre d'ajout */
+      .add-bar {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 20px;
+      }
+      .add-bar input[type="text"] {
+        flex: 1;
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        border: 1px solid #d6d3d1;
+        border-radius: 8px;
+        background: #fff;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      .add-bar input[type="text"]:focus {
+        border-color: #f97316;
+      }
+      .add-bar select {
+        padding: 10px 10px;
+        font-size: 0.75rem;
+        border: 1px solid #d6d3d1;
+        border-radius: 8px;
+        background: #fff;
+        color: #78716c;
+        outline: none;
+      }
+      .add-bar button {
+        padding: 10px 18px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: #292524;
+        color: #fafaf9;
+        border-radius: 8px;
+        transition: background 0.15s;
+      }
+      .add-bar button:hover {
+        background: #f97316;
+      }
+
+      /* Filtres */
+      .filters {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .filters button {
+        font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 5px 12px;
+        border-radius: 6px;
+        border: 1px solid #e7e5e4;
+        color: #a8a29e;
+        transition: all 0.15s;
+      }
+      .filters button:hover {
+        border-color: #292524;
+        color: #292524;
+      }
+      .filters button.active {
+        background: #292524;
+        color: #fafaf9;
+        border-color: #292524;
+      }
+
+      /* Liste de tâches */
+      .tasks {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .task {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid;
+        transition:
+          background 0.15s,
+          border-color 0.15s,
+          opacity 0.15s;
+      }
+      .task.done {
+        opacity: 0.5;
+      }
+      .task.done .task-text {
+        text-decoration: line-through;
+        color: #a8a29e;
+      }
+
+      /* Checkbox custom */
+      .check {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        cursor: pointer;
+      }
+      .check:hover {
+        transform: scale(1.1);
+      }
+      .task.done .check {
+        background: currentColor;
+      }
+      .task.done .check::after {
+        content: "✓";
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: 700;
+      }
+
+      .task-text {
+        flex: 1;
+        font-size: 0.875rem;
+      }
+      .task-tag {
+        font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+        font-size: 0.6rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 5px;
+        flex-shrink: 0;
+      }
+      .task-del {
+        font-size: 0.8rem;
+        color: #d6d3d1;
+        transition: color 0.15s;
+        padding: 2px 4px;
+        flex-shrink: 0;
+      }
+      .task-del:hover {
+        color: #ef4444;
+      }
+
+      /* Couleurs tâches par catégorie */
+      .task-urgent {
+        border-color: #fecdd3;
+        background: rgba(255, 228, 230, 0.3);
+        color: #e11d48;
+      }
+      .task-urgent .task-tag {
+        background: rgba(255, 228, 230, 0.6);
+        color: #be123c;
+      }
+      .task-normal {
+        border-color: #dbeafe;
+        background: rgba(219, 234, 254, 0.3);
+        color: #2563eb;
+      }
+      .task-normal .task-tag {
+        background: rgba(219, 234, 254, 0.6);
+        color: #1d4ed8;
+      }
+      .task-later {
+        border-color: #e7e5e4;
+        background: rgba(231, 229, 228, 0.3);
+        color: #78716c;
+      }
+      .task-later .task-tag {
+        background: rgba(231, 229, 228, 0.6);
+        color: #57534e;
+      }
+
+      .empty-msg {
+        text-align: center;
+        padding: 40px 0;
+        color: #a8a29e;
+        font-style: italic;
+        font-size: 0.9rem;
+      }
+
+      /* ══════════════════════════════════
+       PANEL DROIT — Liens
+       ══════════════════════════════════ */
+      section {
+        margin-bottom: 32px;
+      }
       .links {
         display: flex;
         flex-direction: column;
         gap: 6px;
       }
-
-      /* ── Link card ── */
       .link {
         display: flex;
         align-items: center;
@@ -106,9 +323,6 @@
         flex-shrink: 0;
       }
 
-      /* ── Color themes per section ── */
-
-      /* Vert — Dev */
       .t-green h2 {
         color: #059669;
       }
@@ -126,7 +340,6 @@
         color: #6ee7b7;
       }
 
-      /* Violet — Design */
       .t-violet h2 {
         color: #7c3aed;
       }
@@ -144,7 +357,6 @@
         color: #c4b5fd;
       }
 
-      /* Orange — Outils */
       .t-amber h2 {
         color: #d97706;
       }
@@ -162,7 +374,6 @@
         color: #fcd34d;
       }
 
-      /* Bleu — Veille */
       .t-sky h2 {
         color: #0284c7;
       }
@@ -180,7 +391,6 @@
         color: #7dd3fc;
       }
 
-      /* Rose — Perso */
       .t-rose h2 {
         color: #e11d48;
       }
@@ -198,7 +408,6 @@
         color: #fda4af;
       }
 
-      /* Turquoise */
       .t-teal h2 {
         color: #0d9488;
       }
@@ -218,122 +427,259 @@
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1>mes liens<span>.</span></h1>
-      <p class="subtitle">tout ce que je ne veux pas perdre</p>
+    <div class="shell">
+      <!-- ╔══════════════════════════════════════╗
+       ║  GAUCHE — Tâches (localStorage)     ║
+       ╚══════════════════════════════════════╝ -->
+      <div class="panel panel-left">
+        <div class="inner">
+          <h1>mesTaches<span class="accent">.</span></h1>
+          <p class="subtitle">tout ce que je dois faire</p>
 
-      <!-- ══ Dev & Code (vert) ══ -->
-      <section class="t-green">
-        <h2>Dev & Code</h2>
-        <div class="links">
-          <a href="https://tailwindcss.com/docs" target="_blank" class="link">
-            <div>
-              <span class="link-name">Tailwind CSS</span
-              ><span class="link-desc">— Documentation officielle</span>
-            </div>
-            <span class="arrow">↗</span>
-          </a>
+          <!-- Ajout -->
+          <div class="add-bar">
+            <input
+              type="text"
+              id="taskInput"
+              placeholder="Nouvelle tâche…"
+              onkeydown="if (event.key === 'Enter') addTask();"
+            />
+            <select id="taskPriority">
+              <option value="normal">Normal</option>
+              <option value="urgent">Urgent</option>
+              <option value="later">Plus tard</option>
+            </select>
+            <button onclick="addTask()">+</button>
+          </div>
 
-          <a
-            href="https://developer.mozilla.org/fr/"
-            target="_blank"
-            class="link"
-          >
-            <div>
-              <span class="link-name">MDN Web Docs</span
-              ><span class="link-desc">— Référence HTML, CSS, JS</span>
-            </div>
-            <span class="arrow">↗</span>
-          </a>
+          <!-- Filtres -->
+          <div class="filters">
+            <button class="active" onclick="setFilter('all', this)">
+              Tout
+            </button>
+            <button onclick="setFilter('todo', this)">À faire</button>
+            <button onclick="setFilter('done', this)">Fait</button>
+            <button onclick="setFilter('urgent', this)">Urgent</button>
+            <button onclick="setFilter('normal', this)">Normal</button>
+            <button onclick="setFilter('later', this)">Plus tard</button>
+          </div>
 
-          <a href="https://github.com" target="_blank" class="link">
-            <div>
-              <span class="link-name">GitHub</span
-              ><span class="link-desc">— Repos, issues, PRs</span>
-            </div>
-            <span class="arrow">↗</span>
-          </a>
+          <!-- Liste -->
+          <div class="tasks" id="taskList"></div>
         </div>
-      </section>
+      </div>
 
-      <!-- ══ Design (violet) ══ -->
-      <section class="t-violet">
-        <h2>Design & Inspi</h2>
-        <div class="links">
-          <a href="https://unsplash.com" target="_blank" class="link">
-            <div>
-              <span class="link-name">Unsplash</span
-              ><span class="link-desc">— Photos libres de droits</span>
-            </div>
-            <span class="arrow">↗</span>
-          </a>
+      <!-- ╔══════════════════════════════════════╗
+       ║  DROITE — Liens (statique)          ║
+       ╚══════════════════════════════════════╝ -->
+      <div class="panel">
+        <div class="inner">
+          <h1>mesLiens<span class="accent">.</span></h1>
+          <p class="subtitle">tout ce que je ne veux pas perdre</p>
 
-          <a href="https://dribbble.com" target="_blank" class="link">
-            <div>
-              <span class="link-name">Dribbble</span
-              ><span class="link-desc">— Inspiration UI/UX</span>
+          <!-- ══ Dev & Code (vert) ══ -->
+          <section class="t-green">
+            <h2>Dev & Code</h2>
+            <div class="links">
+              <a
+                href="https://tailwindcss.com/docs"
+                target="_blank"
+                class="link"
+              >
+                <div>
+                  <span class="link-name">Tailwind CSS</span
+                  ><span class="link-desc">— Documentation officielle</span>
+                </div>
+                <span class="arrow">↗</span>
+              </a>
+
+              <a
+                href="https://developer.mozilla.org/fr/"
+                target="_blank"
+                class="link"
+              >
+                <div>
+                  <span class="link-name">MDN Web Docs</span
+                  ><span class="link-desc">— Référence HTML, CSS, JS</span>
+                </div>
+                <span class="arrow">↗</span>
+              </a>
+
+              <a href="https://github.com" target="_blank" class="link">
+                <div>
+                  <span class="link-name">GitHub</span
+                  ><span class="link-desc">— Repos, issues, PRs</span>
+                </div>
+                <span class="arrow">↗</span>
+              </a>
             </div>
-            <span class="arrow">↗</span>
-          </a>
+          </section>
+
+          <!-- ══ Design (violet) ══ -->
+          <section class="t-violet">
+            <h2>Design & Inspi</h2>
+            <div class="links">
+              <a href="https://unsplash.com" target="_blank" class="link">
+                <div>
+                  <span class="link-name">Unsplash</span
+                  ><span class="link-desc">— Photos libres de droits</span>
+                </div>
+                <span class="arrow">↗</span>
+              </a>
+
+              <a href="https://dribbble.com" target="_blank" class="link">
+                <div>
+                  <span class="link-name">Dribbble</span
+                  ><span class="link-desc">— Inspiration UI/UX</span>
+                </div>
+                <span class="arrow">↗</span>
+              </a>
+            </div>
+          </section>
+
+          <!-- ══ Outils (orange) ══ -->
+          <section class="t-amber">
+            <h2>Outils</h2>
+            <div class="links">
+              <a href="https://excalidraw.com" target="_blank" class="link">
+                <div>
+                  <span class="link-name">Excalidraw</span
+                  ><span class="link-desc">— Whiteboard hand-drawn</span>
+                </div>
+                <span class="arrow">↗</span>
+              </a>
+
+              <a href="https://notion.so" target="_blank" class="link">
+                <div>
+                  <span class="link-name">Notion</span
+                  ><span class="link-desc">— Notes et docs tout-en-un</span>
+                </div>
+                <span class="arrow">↗</span>
+              </a>
+            </div>
+          </section>
+
+          <!-- ══ Veille (bleu) ══ -->
+          <section class="t-sky">
+            <h2>Veille</h2>
+            <div class="links">
+              <a
+                href="https://news.ycombinator.com"
+                target="_blank"
+                class="link"
+              >
+                <div>
+                  <span class="link-name">Hacker News</span
+                  ><span class="link-desc">— Actu tech et startups</span>
+                </div>
+                <span class="arrow">↗</span>
+              </a>
+            </div>
+          </section>
+
+          <!--
+        AJOUTER UN LIEN : copier un bloc <a class="link">…</a>
+        AJOUTER UNE SECTION : copier un <section class="t-XXX">
+        Couleurs : t-green, t-violet, t-amber, t-sky, t-rose, t-teal
+      -->
         </div>
-      </section>
+      </div>
+    </div>
 
-      <!-- ══ Outils (orange) ══ -->
-      <section class="t-amber">
-        <h2>Outils</h2>
-        <div class="links">
-          <a href="https://excalidraw.com" target="_blank" class="link">
-            <div>
-              <span class="link-name">Excalidraw</span
-              ><span class="link-desc">— Whiteboard hand-drawn</span>
-            </div>
-            <span class="arrow">↗</span>
-          </a>
+    <!-- ══ JS — uniquement pour les tâches ══ -->
+    <script>
+      const KEY = "mes_taches";
+      let filter = "all";
 
-          <a href="https://notion.so" target="_blank" class="link">
-            <div>
-              <span class="link-name">Notion</span
-              ><span class="link-desc">— Notes et docs tout-en-un</span>
-            </div>
-            <span class="arrow">↗</span>
-          </a>
-        </div>
-      </section>
+      function load() {
+        try {
+          return JSON.parse(localStorage.getItem(KEY)) || [];
+        } catch {
+          return [];
+        }
+      }
+      function save(tasks) {
+        localStorage.setItem(KEY, JSON.stringify(tasks));
+      }
 
-      <!-- ══ Veille (bleu) ══ -->
-      <section class="t-sky">
-        <h2>Veille</h2>
-        <div class="links">
-          <a href="https://news.ycombinator.com" target="_blank" class="link">
-            <div>
-              <span class="link-name">Hacker News</span
-              ><span class="link-desc">— Actu tech et startups</span>
-            </div>
-            <span class="arrow">↗</span>
-          </a>
-        </div>
-      </section>
+      function addTask() {
+        const input = document.getElementById("taskInput");
+        const text = input.value.trim();
+        if (!text) return;
+        const priority = document.getElementById("taskPriority").value;
+        const tasks = load();
+        tasks.unshift({ id: Date.now(), text, priority, done: false });
+        save(tasks);
+        input.value = "";
+        render();
+      }
 
-      <!--
-      ══════════════════════════════════════════
-       COMMENT ÉDITER CE FICHIER
-      ══════════════════════════════════════════
+      function toggle(id) {
+        const tasks = load();
+        const t = tasks.find((t) => t.id === id);
+        if (t) t.done = !t.done;
+        save(tasks);
+        render();
+      }
 
-      AJOUTER UN LIEN :
-      Copier ce bloc dans la section voulue :
+      function remove(id) {
+        save(load().filter((t) => t.id !== id));
+        render();
+      }
 
-        <a href="URL_ICI" target="_blank" class="link">
-          <div><span class="link-name">NOM</span><span class="link-desc">— Description</span></div>
-          <span class="arrow">↗</span>
-        </a>
+      function setFilter(f, btn) {
+        filter = f;
+        document
+          .querySelectorAll(".filters button")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        render();
+      }
 
-      AJOUTER UNE SECTION :
-      Copier un bloc <section>…</section> et changer la classe :
-        t-green   → vert        t-violet → violet
-        t-amber   → orange      t-sky    → bleu
-        t-rose    → rose        t-teal   → turquoise
+      function render() {
+        const tasks = load();
+        const list = document.getElementById("taskList");
 
-      ══════════════════════════════════════════
-    --></div>
+        const filtered = tasks.filter((t) => {
+          if (filter === "todo") return !t.done;
+          if (filter === "done") return t.done;
+          if (filter === "urgent" || filter === "normal" || filter === "later")
+            return t.priority === filter;
+          return true;
+        });
+
+        if (filtered.length === 0) {
+          list.innerHTML = '<p class="empty-msg">Rien ici pour l\'instant.</p>';
+          return;
+        }
+
+        const labels = {
+          urgent: "Urgent",
+          normal: "Normal",
+          later: "Plus tard",
+        };
+
+        list.innerHTML = filtered
+          .map(
+            (t) => `
+      <div class="task task-${t.priority} ${t.done ? "done" : ""}">
+        <div class="check" onclick="toggle(${t.id})"></div>
+        <span class="task-text">${esc(t.text)}</span>
+        <span class="task-tag">${labels[t.priority]}</span>
+        <button class="task-del" onclick="remove(${t.id})" title="Supprimer">✕</button>
+      </div>
+    `,
+          )
+          .join("");
+      }
+
+      function esc(s) {
+        const d = document.createElement("div");
+        d.textContent = s;
+        return d.innerHTML;
+      }
+
+      render();
+    </script>
   </body>
 </html>
