@@ -5,8 +5,20 @@
 Application web sans framework ni dépendance externe, conçue pour fonctionner en mode **`file://`** (ouverture directe dans le navigateur, sans serveur HTTP).
 
 Fichiers du projet :
-- `liens-utiles.html` — HTML, CSS et JavaScript principal
-- `mesLiens.js` — données par défaut de `mesLiens`, chargé via `<script src="mesLiens.js">` avant le script principal
+| Fichier | Rôle |
+|---|---|
+| `liens-utiles.html` | Structure HTML uniquement (markup + modales + balises `<script src>`) |
+| `style.css` | Tout le CSS (layout, typo, tâches, liens, thèmes, modales) |
+| `mesLiens.js` | Données par défaut (`var mesLiensDefaut`) — chargé en premier |
+| `liens.js` | Logique JS du panel mesLiens (CRUD catégories, liens, modales, mode édition) |
+| `taches.js` | Logique JS du panel mesTaches (CRUD tâches, filtres, rendu) |
+
+Ordre de chargement des scripts dans le HTML (important — dépendances) :
+```html
+<script src="mesLiens.js"></script>  <!-- déclare mesLiensDefaut -->
+<script src="liens.js"></script>     <!-- utilise mesLiensDefaut -->
+<script src="taches.js"></script>
+```
 
 Layout deux colonnes côte à côte (flex), responsive (colonne unique sous 860px) :
 - **Gauche** — `mesTaches` : gestionnaire de tâches avec priorités et filtres
