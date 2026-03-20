@@ -48,12 +48,12 @@ start index.html  # Windows
 
 ## Stack technique
 
-| Technologie | Détail |
-|---|---|
-| HTML | Structure sémantique, fichier unique |
-| CSS | Styles intégrés, aucun framework |
-| JavaScript | Vanilla, aucune bibliothèque tierce |
-| Stockage | `localStorage` du navigateur |
+| Technologie | Détail                               |
+| ----------- | ------------------------------------ |
+| HTML        | Structure sémantique, fichier unique |
+| CSS         | Styles intégrés, aucun framework     |
+| JavaScript  | Vanilla, aucune bibliothèque tierce  |
+| Stockage    | `localStorage` du navigateur         |
 
 ## Licence
 

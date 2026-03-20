@@ -477,114 +477,109 @@
           <h1>mesLiens<span class="accent">.</span></h1>
           <p class="subtitle">tout ce que je ne veux pas perdre</p>
 
-          <!-- ══ Dev & Code (vert) ══ -->
-          <section class="t-green">
-            <h2>Dev & Code</h2>
-            <div class="links">
-              <a
-                href="https://tailwindcss.com/docs"
-                target="_blank"
-                class="link"
-              >
-                <div>
-                  <span class="link-name">Tailwind CSS</span
-                  ><span class="link-desc">— Documentation officielle</span>
-                </div>
-                <span class="arrow">↗</span>
-              </a>
-
-              <a
-                href="https://developer.mozilla.org/fr/"
-                target="_blank"
-                class="link"
-              >
-                <div>
-                  <span class="link-name">MDN Web Docs</span
-                  ><span class="link-desc">— Référence HTML, CSS, JS</span>
-                </div>
-                <span class="arrow">↗</span>
-              </a>
-
-              <a href="https://github.com" target="_blank" class="link">
-                <div>
-                  <span class="link-name">GitHub</span
-                  ><span class="link-desc">— Repos, issues, PRs</span>
-                </div>
-                <span class="arrow">↗</span>
-              </a>
-            </div>
-          </section>
-
-          <!-- ══ Design (violet) ══ -->
-          <section class="t-violet">
-            <h2>Design & Inspi</h2>
-            <div class="links">
-              <a href="https://unsplash.com" target="_blank" class="link">
-                <div>
-                  <span class="link-name">Unsplash</span
-                  ><span class="link-desc">— Photos libres de droits</span>
-                </div>
-                <span class="arrow">↗</span>
-              </a>
-
-              <a href="https://dribbble.com" target="_blank" class="link">
-                <div>
-                  <span class="link-name">Dribbble</span
-                  ><span class="link-desc">— Inspiration UI/UX</span>
-                </div>
-                <span class="arrow">↗</span>
-              </a>
-            </div>
-          </section>
-
-          <!-- ══ Outils (orange) ══ -->
-          <section class="t-amber">
-            <h2>Outils</h2>
-            <div class="links">
-              <a href="https://excalidraw.com" target="_blank" class="link">
-                <div>
-                  <span class="link-name">Excalidraw</span
-                  ><span class="link-desc">— Whiteboard hand-drawn</span>
-                </div>
-                <span class="arrow">↗</span>
-              </a>
-
-              <a href="https://notion.so" target="_blank" class="link">
-                <div>
-                  <span class="link-name">Notion</span
-                  ><span class="link-desc">— Notes et docs tout-en-un</span>
-                </div>
-                <span class="arrow">↗</span>
-              </a>
-            </div>
-          </section>
-
-          <!-- ══ Veille (bleu) ══ -->
-          <section class="t-sky">
-            <h2>Veille</h2>
-            <div class="links">
-              <a
-                href="https://news.ycombinator.com"
-                target="_blank"
-                class="link"
-              >
-                <div>
-                  <span class="link-name">Hacker News</span
-                  ><span class="link-desc">— Actu tech et startups</span>
-                </div>
-                <span class="arrow">↗</span>
-              </a>
-            </div>
-          </section>
-
-          <!--
-        AJOUTER UN LIEN : copier un bloc <a class="link">…</a>
-        AJOUTER UNE SECTION : copier un <section class="t-XXX">
-        Couleurs : t-green, t-violet, t-amber, t-sky, t-rose, t-teal
-      -->
+          <div id="linksContainer"></div>
         </div>
       </div>
     </div>
+
+    <!-- ══ JS — tâches + liens ══ -->
+    <script>
+      // ── Données des liens ──────────────────────────────────────────────
+      const mesLiens = [
+        {
+          theme: "t-green",
+          titre: "Dev & Code",
+          liens: [
+            {
+              nom: "Tailwind CSS",
+              desc: "Documentation officielle",
+              url: "https://tailwindcss.com/docs",
+            },
+            {
+              nom: "MDN Web Docs",
+              desc: "Référence HTML, CSS, JS",
+              url: "https://developer.mozilla.org/fr/",
+            },
+            {
+              nom: "GitHub",
+              desc: "Repos, issues, PRs",
+              url: "https://github.com",
+            },
+          ],
+        },
+        {
+          theme: "t-violet",
+          titre: "Design & Inspi",
+          liens: [
+            {
+              nom: "Unsplash",
+              desc: "Photos libres de droits",
+              url: "https://unsplash.com",
+            },
+            {
+              nom: "Dribbble",
+              desc: "Inspiration UI/UX",
+              url: "https://dribbble.com",
+            },
+          ],
+        },
+        {
+          theme: "t-amber",
+          titre: "Outils",
+          liens: [
+            {
+              nom: "Excalidraw",
+              desc: "Whiteboard hand-drawn",
+              url: "https://excalidraw.com",
+            },
+            {
+              nom: "Notion",
+              desc: "Notes et docs tout-en-un",
+              url: "https://notion.so",
+            },
+          ],
+        },
+        {
+          theme: "t-sky",
+          titre: "Veille",
+          liens: [
+            {
+              nom: "Hacker News",
+              desc: "Actu tech et startups",
+              url: "https://news.ycombinator.com",
+            },
+          ],
+        },
+      ];
+
+      function renderLiens() {
+        const container = document.getElementById("linksContainer");
+        container.innerHTML = mesLiens
+          .map(
+            (cat) => `
+          <section class="${cat.theme}">
+            <h2>${cat.titre}</h2>
+            <div class="links">
+              ${cat.liens
+                .map(
+                  (l) => `
+              <a href="${l.url}" target="_blank" class="link">
+                <div>
+                  <span class="link-name">${l.nom}</span
+                  ><span class="link-desc">— ${l.desc}</span>
+                </div>
+                <span class="arrow">↗</span>
+              </a>`,
+                )
+                .join("")}
+            </div>
+          </section>`,
+          )
+          .join("");
+      }
+
+      renderLiens();
+    </script>
 
     <!-- ══ JS — uniquement pour les tâches ══ -->
     <script>
