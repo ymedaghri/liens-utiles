@@ -56,6 +56,7 @@
           <p class="subtitle">tout ce que je ne veux pas perdre</p>
 
           <div class="liens-toolbar">
+            <button class="btn-save" id="btnSave" onclick="enregistrerModifications()">enregistrer les modifications</button>
             <button class="btn-edit-mode" id="btnEditMode" onclick="toggleEditMode()">passer en mode édition</button>
             <button class="btn-add-cat" onclick="openModalCategorie()">+ nouvelle catégorie</button>
           </div>
@@ -145,6 +146,29 @@
         <div class="modal-actions">
           <button class="btn-cancel" onclick="fermerConfirmSupprCat()">Annuler</button>
           <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerCategorie()">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale première sauvegarde ── -->
+    <div class="modal-backdrop" id="modalPremiereSauvegarde">
+      <div class="modal">
+        <h3>Première sauvegarde</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:12px;">
+          Une boîte de dialogue va s'ouvrir pour choisir le fichier à écraser.
+        </p>
+        <p style="font-size:0.875rem;color:#292524;margin-bottom:8px;">
+          Navigue jusqu'au dossier du projet et sélectionne le fichier :
+        </p>
+        <p style="font-family:'Cascadia Code','SF Mono',Consolas,monospace;font-size:0.8rem;background:#f5f5f4;padding:8px 12px;border-radius:6px;margin-bottom:24px;color:#059669;">
+          mesLiens.js
+        </p>
+        <p style="font-size:0.8rem;color:#a8a29e;margin-bottom:24px;">
+          Cette étape n'aura lieu qu'une seule fois. Les sauvegardes suivantes seront directes.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerModalPremiereSauvegarde()">Annuler</button>
+          <button class="btn-confirm" onclick="ouvrirSelecteurFichier()">Choisir le fichier</button>
         </div>
       </div>
     </div>

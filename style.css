@@ -508,7 +508,8 @@ section {
 
 /* ── Bouton mode édition + bouton ajouter catégorie (styles communs) ── */
 .btn-add-cat,
-.btn-edit-mode {
+.btn-edit-mode,
+.btn-save {
   font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
   font-size: 0.65rem;
   letter-spacing: 0.1em;
@@ -537,6 +538,17 @@ section {
 .btn-edit-mode:hover {
   border-color: #292524;
   color: #292524;
+}
+.btn-save {
+  display: none;
+  background: #047857;
+  border: 1px solid #047857;
+  color: #fff;
+}
+.btn-save:hover {
+  background: #059669;
+  border-color: #059669;
+  color: #fff;
 }
 
 /* ── Mode édition : rendre tous les boutons d'action visibles ── */

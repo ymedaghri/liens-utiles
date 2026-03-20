@@ -13,6 +13,112 @@ function saveLiens(data) {
   localStorage.setItem(LIENS_KEY, JSON.stringify(data));
 }
 
+function checkDiff() {
+  const stored = localStorage.getItem(LIENS_KEY);
+  const areDifferent = stored !== JSON.stringify(mesLiensDefaut);
+  document.getElementById("btnSave").style.display = areDifferent
+    ? "inline-flex"
+    : "none";
+}
+
+// ── Persistance du FileSystemFileHandle via IndexedDB ────────────────
+const IDB_NAME = "liens-utiles-db";
+const IDB_STORE = "fileHandles";
+const IDB_KEY = "mesLiens";
+
+function ouvrirDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = (e) => e.target.result.createObjectStore(IDB_STORE);
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function sauvegarderHandle(handle) {
+  const db = await ouvrirDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, "readwrite");
+    tx.objectStore(IDB_STORE).put(handle, IDB_KEY);
+    tx.oncomplete = resolve;
+    tx.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function recupererHandle() {
+  const db = await ouvrirDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, "readonly");
+    const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+    req.onsuccess = (e) => resolve(e.target.result || null);
+    req.onerror = (e) => reject(e.target.error);
+  });
+}
+
+// ── Enregistrement du fichier mesLiens.js ────────────────────────────
+async function enregistrerModifications() {
+  if (!("showSaveFilePicker" in window)) {
+    console.error("File System Access API non disponible dans ce navigateur.");
+    return;
+  }
+
+  const handle = await recupererHandle();
+
+  if (!handle) {
+    document.getElementById("modalPremiereSauvegarde").classList.add("open");
+    return;
+  }
+
+  await ecrireFichier(handle);
+}
+
+function fermerModalPremiereSauvegarde() {
+  document.getElementById("modalPremiereSauvegarde").classList.remove("open");
+}
+
+async function ouvrirSelecteurFichier() {
+  fermerModalPremiereSauvegarde();
+  try {
+    const handle = await window.showSaveFilePicker({
+      suggestedName: "mesLiens.js",
+      types: [{ description: "Fichier JavaScript", accept: { "text/javascript": [".js"] } }],
+    });
+    await sauvegarderHandle(handle);
+    await ecrireFichier(handle);
+  } catch (err) {
+    if (err.name !== "AbortError") {
+      console.error("Erreur lors de la sélection du fichier :", err);
+    }
+  }
+}
+
+async function ecrireFichier(handle) {
+  try {
+    let permission = await handle.queryPermission({ mode: "readwrite" });
+    if (permission !== "granted") {
+      permission = await handle.requestPermission({ mode: "readwrite" });
+    }
+    if (permission !== "granted") {
+      console.error("Permission d'écriture refusée.");
+      return;
+    }
+    const data = loadLiens();
+    const content = "var mesLiensDefaut = " + JSON.stringify(data, null, 2) + ";\n";
+    const writable = await handle.createWritable();
+    await writable.write(content);
+    await writable.close();
+    mesLiensDefaut = data;
+    checkDiff();
+    console.log("mesLiens.js enregistré avec succès.", data);
+  } catch (err) {
+    console.error("Erreur lors de l'enregistrement :", err);
+  }
+}
+
+document.getElementById("modalPremiereSauvegarde").addEventListener("click", function (e) {
+  if (e.target === this) fermerModalPremiereSauvegarde();
+});
+
 function renderLiens() {
   const data = loadLiens();
   const container = document.getElementById("linksContainer");
@@ -48,6 +154,7 @@ function renderLiens() {
       </section>`,
     )
     .join("");
+  checkDiff();
 }
 
 if (!localStorage.getItem(LIENS_KEY)) {
@@ -82,9 +189,11 @@ function confirmerCategorie() {
   closeModalCategorie();
 }
 
-document.getElementById("modalCategorie").addEventListener("click", function (e) {
-  if (e.target === this) closeModalCategorie();
-});
+document
+  .getElementById("modalCategorie")
+  .addEventListener("click", function (e) {
+    if (e.target === this) closeModalCategorie();
+  });
 
 // ── Suppression de catégorie ─────────────────────────────────────────
 let idxCatASupprimer = null;
@@ -108,9 +217,11 @@ function supprimerCategorie() {
   fermerConfirmSupprCat();
 }
 
-document.getElementById("modalConfirmSupprCat").addEventListener("click", function (e) {
-  if (e.target === this) fermerConfirmSupprCat();
-});
+document
+  .getElementById("modalConfirmSupprCat")
+  .addEventListener("click", function (e) {
+    if (e.target === this) fermerConfirmSupprCat();
+  });
 
 // ── Ajout d'un lien dans une catégorie ──────────────────────────────
 let idxCatLien = null;
@@ -174,9 +285,11 @@ function confirmerSupprLien() {
   fermerConfirmSupprLien();
 }
 
-document.getElementById("modalConfirmSupprLien").addEventListener("click", function (e) {
-  if (e.target === this) fermerConfirmSupprLien();
-});
+document
+  .getElementById("modalConfirmSupprLien")
+  .addEventListener("click", function (e) {
+    if (e.target === this) fermerConfirmSupprLien();
+  });
 
 // ── Édition d'un lien ────────────────────────────────────────────────
 let editLienCatIdx = null;
@@ -215,14 +328,18 @@ function confirmerEditLien() {
   fermerModalEditLien();
 }
 
-document.getElementById("modalEditLien").addEventListener("click", function (e) {
-  if (e.target === this) fermerModalEditLien();
-});
+document
+  .getElementById("modalEditLien")
+  .addEventListener("click", function (e) {
+    if (e.target === this) fermerModalEditLien();
+  });
 
 // ── Mode édition ─────────────────────────────────────────────────────
 function toggleEditMode() {
   const container = document.getElementById("linksContainer");
   const btn = document.getElementById("btnEditMode");
   const actif = container.classList.toggle("edit-mode");
-  btn.textContent = actif ? "quitter le mode édition" : "passer en mode édition";
+  btn.textContent = actif
+    ? "quitter le mode édition"
+    : "passer en mode édition";
 }
