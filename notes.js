@@ -142,7 +142,9 @@ function renderNotes() {
         } else if (bloc.type === "p") {
           inner = "<p>" + esc(bloc.content) + "</p>";
         } else if (bloc.type === "pre") {
-          inner = "<pre>" + esc(bloc.content) + "</pre>";
+          inner = '<div class="pre-wrapper"><pre>' + esc(bloc.content) + '</pre>'
+            + '<button class="btn-copy-pre" onclick="copierBloc(this)">copier</button>'
+            + '</div>';
         } else if (bloc.type === "ul") {
           inner = "<ul>" + bloc.items.map(function(i) {
             return "<li>" + esc(i) + "</li>";
@@ -337,6 +339,19 @@ function supprimerBloc() {
   saveNotes(notes);
   fermerConfirmSupprBloc();
   renderNotes();
+}
+
+// ── Copier un bloc pre ──
+function copierBloc(btn) {
+  var content = btn.closest(".pre-wrapper").querySelector("pre").textContent;
+  navigator.clipboard.writeText(content).then(function() {
+    btn.textContent = "copié ✓";
+    btn.classList.add("copied");
+    setTimeout(function() {
+      btn.textContent = "copier";
+      btn.classList.remove("copied");
+    }, 1500);
+  });
 }
 
 // ── Init ──

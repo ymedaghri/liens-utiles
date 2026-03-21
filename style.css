@@ -892,6 +892,39 @@ section {
   border-bottom-color: #ccfbf1;
 }
 
+/* ── Bouton copier dans les blocs pre ── */
+.pre-wrapper {
+  position: relative;
+}
+.btn-copy-pre {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  color: #78716c;
+  opacity: 0;
+  transition:
+    opacity 0.15s,
+    background 0.15s,
+    color 0.15s;
+}
+.pre-wrapper:hover .btn-copy-pre {
+  opacity: 1;
+}
+.btn-copy-pre:hover {
+  background: rgba(0, 0, 0, 0.12);
+  color: #292524;
+}
+.btn-copy-pre.copied {
+  background: #d1fae5;
+  color: #047857;
+}
+
 /* Textarea dans les modales */
 .modal textarea {
   width: 100%;
