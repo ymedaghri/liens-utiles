@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="diag_page_title">Diagrammes</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="diagram-page">
+
+    <!-- Bouton retour — fixe en haut à droite (comme ⚙ sur index.html) -->
+    <a href="index.html" class="diagram-topbar-back" title="Retour">←</a>
+
+    <!-- Barre d'outils -->
+    <div class="diagram-topbar">
+
+      <!-- ☰ Liste des diagrammes — premier à gauche -->
+      <button class="diagram-tool" onclick="toggleDiagramList()" data-i18n-title="diag_my_diagrams">☰</button>
+      <span class="diagram-sep">|</span>
+
+      <!-- Outils formes -->
+      <button class="diagram-tool active" id="toolSelect" onclick="setTool('select')" data-i18n-title="diag_tool_select">
+        <svg width="12" height="14" viewBox="0 0 12 14" fill="currentColor" stroke="none">
+          <path d="M1 1 L1 13 L4.5 9.5 L7 14 L9 13 L6.5 8.5 L11 8.5 Z"/>
+        </svg>
+      </button>
+      <button class="diagram-tool" id="toolRect" onclick="setTool('rect')" data-i18n-title="diag_tool_rect">
+        <svg width="18" height="11" viewBox="0 0 18 11" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="1" width="16" height="9" rx="1"/>
+        </svg>
+      </button>
+      <button class="diagram-tool" id="toolRounded" onclick="setTool('rounded')" data-i18n-title="diag_tool_rounded">
+        <svg width="18" height="11" viewBox="0 0 18 11" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="1" width="16" height="9" rx="4.5"/>
+        </svg>
+      </button>
+      <button class="diagram-tool" id="toolDb" onclick="setTool('db')" data-i18n-title="diag_tool_db">
+        <svg width="14" height="17" viewBox="0 0 14 17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <ellipse cx="7" cy="3.5" rx="5.5" ry="2.5"/>
+          <path d="M1.5 3.5v10c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5V3.5"/>
+          <path d="M12.5 8.5c0 1.4-2.5 2.5-5.5 2.5S1.5 9.9 1.5 8.5"/>
+        </svg>
+      </button>
+      <button class="diagram-tool" id="toolCloud" onclick="setTool('cloud')" data-i18n-title="diag_tool_cloud">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3,2">
+          <ellipse cx="9" cy="6" rx="8" ry="5"/>
+        </svg>
+      </button>
+      <button class="diagram-tool" id="toolText" onclick="setTool('text')" data-i18n-title="diag_tool_text">T</button>
+      <span class="diagram-sep">|</span>
+
+      <!-- Outil flèche -->
+      <button class="diagram-tool" id="toolArrow" onclick="setTool('arrow')" data-i18n-title="diag_tool_arrow">→</button>
+      <span class="diagram-sep">|</span>
+
+      <!-- Supprimer -->
+      <button class="diagram-tool" id="btnDelSelected" onclick="deleteSelected()" data-i18n-title="diag_tool_delete">✕</button>
+      <span class="diagram-sep">|</span>
+
+      <!-- Titre (prend l'espace restant) -->
+      <input type="text" id="diagramTitle" class="diagram-title-input" />
+
+      <span class="diagram-sep">|</span>
+
+      <!-- Zoom -->
+      <button class="diagram-tool" onclick="zoomOut()" title="−">−</button>
+      <span id="zoomLevel" class="zoom-level">100%</span>
+      <button class="diagram-tool" onclick="zoomIn()" title="+">+</button>
+      <button class="diagram-tool" onclick="resetZoom()" title="⊡">⊡</button>
+      <span class="diagram-sep">|</span>
+
+      <!-- Enregistrer -->
+      <button class="btn-save diagram-btn-save" id="btnSaveDiagram" style="display:none" onclick="enregistrerDiagrammes()" data-i18n="diag_btn_save">enregistrer</button>
+    </div>
+
+    <!-- Panneau liste des diagrammes -->
+    <div id="diagramListPanel" class="diagram-list-panel">
+      <div class="diagram-list-header">
+        <span data-i18n="diag_my_diagrams">Mes diagrammes</span>
+        <button onclick="creerDiagramme()" data-i18n="diag_btn_new">+ Nouveau</button>
+      </div>
+      <div id="diagramList"></div>
+    </div>
+
+    <!-- Palette de couleurs (visible quand forme sélectionnée) -->
+    <div id="colorPanel" class="diagram-color-panel" style="display:none">
+      <button class="color-dot t-green"  onclick="setShapeColor('t-green')"></button>
+      <button class="color-dot t-violet" onclick="setShapeColor('t-violet')"></button>
+      <button class="color-dot t-amber"  onclick="setShapeColor('t-amber')"></button>
+      <button class="color-dot t-sky"    onclick="setShapeColor('t-sky')"></button>
+      <button class="color-dot t-rose"   onclick="setShapeColor('t-rose')"></button>
+      <button class="color-dot t-teal"   onclick="setShapeColor('t-teal')"></button>
+      <span style="width:1px;background:#e7e5e4;margin:0 4px;align-self:stretch;"></span>
+      <button class="diagram-color-edit" onclick="startTextEdit(selectedId)" data-i18n-title="diag_edit_text">✎</button>
+    </div>
+
+    <!-- Canvas SVG -->
+    <svg id="canvas" class="diagram-canvas">
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#a8a29e" />
+        </marker>
+        <marker id="arrowhead-sel" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#f97316" />
+        </marker>
+      </defs>
+      <g id="viewport">
+        <g id="arrowsLayer"></g>
+        <g id="shapesLayer"></g>
+        <line id="tempArrow" style="display:none" stroke="#f97316" stroke-width="1.5"
+              stroke-dasharray="6,4" marker-end="url(#arrowhead-sel)" />
+      </g>
+    </svg>
+
+    <!-- Éditeur de texte inline -->
+    <div id="textOverlay" style="display:none;position:fixed;inset:0;z-index:200;pointer-events:none;">
+      <input id="shapeTextInput" type="text" style="position:absolute;pointer-events:auto;
+             background:rgba(255,255,255,0.92);border:1.5px solid #f97316;border-radius:5px;
+             outline:none;text-align:center;font-family:'Segoe UI',system-ui,sans-serif;
+             font-weight:600;padding:2px 6px;" />
+    </div>
+
+    <!-- Modale première sauvegarde -->
+    <div class="modal-backdrop" id="modalPremiereSauvegardeDiag">
+      <div class="modal">
+        <h3 data-i18n="modal_first_save_title">Première sauvegarde</h3>
+        <p style="font-size:.875rem;color:#78716c;margin-bottom:12px;" data-i18n="modal_first_save_intro">
+          Une boîte de dialogue va s'ouvrir pour sélectionner le dossier du projet.
+        </p>
+        <p style="font-size:.875rem;color:#292524;margin-bottom:8px;" data-i18n="modal_first_save_navigate">
+          Navigue jusqu'au dossier contenant le fichier :
+        </p>
+        <p style="font-family:'Cascadia Code',monospace;font-size:.8rem;background:#f5f5f4;padding:8px 12px;border-radius:6px;margin-bottom:24px;color:#059669;">
+          diagrammes.js
+        </p>
+        <p style="font-size:.8rem;color:#a8a29e;margin-bottom:24px;" data-i18n="modal_first_save_once">
+          Cette étape n'aura lieu qu'une seule fois.
+        </p>
+        <p id="erreurFichierDiag" style="display:none;font-size:.8rem;color:#ef4444;background:#fef2f2;padding:8px 12px;border-radius:6px;margin-bottom:16px;" data-i18n-html="diag_first_save_error">
+          Fichier introuvable. Sélectionne le dossier contenant <strong>diagrammes.js</strong>.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerModalSauvegardeDiag()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="ouvrirSelecteurFichierDiag()" data-i18n="modal_first_save_btn_choose">Choisir le dossier</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="i18n/fr.js"></script>
+    <script src="i18n/en.js"></script>
+    <script src="i18n/i18n.js"></script>
+    <script src="diagrammes.js"></script>
+    <script src="diagram.js"></script>
+  </body>
+</html>

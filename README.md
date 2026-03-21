@@ -15,15 +15,17 @@ This is one of the dashboard's greatest strengths. Here is why it poses **no ris
 | Installation     | **None** — no executable, no package manager, no admin rights                 |
 | Auditable code   | **Yes** — a handful of readable files, nothing minified or obfuscated         |
 
-> **In practice**: you can open this on an air-gapped machine, inside a network with no internet access, or in a strict security environment (IT departments, defence, finance, healthcare…). It makes no outbound connections, loads nothing from the outside, and stores your data only where you choose.
+> **In practice**: you can open this on any machine without internet access, or in any environment where installing tools or reaching external services is not possible. It makes no outbound connections, loads nothing from the outside, and stores your data only where you choose.
 
 ---
 
 ![Dashboard preview](mon_dashboard.png)
 
+![Diagraming preview](mes_diagrammes.png)
+
 ## Why this project?
 
-Some work environments are **highly restricted**: no access to the usual task-tracking tools, no CDN, no way to install anything.
+Some environments have **no internet access** or don't allow installing tools: no task-tracking software, no CDN, nothing from the outside.
 
 Yet your productivity depends on your ability to **log your tasks**, your **notes** and your **useful links** somewhere — and find them again each morning.
 
@@ -62,6 +64,19 @@ Your links organised by category, accessible in one click.
 - Customisable categories with a colour of your choice
 - Displayed with name and description
 - Add, edit and delete in edit mode
+
+### myDiagrams. — Diagram editor
+
+A lightweight SVG diagram editor accessible via the diagram icon (top-right of the dashboard).
+
+- Five shape types: **Rectangle**, **Rounded rectangle**, **Database** (cylinder), **Cloud** (external service), **Free text**
+- Draw **arrows** between shapes by clicking source → target, or by dragging from a connection dot
+- **Double-click** on any shape (or use the ✎ button) to edit its label inline
+- **Colour** each shape with the six theme colours
+- **Resize** shapes by dragging the bottom-right handle
+- **Pan** by dragging on the canvas background; **zoom** with the mouse wheel or toolbar buttons
+- Manage multiple diagrams from the ☰ panel
+- Saves directly to `diagrammes.js` on disk (same File System Access API mechanism as notes and links)
 
 ---
 
@@ -115,6 +130,9 @@ Creates a `doc-survival-kit/` folder in the current directory and opens the appl
 
 - `index.html`
 - `admin.html`
+- `diagram.html`
+- `diagram.js`
+- `diagrammes.js`
 - `liens.js`
 - `mesLiens.js`
 - `mesNotes.js`

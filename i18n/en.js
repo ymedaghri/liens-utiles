@@ -136,6 +136,23 @@ var i18n_en = {
   // Modal confirm delete block
   modal_suppr_bloc_title: "Delete this block?",
 
+  // Diagrams
+  diag_page_title: "Diagrams",
+  diag_btn_save: "save",
+  diag_btn_new: "+ New",
+  diag_my_diagrams: "My diagrams",
+  diag_new_diagram: "New diagram",
+  diag_tool_select:  "Select / Move",
+  diag_tool_rect:    "Rectangle",
+  diag_tool_rounded: "Rounded rectangle",
+  diag_tool_db:      "Database",
+  diag_tool_cloud:   "External service / Cloud",
+  diag_tool_text:    "Free text",
+  diag_tool_arrow:   "Arrow (click source → click target, or drag from a connection dot)",
+  diag_tool_delete:  "Delete selection (Del)",
+  diag_first_save_error: "File not found. Select the folder containing <strong>diagrammes.js</strong>.",
+  diag_edit_text: "Edit text",
+
   // Admin
   admin_subtitle: "data reset",
   admin_why_title: "Why this page?",

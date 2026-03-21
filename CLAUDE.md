@@ -7,14 +7,17 @@ Application web sans framework ni dépendance externe, conçue pour fonctionner 
 Fichiers du projet :
 | Fichier | Rôle |
 |---|---|
-| `index.html` | Structure HTML uniquement (markup + modales + balises `<script src>`) — contient le bouton `.btn-admin` (⚙) liant vers `admin.html` |
+| `index.html` | Structure HTML uniquement (markup + modales + balises `<script src>`) — contient le bouton `.btn-admin` (⚙) liant vers `admin.html` et le bouton `.btn-diagram` liant vers `diagram.html` |
 | `admin.html` | Page d'administration : sélecteur de langue, réinitialisation localStorage et IndexedDB — styles inline, JS inline, lien retour vers `index.html` |
-| `style.css` | Tout le CSS (layout, typo, tâches, liens, notes, thèmes, modales, `.btn-admin`) |
+| `diagram.html` | Éditeur de diagrammes SVG — barre d'outils, canvas SVG, panel liste des diagrammes, palette couleurs, modale première sauvegarde |
+| `style.css` | Tout le CSS (layout, typo, tâches, liens, notes, thèmes, modales, `.btn-admin`, `.btn-diagram`, page diagrammes) |
 | `mesLiens.js` | Données par défaut (`var mesLiensDefaut`) — chargé avant `liens.js` |
 | `mesNotes.js` | Données par défaut (`var mesNotesDefaut`) — chargé avant `notes.js` |
+| `diagrammes.js` | Données par défaut (`var diagrammesDefaut`) — chargé avant `diagram.js` |
 | `liens.js` | Logique JS du panel mesLiens (CRUD catégories, liens, modales, mode édition, sauvegarde fichier) |
 | `taches.js` | Logique JS du panel mesTaches (CRUD tâches, filtres, rendu) |
 | `notes.js` | Logique JS du panel mesNotes (CRUD notes, blocs, modales, mode édition, sauvegarde fichier) |
+| `diagram.js` | Logique JS de l'éditeur de diagrammes (CRUD formes, flèches, pan/zoom, édition texte, sauvegarde fichier) |
 | `i18n/fr.js` | Traductions françaises — déclare `var i18n_fr = {...}` |
 | `i18n/en.js` | Traductions anglaises — déclare `var i18n_en = {...}` |
 | `i18n/i18n.js` | Moteur i18n — lit `localStorage["lang"]`, expose `window.t` et `applyI18n()` |
@@ -248,6 +251,7 @@ Apparaissent dans leur toolbar respective quand le localStorage diffère des don
 - Le `FileSystemFileHandle` est persisté en **IndexedDB** (base `doc-survival-kit-db` / store `fileHandles`)
   - clé `"mesLiens"` pour `mesLiens.js`
   - clé `"mesNotes"` pour `mesNotes.js`
+  - clé `"diagrammes"` pour `diagrammes.js`
 - **1ère utilisation** : modale d'instruction → `showDirectoryPicker()` (l'utilisateur sélectionne le **dossier** du projet) → `dirHandle.getFileHandle("mesLiens.js")` récupère le fichier par nom → handle sauvegardé en IndexedDB
 - **Sécurité** : on ne manipule jamais directement un fichier via le sélecteur — le fichier cible est obtenu programmatiquement par son nom depuis le dossier. Si le fichier est absent du dossier sélectionné (`NotFoundError`), la modale se ré-ouvre avec un message d'erreur rouge. Aucun fichier n'est écrasé accidentellement.
 - **Utilisations suivantes** : sauvegarde directe sans dialogue (handle récupéré depuis IndexedDB, permission vérifiée/redemandée si nécessaire)
@@ -345,7 +349,7 @@ Pour les éléments dont le contenu est généré dynamiquement par JS (`render(
 
 ### Règle de nommage des clés
 
-Préfixe par domaine : `taches_*`, `notes_*`, `liens_*`, `modal_cat_*`, `modal_lien_*`, `modal_note_*`, `modal_bloc_*`, `modal_first_save_*`, `modal_suppr_*`, `admin_*`, `panel_*`.
+Préfixe par domaine : `taches_*`, `notes_*`, `liens_*`, `modal_cat_*`, `modal_lien_*`, `modal_note_*`, `modal_bloc_*`, `modal_first_save_*`, `modal_suppr_*`, `admin_*`, `panel_*`, `diag_*`.
 
 ### Conflit de nommage important
 
@@ -358,6 +362,136 @@ Dans `taches.js`, la variable locale `t` est utilisée comme paramètre dans les
 3. Mettre à jour `i18n/i18n.js` pour reconnaître la nouvelle valeur de `lang`
 4. Ajouter le bouton dans `admin.html`
 5. Ajouter le fichier dans `bin/cli.js` (`I18N_FILES`) et `package.json` (`files`)
+
+---
+
+## Éditeur de diagrammes (`diagram.html` / `diagram.js`)
+
+Page séparée accessible via le bouton `.btn-diagram` (icône SVG, `position: fixed; top: 16px; right: 64px` sur `index.html`, à gauche du bouton ⚙).
+
+### Fichiers
+
+| Fichier | Rôle |
+|---|---|
+| `diagram.html` | Structure HTML : barre d'outils, canvas SVG, panneau liste, palette couleurs, modale première sauvegarde |
+| `diagram.js` | Toute la logique : rendu SVG, interactions souris, pan/zoom, édition texte, persistance |
+| `diagrammes.js` | Données par défaut — déclare `var diagrammesDefaut` (tableau de diagrammes) |
+
+Ordre de chargement dans `diagram.html` :
+```html
+<script src="i18n/fr.js"></script>
+<script src="i18n/en.js"></script>
+<script src="i18n/i18n.js"></script>
+<script src="diagrammes.js"></script>  <!-- déclare diagrammesDefaut -->
+<script src="diagram.js"></script>
+```
+
+### Persistance
+
+Stocké dans `localStorage` sous la clé `"mes_diagrammes"`.
+Sauvegarde dans `diagrammes.js` via la File System Access API (même mécanisme que `mesLiens.js` / `mesNotes.js`).
+Clé IndexedDB : `"diagrammes"` (base `doc-survival-kit-db` / store `fileHandles`).
+
+### Structure des données
+
+```json
+[
+  {
+    "id": 1700000000000,
+    "titre": "Nom du diagramme",
+    "shapes": [
+      { "id": "s1", "type": "rect",    "x": 100, "y": 80,  "w": 120, "h": 50, "label": "Texte", "color": "t-sky" },
+      { "id": "s2", "type": "rounded", "x": 300, "y": 80,  "w": 120, "h": 50, "label": "Texte", "color": "t-green" },
+      { "id": "s3", "type": "db",      "x": 100, "y": 200, "w": 80,  "h": 60, "label": "DB",    "color": "t-violet" },
+      { "id": "s4", "type": "cloud",   "x": 300, "y": 200, "w": 100, "h": 60, "label": "API",   "color": "t-amber" },
+      { "id": "s5", "type": "text",    "x": 200, "y": 300, "w": 0,   "h": 0,  "label": "Note",  "color": "" }
+    ],
+    "arrows": [
+      { "id": "a1", "src": "s1", "tgt": "s2", "label": "" }
+    ]
+  }
+]
+```
+
+### Types de formes
+
+| Type | Rendu SVG | Taille par défaut |
+|---|---|---|
+| `rect` | Rectangle avec coins légèrement arrondis (`rx=4`) | 120 × 50 |
+| `rounded` | Rectangle très arrondi (`rx=22`) | 120 × 50 |
+| `db` | Cylindre (ellipse + corps + ellipse centrale) | 80 × 60 |
+| `cloud` | Ellipse en tirets | 100 × 60 |
+| `text` | Texte seul, sans fond | 0 × 0 |
+
+Toutes les formes ont : fond coloré (classe CSS du thème), trait `#a8a29e`, texte centré, 4 points de connexion (conn-dots), 1 poignée de redimensionnement (coin bas-droit).
+
+### Interactions
+
+| Action | Geste |
+|---|---|
+| Sélectionner / déplacer | Outil `select` + clic/drag sur une forme |
+| Créer une forme | Outil `rect`/`rounded`/`db`/`cloud`/`text` + clic sur le canvas |
+| Créer une flèche | Outil `arrow` + clic source → clic cible, **ou** drag depuis un conn-dot (tout outil) |
+| Éditer le texte | Double-clic sur une forme **ou** bouton ✎ de la palette couleurs (forme sélectionnée) |
+| Changer la couleur | Palette couleurs (visible quand une forme est sélectionnée) |
+| Redimensionner | Drag de la poignée bas-droit (carré orange) |
+| Supprimer | Outil ✕ ou touche `Del` |
+| Pan | Drag sur le canvas vide (tout outil) |
+| Zoom | Molette souris (centré sur le curseur) ou boutons `−` / `+` / `⊡` |
+
+### Double-clic — implémentation
+
+Le `dblclick` natif ne fonctionne pas sur les formes SVG car `renderAll()` remplace les éléments DOM entre les deux clics, détachant la cible. Solution : détection manuelle par timestamp dans `onMouseDown` :
+
+```js
+var now = Date.now();
+if (now - lastClickTime < 350 && lastClickShapeId === shape.id) {
+  lastClickTime = 0; lastClickShapeId = null;
+  startTextEdit(shape.id);
+  return;
+}
+lastClickTime = now; lastClickShapeId = shape.id;
+```
+
+`input.focus()` est différé via `setTimeout(..., 10)` pour éviter que le blur sur le mouseup ne ferme immédiatement l'overlay.
+
+### Fonctions JS clés (`diagram.js`)
+
+| Fonction | Rôle |
+|---|---|
+| `svgPoint(clientX, clientY)` | Convertit coordonnées écran → SVG (tient compte du pan/zoom) |
+| `renderShape(shape)` | Crée le groupe SVG d'une forme (fond, texte, conn-dots, resize grip) |
+| `renderArrow(arrow, shapes)` | Crée le groupe SVG d'une flèche (ligne + zone de clic + marqueur) |
+| `getEdgePoint(shape, tx, ty)` | Calcule le point de sortie sur le bord d'une forme selon l'angle vers la cible |
+| `renderAll()` | Re-rendu complet du canvas SVG |
+| `shapeAt(x, y)` | Hit-test par bounding box — retourne la forme sous le curseur |
+| `arrowIdAt(x, y)` | Hit-test par distance au segment — retourne l'id de la flèche sous le curseur |
+| `setTool(name)` | Change l'outil actif, met à jour les classes CSS des boutons |
+| `setShapeColor(color)` | Applique une classe de thème à la forme sélectionnée |
+| `deleteSelected()` | Supprime la forme ou la flèche sélectionnée |
+| `startTextEdit(shapeId)` | Positionne l'overlay `#shapeTextInput` sur la forme et lui donne le focus |
+| `confirmTextEdit()` | Sauvegarde le texte saisi et masque l'overlay |
+| `creerDiagramme()` | Ajoute un nouveau diagramme vide et le sélectionne |
+| `toggleDiagramList()` | Affiche / masque le panneau liste des diagrammes |
+| `enregistrerDiagrammes()` | Sauvegarde dans `diagrammes.js` via File System Access API |
+| `zoomIn()` / `zoomOut()` / `resetZoom()` | Contrôle du zoom |
+| `onMouseDown(e)` | Gestionnaire principal : conn-dot drag, resize, sélection/déplacement, outil arrow, placement forme, détection double-clic |
+| `onMouseMove(e)` | Déplacement/redimensionnement en cours, pan, flèche temporaire |
+| `onMouseUp(e)` | Finalise drag, connexion flèche |
+| `onWheel(e)` | Zoom centré sur le curseur |
+
+### État global (`diagram.js`)
+
+| Variable | Rôle |
+|---|---|
+| `currentTool` | Outil actif (`"select"`, `"rect"`, `"rounded"`, `"db"`, `"cloud"`, `"text"`, `"arrow"`) |
+| `diagramsList` | Tableau des diagrammes en mémoire |
+| `currentDiagramIdx` | Index du diagramme affiché |
+| `viewTransform` | `{ x, y, scale }` — état du pan/zoom |
+| `selectedId` / `selectedType` | Id et type (`"shape"` ou `"arrow"`) de l'élément sélectionné |
+| `dragState` | État du drag en cours (`null` ou objet de contexte) |
+| `arrowSrcId` | Id de la forme source lors du dessin d'une flèche (outil arrow) |
+| `lastClickTime` / `lastClickShapeId` | Détection du double-clic manuel |
 
 ---
 

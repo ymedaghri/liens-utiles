@@ -136,6 +136,23 @@ var i18n_fr = {
   // Modal confirm suppr bloc
   modal_suppr_bloc_title: "Supprimer le bloc ?",
 
+  // Diagrammes
+  diag_page_title: "Diagrammes",
+  diag_btn_save: "enregistrer",
+  diag_btn_new: "+ Nouveau",
+  diag_my_diagrams: "Mes diagrammes",
+  diag_new_diagram: "Nouveau diagramme",
+  diag_tool_select:  "Sélectionner / Déplacer",
+  diag_tool_rect:    "Rectangle",
+  diag_tool_rounded: "Rectangle arrondi",
+  diag_tool_db:      "Base de données",
+  diag_tool_cloud:   "Service externe / Cloud",
+  diag_tool_text:    "Texte libre",
+  diag_tool_arrow:   "Flèche (clic source → clic cible, ou drag depuis un point de connexion)",
+  diag_tool_delete:  "Supprimer la sélection (Del)",
+  diag_first_save_error: "Fichier introuvable. Sélectionne le dossier contenant <strong>diagrammes.js</strong>.",
+  diag_edit_text: "Modifier le texte",
+
   // Admin
   admin_subtitle: "réinitialisation des données",
   admin_why_title: "Pourquoi cette page ?",

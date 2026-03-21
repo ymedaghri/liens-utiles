@@ -9,12 +9,14 @@ const SRC_DIR = path.join(__dirname, "..");
 const APP_FILES = [
   "index.html",
   "admin.html",
+  "diagram.html",
   "style.css",
   "liens.js",
   "taches.js",
   "notes.js",
+  "diagram.js",
 ];
-const DATA_FILES = ["mesLiens.js", "mesNotes.js"];
+const DATA_FILES = ["mesLiens.js", "mesNotes.js", "diagrammes.js"];
 const I18N_FILES = ["i18n/fr.js", "i18n/en.js", "i18n/i18n.js"];
 
 function openBrowser(filePath) {
