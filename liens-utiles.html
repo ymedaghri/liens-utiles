@@ -264,6 +264,7 @@
           <option value="ul">Liste à puces</option>
         </select>
         <label for="blocContent">Contenu</label>
+        <input type="text" id="blocContentInput" placeholder="Texte…" onkeydown="if(event.key==='Enter') confirmerBloc();" />
         <textarea id="blocContent" rows="6" placeholder="Texte…"></textarea>
         <div class="modal-actions">
           <button class="btn-cancel" onclick="fermerModalBloc()">Annuler</button>

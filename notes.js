@@ -259,10 +259,14 @@ function supprimerNote() {
 function updateBlocPlaceholder() {
   var type = document.getElementById("blocType").value;
   var ta = document.getElementById("blocContent");
+  var inp = document.getElementById("blocContentInput");
+  var useInput = (type === "b" || type === "p");
+  inp.style.display = useInput ? "" : "none";
+  ta.style.display = useInput ? "none" : "";
   if (type === "ul") ta.placeholder = "Un élément par ligne…";
   else if (type === "pre") ta.placeholder = "Code…";
-  else if (type === "b") ta.placeholder = "Titre…";
-  else ta.placeholder = "Texte…";
+  else if (type === "b") inp.placeholder = "Titre…";
+  else inp.placeholder = "Texte…";
 }
 
 function ouvrirModalBloc(noteIdx) {
@@ -271,9 +275,10 @@ function ouvrirModalBloc(noteIdx) {
   document.getElementById("modalBlocTitre").textContent = "Nouveau bloc";
   document.getElementById("blocType").value = "p";
   document.getElementById("blocContent").value = "";
+  document.getElementById("blocContentInput").value = "";
   updateBlocPlaceholder();
   document.getElementById("modalBloc").classList.add("open");
-  setTimeout(function() { document.getElementById("blocContent").focus(); }, 50);
+  setTimeout(function() { document.getElementById("blocContentInput").focus(); }, 50);
 }
 
 function ouvrirModalEditBloc(noteIdx, blocIdx) {
@@ -282,12 +287,14 @@ function ouvrirModalEditBloc(noteIdx, blocIdx) {
   var bloc = loadNotes()[noteIdx].blocs[blocIdx];
   document.getElementById("modalBlocTitre").textContent = "Modifier le bloc";
   document.getElementById("blocType").value = bloc.type;
-  document.getElementById("blocContent").value = bloc.type === "ul"
-    ? bloc.items.join("\n")
-    : bloc.content;
+  var useInput = (bloc.type === "b" || bloc.type === "p");
+  document.getElementById("blocContentInput").value = useInput ? bloc.content : "";
+  document.getElementById("blocContent").value = useInput ? "" : (bloc.type === "ul" ? bloc.items.join("\n") : bloc.content);
   updateBlocPlaceholder();
   document.getElementById("modalBloc").classList.add("open");
-  setTimeout(function() { document.getElementById("blocContent").focus(); }, 50);
+  setTimeout(function() {
+    document.getElementById(useInput ? "blocContentInput" : "blocContent").focus();
+  }, 50);
 }
 
 function fermerModalBloc() {
@@ -298,7 +305,8 @@ function fermerModalBloc() {
 
 function confirmerBloc() {
   var type = document.getElementById("blocType").value;
-  var raw = document.getElementById("blocContent").value;
+  var useInput = (type === "b" || type === "p");
+  var raw = document.getElementById(useInput ? "blocContentInput" : "blocContent").value;
   if (!raw.trim()) return;
   var bloc;
   if (type === "ul") {
