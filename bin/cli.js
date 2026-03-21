@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { exec } = require("child_process");
 
-const DEST_DIR = path.join(process.cwd(), "kit-doc-survie");
+const DEST_DIR = path.join(process.cwd(), "doc-survival-kit");
 const SRC_DIR = path.join(__dirname, "..");
 const APP_FILES = [
   "index.html",
@@ -15,6 +15,7 @@ const APP_FILES = [
   "notes.js",
 ];
 const DATA_FILES = ["mesLiens.js", "mesNotes.js"];
+const I18N_FILES = ["i18n/fr.js", "i18n/en.js", "i18n/i18n.js"];
 
 function openBrowser(filePath) {
   const url = "file://" + filePath;
@@ -35,7 +36,7 @@ function openBrowser(filePath) {
 const htmlFile = path.join(DEST_DIR, "index.html");
 
 if (fs.existsSync(DEST_DIR)) {
-  console.log("Le dossier kit-doc-survie existe déjà.");
+  console.log("Le dossier doc-survival-kit existe déjà.");
   console.log("Ouverture de l'application...");
   openBrowser(htmlFile);
 } else {
@@ -46,12 +47,18 @@ if (fs.existsSync(DEST_DIR)) {
     fs.copyFileSync(path.join(SRC_DIR, file), path.join(DEST_DIR, file));
   }
 
+  // Fichiers i18n (toujours copiés)
+  fs.mkdirSync(path.join(DEST_DIR, "i18n"), { recursive: true });
+  for (const file of I18N_FILES) {
+    fs.copyFileSync(path.join(SRC_DIR, file), path.join(DEST_DIR, file));
+  }
+
   // Fichiers de données (copiés seulement à la création)
   for (const file of DATA_FILES) {
     fs.copyFileSync(path.join(SRC_DIR, file), path.join(DEST_DIR, file));
   }
 
-  console.log("kit-doc-survie créé dans : " + DEST_DIR);
+  console.log("doc-survival-kit créé dans : " + DEST_DIR);
   console.log("");
   console.log("Note : tes données sont sauvegardées dans ce dossier.");
   console.log("       Ouvre toujours le fichier depuis ce même dossier.");

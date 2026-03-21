@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Administration — kit-doc-survie</title>
+    <title data-i18n="page_title_admin">
+      Administration — doc-survival-kit
+    </title>
     <link rel="stylesheet" href="style.css" />
     <style>
       .admin-shell {
@@ -35,6 +37,44 @@
         background: #292524;
         color: #fff;
         border-color: #292524;
+      }
+      .admin-lang-section {
+        margin-bottom: 36px;
+      }
+      .admin-lang-section h2 {
+        font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #a8a29e;
+        margin-bottom: 12px;
+      }
+      .admin-lang-options {
+        display: flex;
+        gap: 8px;
+      }
+      .btn-lang {
+        font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        padding: 8px 20px;
+        border-radius: 8px;
+        border: 1px solid #e7e5e4;
+        background: #fff;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          border-color 0.15s,
+          color 0.15s;
+      }
+      .btn-lang:hover {
+        border-color: #f97316;
+        background: #fff7ed;
+      }
+      .btn-lang.active {
+        background: #f97316;
+        color: #fff;
+        border-color: #f97316;
       }
       .admin-intro {
         background: #fff7ed;
@@ -151,25 +191,40 @@
 
     <div class="admin-shell">
       <h1>admin<span class="accent">.</span></h1>
-      <p class="subtitle">réinitialisation des données</p>
+      <p class="subtitle" data-i18n="admin_subtitle">
+        réinitialisation des données
+      </p>
+
+      <!-- ── Sélecteur de langue ── -->
+      <div class="admin-lang-section">
+        <h2 data-i18n="admin_lang_title">Langue / Language</h2>
+        <div class="admin-lang-options">
+          <button class="btn-lang" id="btnLangFr" onclick="setLang('fr')">
+            Français
+          </button>
+          <button class="btn-lang" id="btnLangEn" onclick="setLang('en')">
+            English
+          </button>
+        </div>
+      </div>
 
       <div class="admin-intro">
-        <h2>Pourquoi cette page ?</h2>
-        <p>
+        <h2 data-i18n="admin_why_title">Pourquoi cette page ?</h2>
+        <p data-i18n-html="admin_why_p1">
           L'application stocke tes données à deux endroits dans ton navigateur :
           le <strong>localStorage</strong> (tâches, notes, liens) et l'<strong
             >IndexedDB</strong
           >
           (le handle du fichier pour la sauvegarde directe).
         </p>
-        <p>
+        <p data-i18n-html="admin_why_p2">
           Ces données <strong>ne sont pas supprimées</strong> en vidant le cache
           classique ou en fermant le navigateur. Cette page te permet de les
           effacer proprement, par exemple pour repartir d'une installation
           vierge ou résoudre un problème de synchronisation entre le fichier et
           le navigateur.
         </p>
-        <p>
+        <p data-i18n-html="admin_why_p3">
           <strong>Attention :</strong> ces actions sont irréversibles. Si tu
           n'as pas sauvegardé tes modifications dans les fichiers
           <code>mesLiens.js</code> et <code>mesNotes.js</code>, tes données
@@ -181,8 +236,8 @@
         <label class="admin-check-label">
           <input type="checkbox" id="checkLocalStorage" />
           <div class="admin-check-text">
-            <strong>Effacer le localStorage</strong>
-            <span
+            <strong data-i18n="admin_ls_label">Effacer le localStorage</strong>
+            <span data-i18n-html="admin_ls_desc"
               >Supprime toutes les tâches, notes et liens mémorisés dans le
               navigateur. Au prochain chargement, l'application repart des
               données par défaut contenues dans <code>mesLiens.js</code> et
@@ -194,8 +249,8 @@
         <label class="admin-check-label">
           <input type="checkbox" id="checkIndexedDB" />
           <div class="admin-check-text">
-            <strong>Supprimer l'IndexedDB</strong>
-            <span
+            <strong data-i18n="admin_idb_label">Supprimer l'IndexedDB</strong>
+            <span data-i18n="admin_idb_desc"
               >Efface le handle de fichier mémorisé pour la sauvegarde directe.
               La prochaine sauvegarde te demandera à nouveau de sélectionner le
               dossier du projet, comme lors de la première utilisation.</span
@@ -204,18 +259,40 @@
         </label>
       </div>
 
-      <button class="btn-execute" id="btnExecute" disabled onclick="executer()">
+      <button
+        class="btn-execute"
+        id="btnExecute"
+        disabled
+        onclick="executer()"
+        data-i18n="admin_execute_btn"
+      >
         exécuter les actions sélectionnées
       </button>
 
       <div class="admin-feedback" id="adminFeedback"></div>
     </div>
 
+    <script src="i18n/fr.js"></script>
+    <script src="i18n/en.js"></script>
+    <script src="i18n/i18n.js"></script>
     <script>
       var chkLS = document.getElementById("checkLocalStorage");
       var chkIDB = document.getElementById("checkIndexedDB");
       var btn = document.getElementById("btnExecute");
       var feedback = document.getElementById("adminFeedback");
+
+      // Highlight active language button
+      (function () {
+        var lang = localStorage.getItem("lang") || "fr";
+        document
+          .getElementById(lang === "en" ? "btnLangEn" : "btnLangFr")
+          .classList.add("active");
+      })();
+
+      function setLang(lang) {
+        localStorage.setItem("lang", lang);
+        window.location.reload();
+      }
 
       function updateBtn() {
         btn.disabled = !chkLS.checked && !chkIDB.checked;
@@ -228,20 +305,22 @@
 
         if (chkLS.checked) {
           localStorage.clear();
-          messages.push("localStorage effacé.");
+          // Restore lang setting so the page stays in the right language
+          var lang = window.t === i18n_en ? "en" : "fr";
+          localStorage.setItem("lang", lang);
+          messages.push(window.t.admin_feedback_ls);
           chkLS.checked = false;
         }
 
         if (chkIDB.checked) {
-          indexedDB.deleteDatabase("kit-doc-survie-db");
-          messages.push("IndexedDB supprimée.");
+          indexedDB.deleteDatabase("doc-survival-kit-db");
+          messages.push(window.t.admin_feedback_idb);
           chkIDB.checked = false;
         }
 
         updateBtn();
         feedback.textContent =
-          messages.join(" ") +
-          " Retourne sur le dashboard pour constater les changements.";
+          messages.join(" ") + " " + window.t.admin_feedback_return;
         feedback.className = "admin-feedback success";
         feedback.style.display = "block";
       }

@@ -35,7 +35,7 @@ var IDB_KEY_NOTES = "mesNotes";
 
 function ouvrirDBNotes() {
   return new Promise(function (resolve, reject) {
-    var req = indexedDB.open("kit-doc-survie-db", 1);
+    var req = indexedDB.open("doc-survival-kit-db", 1);
     req.onupgradeneeded = function (e) {
       e.target.result.createObjectStore("fileHandles");
     };
@@ -168,7 +168,7 @@ function renderNotes() {
 
   if (notes.length === 0) {
     container.innerHTML =
-      '<p class="empty-msg">Aucune note pour l\'instant.</p>';
+      '<p class="empty-msg">' + window.t.notes_empty + "</p>";
   } else {
     container.innerHTML = notes
       .map(function (note, nIdx) {
@@ -184,7 +184,9 @@ function renderNotes() {
                 '<div class="pre-wrapper"><pre>' +
                 esc(bloc.content) +
                 "</pre>" +
-                '<button class="btn-copy-pre" onclick="copierBloc(this)">copier</button>' +
+                '<button class="btn-copy-pre" onclick="copierBloc(this)">' +
+                window.t.notes_btn_copy +
+                "</button>" +
                 "</div>";
             } else if (bloc.type === "ul") {
               inner =
@@ -204,7 +206,9 @@ function renderNotes() {
               nIdx +
               "," +
               bIdx +
-              ')">modifier</button>' +
+              ')">' +
+              window.t.notes_btn_edit_bloc +
+              "</button>" +
               '<button class="btn-del-bloc" onclick="ouvrirConfirmSupprBloc(' +
               nIdx +
               "," +
@@ -226,7 +230,9 @@ function renderNotes() {
           '<div class="note-actions">' +
           '<button class="btn-edit-note" onclick="ouvrirModalEditNote(' +
           nIdx +
-          ')">modifier</button>' +
+          ')">' +
+          window.t.notes_btn_edit_note +
+          "</button>" +
           '<button class="btn-del-note" onclick="ouvrirConfirmSupprNote(' +
           nIdx +
           ')">×</button>' +
@@ -237,7 +243,9 @@ function renderNotes() {
           '<div class="note-footer">' +
           '<button class="btn-add-bloc" onclick="ouvrirModalBloc(' +
           nIdx +
-          ')">+ ajouter un bloc</button>' +
+          ')">' +
+          window.t.notes_btn_add_bloc +
+          "</button>" +
           "</div></div>"
         );
       })
@@ -252,9 +260,9 @@ function toggleEditModeNotes() {
   var container = document.getElementById("notesContainer");
   var btn = document.getElementById("btnEditModeNotes");
   if (container.classList.toggle("edit-mode")) {
-    btn.textContent = "quitter le mode édition";
+    btn.textContent = window.t.notes_btn_quit_edit_mode;
   } else {
-    btn.textContent = "passer en mode édition";
+    btn.textContent = window.t.notes_btn_edit_mode;
   }
 }
 
@@ -345,16 +353,17 @@ function updateBlocPlaceholder() {
   var useInput = type === "b" || type === "p";
   inp.style.display = useInput ? "" : "none";
   ta.style.display = useInput ? "none" : "";
-  if (type === "ul") ta.placeholder = "Un élément par ligne…";
-  else if (type === "pre") ta.placeholder = "Code…";
-  else if (type === "b") inp.placeholder = "Titre…";
-  else inp.placeholder = "Texte…";
+  if (type === "ul") ta.placeholder = window.t.modal_bloc_placeholder_ul;
+  else if (type === "pre") ta.placeholder = window.t.modal_bloc_placeholder_pre;
+  else if (type === "b") inp.placeholder = window.t.modal_bloc_placeholder_b;
+  else inp.placeholder = window.t.modal_bloc_placeholder_p;
 }
 
 function ouvrirModalBloc(noteIdx) {
   noteBlocNoteIdx = noteIdx;
   noteBlocBlocIdx = null;
-  document.getElementById("modalBlocTitre").textContent = "Nouveau bloc";
+  document.getElementById("modalBlocTitre").textContent =
+    window.t.modal_bloc_new;
   document.getElementById("blocType").value = "p";
   document.getElementById("blocContent").value = "";
   document.getElementById("blocContentInput").value = "";
@@ -369,7 +378,8 @@ function ouvrirModalEditBloc(noteIdx, blocIdx) {
   noteBlocNoteIdx = noteIdx;
   noteBlocBlocIdx = blocIdx;
   var bloc = loadNotes()[noteIdx].blocs[blocIdx];
-  document.getElementById("modalBlocTitre").textContent = "Modifier le bloc";
+  document.getElementById("modalBlocTitre").textContent =
+    window.t.modal_bloc_edit;
   document.getElementById("blocType").value = bloc.type;
   var useInput = bloc.type === "b" || bloc.type === "p";
   document.getElementById("blocContentInput").value = useInput
@@ -452,10 +462,10 @@ function supprimerBloc() {
 function copierBloc(btn) {
   var content = btn.closest(".pre-wrapper").querySelector("pre").textContent;
   navigator.clipboard.writeText(content).then(function () {
-    btn.textContent = "copié ✓";
+    btn.textContent = window.t.notes_btn_copied;
     btn.classList.add("copied");
     setTimeout(function () {
-      btn.textContent = "copier";
+      btn.textContent = window.t.notes_btn_copy;
       btn.classList.remove("copied");
     }, 1500);
   });

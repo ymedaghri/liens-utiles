@@ -1,4 +1,4 @@
-# kit-doc-survie — Description du projet
+# doc-survival-kit — Description du projet
 
 ## Vue d'ensemble
 
@@ -8,26 +8,36 @@ Fichiers du projet :
 | Fichier | Rôle |
 |---|---|
 | `index.html` | Structure HTML uniquement (markup + modales + balises `<script src>`) — contient le bouton `.btn-admin` (⚙) liant vers `admin.html` |
-| `admin.html` | Page d'administration : réinitialisation localStorage et IndexedDB — styles inline, JS inline, lien retour vers `index.html` |
+| `admin.html` | Page d'administration : sélecteur de langue, réinitialisation localStorage et IndexedDB — styles inline, JS inline, lien retour vers `index.html` |
 | `style.css` | Tout le CSS (layout, typo, tâches, liens, notes, thèmes, modales, `.btn-admin`) |
 | `mesLiens.js` | Données par défaut (`var mesLiensDefaut`) — chargé avant `liens.js` |
 | `mesNotes.js` | Données par défaut (`var mesNotesDefaut`) — chargé avant `notes.js` |
 | `liens.js` | Logique JS du panel mesLiens (CRUD catégories, liens, modales, mode édition, sauvegarde fichier) |
 | `taches.js` | Logique JS du panel mesTaches (CRUD tâches, filtres, rendu) |
 | `notes.js` | Logique JS du panel mesNotes (CRUD notes, blocs, modales, mode édition, sauvegarde fichier) |
+| `i18n/fr.js` | Traductions françaises — déclare `var i18n_fr = {...}` |
+| `i18n/en.js` | Traductions anglaises — déclare `var i18n_en = {...}` |
+| `i18n/i18n.js` | Moteur i18n — lit `localStorage["lang"]`, expose `window.t` et `applyI18n()` |
 
 Ordre de chargement des scripts dans le HTML (important — dépendances) :
 
 ```html
+<script src="i18n/fr.js"></script>
+<!-- déclare i18n_fr -->
+<script src="i18n/en.js"></script>
+<!-- déclare i18n_en -->
+<script src="i18n/i18n.js"></script>
+<!-- expose window.t et applyI18n() — DOIT être chargé avant tout le reste -->
 <script src="mesLiens.js"></script>
 <!-- déclare mesLiensDefaut -->
 <script src="mesNotes.js"></script>
 <!-- déclare mesNotesDefaut -->
 <script src="liens.js"></script>
-<!-- utilise mesLiensDefaut -->
+<!-- utilise mesLiensDefaut, window.t -->
 <script src="taches.js"></script>
+<!-- utilise window.t -->
 <script src="notes.js"></script>
-<!-- utilise mesNotesDefaut, esc() de taches.js -->
+<!-- utilise mesNotesDefaut, esc() de taches.js, window.t -->
 ```
 
 Layout trois colonnes côte à côte (flex), responsive (colonne unique sous 860px) :
@@ -233,7 +243,7 @@ Apparaissent dans leur toolbar respective quand le localStorage diffère des don
 ### Mécanisme de sauvegarde du fichier (`File System Access API`)
 
 - Utilise `showDirectoryPicker` (Chrome/Edge Chromium uniquement)
-- Le `FileSystemFileHandle` est persisté en **IndexedDB** (base `kit-doc-survie-db` / store `fileHandles`)
+- Le `FileSystemFileHandle` est persisté en **IndexedDB** (base `doc-survival-kit-db` / store `fileHandles`)
   - clé `"mesLiens"` pour `mesLiens.js`
   - clé `"mesNotes"` pour `mesNotes.js`
 - **1ère utilisation** : modale d'instruction → `showDirectoryPicker()` (l'utilisateur sélectionne le **dossier** du projet) → `dirHandle.getFileHandle("mesLiens.js")` récupère le fichier par nom → handle sauvegardé en IndexedDB
@@ -254,10 +264,10 @@ Page séparée, accessible via le bouton `.btn-admin` (⚙, fixé en haut à dro
 
 ### Actions disponibles
 
-| Checkbox             | Action                                                                                 |
-| -------------------- | -------------------------------------------------------------------------------------- |
-| `#checkLocalStorage` | `localStorage.clear()` — efface toutes les données des trois panels                    |
-| `#checkIndexedDB`    | `indexedDB.deleteDatabase("kit-doc-survie-db")` — efface le handle de fichier mémorisé |
+| Checkbox             | Action                                                                                   |
+| -------------------- | ---------------------------------------------------------------------------------------- |
+| `#checkLocalStorage` | `localStorage.clear()` — efface toutes les données des trois panels                      |
+| `#checkIndexedDB`    | `indexedDB.deleteDatabase("doc-survival-kit-db")` — efface le handle de fichier mémorisé |
 
 - Le bouton `#btnExecute` est désactivé (`disabled`) tant qu'aucune case n'est cochée
 - Après exécution : les cases se décochent, le bouton se désactive, un message de confirmation vert s'affiche (`#adminFeedback`)
@@ -299,6 +309,53 @@ Toutes les modales partagent la même structure `.modal-backdrop > .modal` et la
 | `#modalBloc`                    | Ajout ou édition d'un bloc — titre dynamique via `#modalBlocTitre` ; contient `#blocContentInput` (input, pour `b`/`p`) et `#blocContent` (textarea, pour `pre`/`ul`), un seul affiché à la fois |
 | `#modalConfirmSupprBloc`        | Confirmation de suppression de bloc                                                                                                                                                              |
 | `#modalPremiereSauvegardeNotes` | Instructions pour la première sauvegarde de `mesNotes.js` (avec `#erreurFichierNotes`)                                                                                                           |
+
+---
+
+## Internationalisation (i18n)
+
+### Principe
+
+Pas de `fetch()` (incompatible `file://`) — les fichiers de traduction sont chargés via `<script src>` comme variables globales `var`.
+
+La langue active est lue depuis `localStorage["lang"]` (valeur par défaut : `"fr"`). Elle se choisit depuis la page `admin.html` (boutons FR / EN) et est persistée dans le localStorage. Changer la langue recharge la page via `window.location.reload()`.
+
+### Architecture
+
+| Fichier        | Rôle                                                             |
+| -------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `i18n/fr.js`   | Déclare `var i18n_fr = { clé: "valeur", ... }`                   |
+| `i18n/en.js`   | Déclare `var i18n_en = { clé: "valeur", ... }`                   |
+| `i18n/i18n.js` | IIFE qui lit `localStorage["lang"]`, affecte `window.t = i18n_fr | i18n_en`, expose `window.applyI18n()`, et enregistre un listener `DOMContentLoaded` |
+
+### Application des traductions
+
+`applyI18n()` parcourt le DOM et applique les traductions via des attributs :
+
+| Attribut                      | Effet                                                                           |
+| ----------------------------- | ------------------------------------------------------------------------------- |
+| `data-i18n="clé"`             | `el.textContent = window.t[clé]`                                                |
+| `data-i18n-html="clé"`        | `el.innerHTML = window.t[clé]` (pour les éléments avec balises HTML embarquées) |
+| `data-i18n-placeholder="clé"` | `el.placeholder = window.t[clé]`                                                |
+| `data-i18n-title="clé"`       | `el.title = window.t[clé]`                                                      |
+
+Pour les éléments dont le contenu est généré dynamiquement par JS (`render()`, `renderLiens()`, `renderNotes()`…), les textes utilisent `window.t.clé` directement.
+
+### Règle de nommage des clés
+
+Préfixe par domaine : `taches_*`, `notes_*`, `liens_*`, `modal_cat_*`, `modal_lien_*`, `modal_note_*`, `modal_bloc_*`, `modal_first_save_*`, `modal_suppr_*`, `admin_*`, `panel_*`.
+
+### Conflit de nommage important
+
+Dans `taches.js`, la variable locale `t` est utilisée comme paramètre dans les arrow functions (`filtered.map((t) => ...)`). Toujours utiliser `window.t.clé` (préfixe explicite) dans ce fichier pour éviter la collision avec le nom `t`.
+
+### Ajouter une langue
+
+1. Créer `i18n/xx.js` avec `var i18n_xx = { ...mêmes clés... }`
+2. Charger le fichier via `<script src="i18n/xx.js">` dans `index.html` et `admin.html` (avant `i18n/i18n.js`)
+3. Mettre à jour `i18n/i18n.js` pour reconnaître la nouvelle valeur de `lang`
+4. Ajouter le bouton dans `admin.html`
+5. Ajouter le fichier dans `bin/cli.js` (`I18N_FILES`) et `package.json` (`files`)
 
 ---
 

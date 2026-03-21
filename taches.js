@@ -63,14 +63,14 @@ function render() {
   });
 
   if (filtered.length === 0) {
-    list.innerHTML = '<p class="empty-msg">Rien ici pour l\'instant.</p>';
+    list.innerHTML = '<p class="empty-msg">' + window.t.taches_empty + '</p>';
     return;
   }
 
   const labels = {
-    urgent: "Urgent",
-    normal: "Normal",
-    later: "Plus tard",
+    urgent: window.t.taches_priority_urgent,
+    normal: window.t.taches_priority_normal,
+    later: window.t.taches_priority_later,
   };
 
   list.innerHTML = filtered
@@ -80,7 +80,7 @@ function render() {
       <div class="check" onclick="toggle(${t.id})"></div>
       <span class="task-text">${esc(t.text)}</span>
       <span class="task-tag">${labels[t.priority]}</span>
-      <button class="task-del" onclick="remove(${t.id})" title="Supprimer">✕</button>
+      <button class="task-del" onclick="remove(${t.id})" title="${window.t.taches_delete_title}">✕</button>
     </div>
   `,
     )

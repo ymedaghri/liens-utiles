@@ -1,103 +1,116 @@
-# mesTaches. mesNotes. mesLiens.
+# myTasks. myNotes. myLinks.
 
-> Un mini-dashboard de productivité en trois colonnes — zéro dépendance, zéro serveur, zéro compromis sur la sécurité.
+> A three-column personal productivity dashboard — zero dependencies, zero server, zero security compromises. Available in **French** and **English**.
 
-## Sécurité — pourquoi ce projet peut être utilisé partout
+## Security — why this project can be used anywhere
 
-C'est l'un des atouts majeurs de ce dashboard. Voici pourquoi il ne représente **aucun risque** dans un environnement sécurisé :
+This is one of the dashboard's greatest strengths. Here is why it poses **no risk** in a secure environment:
 
-| Critère              | Ce projet                                                                     |
-| -------------------- | ----------------------------------------------------------------------------- |
-| Requêtes réseau      | **Aucune** — pas de CDN, pas d'API, pas de tracking                           |
-| Dépendances externes | **Aucune** — HTML, CSS et JavaScript Vanilla uniquement                       |
-| Serveur requis       | **Non** — s'ouvre directement via `file://` dans le navigateur                |
-| Données envoyées     | **Jamais** — tout reste sur votre machine (`localStorage` et fichiers locaux) |
-| Installation         | **Aucune** — pas d'exécutable, pas de package, pas de droits admin            |
-| Code auditables      | **Oui** — quelques fichiers lisibles, rien de minifié ni d'obfusqué           |
+| Criterion        | This project                                                                  |
+| ---------------- | ----------------------------------------------------------------------------- |
+| Network requests | **None** — no CDN, no API, no tracking                                        |
+| External deps    | **None** — plain HTML, CSS and Vanilla JavaScript only                        |
+| Server required  | **No** — opens directly via `file://` in the browser                          |
+| Data sent        | **Never** — everything stays on your machine (`localStorage` and local files) |
+| Installation     | **None** — no executable, no package manager, no admin rights                 |
+| Auditable code   | **Yes** — a handful of readable files, nothing minified or obfuscated         |
 
-> **En pratique** : vous pouvez ouvrir ce fichier sur un poste isolé, dans un réseau sans accès internet, dans un environnement à politique de sécurité stricte (DSI, défense, finance, santé…). Il ne tente aucune connexion sortante, ne charge rien de l'extérieur, et ne stocke vos données que là où vous décidez de les stocker.
-
----
-
-![Aperçu du dashboard](mon_dashboard.png)
-
-## Pourquoi ce projet ?
-
-Certains environnements de travail sont **hautement sécurisés** : pas d'accès aux outils classiques de suivi des tâches, pas d'accès aux CDN, pas de possibilité d'installer quoi que ce soit.
-
-Et pourtant, votre productivité dépend de votre capacité à **consigner vos tâches**, vos **notes** et vos **liens utiles** quelque part, puis à les retrouver chaque matin.
-
-Ce projet résout ce problème : un **unique fichier HTML** que vous déposez sur votre bureau et qui fonctionne dans n'importe quel navigateur, même hors ligne.
+> **In practice**: you can open this on an air-gapped machine, inside a network with no internet access, or in a strict security environment (IT departments, defence, finance, healthcare…). It makes no outbound connections, loads nothing from the outside, and stores your data only where you choose.
 
 ---
 
-## Les trois colonnes
+![Dashboard preview](mon_dashboard.png)
 
-### mesTaches. — Gestionnaire de tâches
+## Why this project?
 
-Ajoutez des tâches en un instant, triez-les par priorité, cochez-les au fil de la journée.
+Some work environments are **highly restricted**: no access to the usual task-tracking tools, no CDN, no way to install anything.
 
-- Trois niveaux de priorité : **Urgent**, **Normal**, **Plus tard**
-- Filtres par statut : Tout, À faire, Fait, Urgent, Normal, Plus tard
-- Case à cocher pour marquer une tâche comme terminée
-- Suppression individuelle
+Yet your productivity depends on your ability to **log your tasks**, your **notes** and your **useful links** somewhere — and find them again each morning.
 
-### mesNotes. — Bloc-notes structuré
-
-Tout ce que vous devez hélas retenir, organisé en notes composées de blocs librement empilables.
-
-- Quatre types de blocs par note :
-  - **Titre** — texte court mis en gras pour structurer
-  - **Texte** — paragraphe libre
-  - **Code** — bloc monospace à fond gris (commandes, regex, snippets…)
-  - **Liste** — bullet points
-- Chaque note a une couleur personnalisable
-- Ajout, modification et suppression de notes et de blocs en mode édition
-
-### mesLiens. — Répertoire de liens utiles
-
-Vos liens organisés par catégories, accessibles en un clic.
-
-- Catégories personnalisables avec couleur au choix
-- Affichage avec nom et description
-- Ajout, modification et suppression en mode édition
+This project solves that problem: a **single HTML file** you drop on your desktop that works in any browser, even offline.
 
 ---
 
-## Persistance des données
+## The three panels
 
-Tout est sauvegardé dans le `localStorage` du navigateur — vos contenus survivent à la fermeture du navigateur.
+### myTasks. — Task manager
 
-Pour ne pas perdre vos données si vous videz le cache ou changez de machine, chaque panel dispose d'un bouton **"enregistrer les modifications"** qui écrase le fichier source (`mesLiens.js` ou `mesNotes.js`) directement sur votre disque, grâce à la **File System Access API** (Chrome et Edge Chromium uniquement).
+Add tasks in an instant, sort them by priority, tick them off as the day goes on.
 
-> **Première sauvegarde** : une modale vous demande de sélectionner le dossier du projet. Le fichier est ensuite mis à jour directement à chaque sauvegarde suivante, sans dialogue.
+- Three priority levels: **Urgent**, **Normal**, **Later**
+- Status filters: All, To do, Done, Urgent, Normal, Later
+- Checkbox to mark a task as complete
+- Individual deletion
 
-## Page d'administration
+### myNotes. — Structured notepad
 
-L'icône ⚙ en haut à droite du dashboard ouvre la page `admin.html`. Elle permet de réinitialiser proprement les données du navigateur :
+Everything you need to remember, organised as notes made of freely stackable blocks.
 
-- **Effacer le localStorage** — repart des données par défaut de `mesLiens.js` et `mesNotes.js` au prochain chargement
-- **Supprimer l'IndexedDB** — efface le handle de fichier mémorisé ; la prochaine sauvegarde redemandera de sélectionner le dossier
+- Four block types per note:
+  - **Title** — short bold text to structure the note
+  - **Text** — free paragraph
+  - **Code** — monospace block with grey background (commands, regex, snippets…)
+  - **List** — bullet points
+- Each note has a customisable colour
+- Add, edit and delete notes and blocks in edit mode
 
-Les deux actions sont indépendantes, cochables séparément, et s'exécutent via un bouton unique. La page explique les conséquences avant d'agir.
+### myLinks. — Useful link directory
+
+Your links organised by category, accessible in one click.
+
+- Customisable categories with a colour of your choice
+- Displayed with name and description
+- Add, edit and delete in edit mode
 
 ---
 
-## Démarrage rapide
+## Data persistence
 
-### Via npx (recommandé)
+Everything is saved in the browser's `localStorage` — your content survives browser restarts.
+
+To avoid losing data when you clear the cache or switch machines, each panel has a **"save changes"** button that overwrites the source file (`mesLiens.js` or `mesNotes.js`) directly on your disk, using the **File System Access API** (Chrome and Edge Chromium only).
+
+> **First save**: a modal asks you to select the project folder. The file is then updated directly on every subsequent save, with no dialog.
+
+## Administration page
+
+The ⚙ icon in the top-right corner of the dashboard opens `admin.html`. It lets you:
+
+- **Choose the language** — switch between Français and English (saved in localStorage)
+- **Clear localStorage** — resets to the default data from `mesLiens.js` and `mesNotes.js` on next load
+- **Delete IndexedDB** — clears the stored file handle; the next save will ask you to select the folder again
+
+The two reset actions are independent, can be checked separately, and are executed via a single button. The page explains the consequences before acting.
+
+## Internationalisation
+
+The interface is available in **French** (default) and **English**. The language is chosen from the administration page and stored in `localStorage`.
+
+Translations live in the `i18n/` folder:
+
+| File           | Role                                                                       |
+| -------------- | -------------------------------------------------------------------------- |
+| `i18n/fr.js`   | French translations (`var i18n_fr`)                                        |
+| `i18n/en.js`   | English translations (`var i18n_en`)                                       |
+| `i18n/i18n.js` | Engine: reads `localStorage["lang"]`, exposes `window.t` and `applyI18n()` |
+
+---
+
+## Quick start
+
+### Via npx (recommended)
 
 ```bash
-npx kit-doc-survie
+npx doc-survival-kit
 ```
 
-Crée un dossier `kit-doc-survie/` dans le répertoire courant et ouvre l'application automatiquement dans le navigateur. Les exécutions suivantes ouvrent simplement l'application sans rien écraser.
+Creates a `doc-survival-kit/` folder in the current directory and opens the application automatically in the browser. Subsequent runs simply open the application without overwriting anything.
 
-> Requiert Node.js >= 16.7. Utilise Chrome ou Edge pour la sauvegarde de fichiers.
+> Requires Node.js >= 16.7. Use Chrome or Edge for file saving.
 
-### Sans aucun outil
+### Without any tool
 
-1. Copier les fichiers suivants dans un nouveau dossier
+1. Copy the following files and folder into a new directory:
 
 - `index.html`
 - `admin.html`
@@ -107,50 +120,49 @@ Crée un dossier `kit-doc-survie/` dans le répertoire courant et ouvre l'applic
 - `notes.js`
 - `style.css`
 - `taches.js`
+- `i18n/` (entire folder)
 
-2. Ouvrez le fichier `index.html` dans Chrome ou Edge
-3. C'est tout.
+2. Open `index.html` in Chrome or Edge
+3. That's it.
 
-Des exemples sont déjà présents dans chaque panel pour vous donner une idée de ce que vous pouvez y mettre.
+Sample content is already present in each panel to give you an idea of what you can put there.
 
-### Manuellement
+### Manually
 
-1. Clonez ou téléchargez ce dépôt
-2. Ouvrez le fichier `index.html` dans Chrome ou Edge
-3. C'est tout.
+1. Clone or download this repository
+2. Open `index.html` in Chrome or Edge
+3. That's it.
 
 ```bash
-git clone https://github.com/ymedaghri/kit-doc-survie.git
-cd kit-doc-survie
+git clone https://github.com/ymedaghri/doc-survival-kit.git
+cd doc-survival-kit
 open index.html   # macOS
-# ou
+# or
 start index.html  # Windows
 ```
 
-Des exemples sont déjà présents dans chaque panel pour vous donner une idée de ce que vous pouvez y mettre.
+---
+
+## Tech stack
+
+| Technology         | Detail                                                  |
+| ------------------ | ------------------------------------------------------- |
+| HTML               | Semantic structure, no framework                        |
+| CSS                | Separate styles in `style.css`, no framework            |
+| JavaScript         | Vanilla, no third-party library                         |
+| Local storage      | Browser `localStorage`                                  |
+| File storage       | File System Access API (`showDirectoryPicker`)          |
+| Handle persistence | `IndexedDB` — file handle is remembered across sessions |
 
 ---
 
-## Stack technique
-
-| Technologie        | Détail                                                             |
-| ------------------ | ------------------------------------------------------------------ |
-| HTML               | Structure sémantique, pas de framework                             |
-| CSS                | Styles séparés dans `style.css`, aucun framework                   |
-| JavaScript         | Vanilla, aucune bibliothèque tierce                                |
-| Stockage local     | `localStorage` du navigateur                                       |
-| Stockage fichier   | File System Access API (`showDirectoryPicker`)                     |
-| Persistance handle | `IndexedDB` — le handle du fichier est mémorisé entre les sessions |
-
----
-
-## Auteur
+## Author
 
 **Youssef MEDAGHRI-ALAOUI**
 [craftskillz.com](https://www.craftskillz.com/posts/stay-secure-and-productive)
 
 ---
 
-## Licence
+## License
 
-Ce projet est distribué sous licence **MIT** — vous pouvez l'utiliser, le modifier et le redistribuer librement, y compris dans des projets commerciaux, à condition de conserver la mention de l'auteur original.
+This project is distributed under the **MIT** licence — you are free to use, modify and redistribute it, including in commercial projects, provided you retain the original author credit.

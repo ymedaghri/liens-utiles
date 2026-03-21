@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
+    <title data-i18n="page_title">Dashboard</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -14,33 +14,34 @@
        ╚══════════════════════════════════════╝ -->
       <div class="panel panel-left">
         <div class="inner">
-          <h1>mesTaches<span class="accent">.</span></h1>
-          <p class="subtitle">tout ce que je dois faire</p>
+          <h1><span data-i18n="panel_taches_title">mesTaches</span><span class="accent">.</span></h1>
+          <p class="subtitle" data-i18n="taches_subtitle">tout ce que je dois faire</p>
 
           <!-- Ajout -->
           <div class="add-bar">
             <input
               type="text"
               id="taskInput"
+              data-i18n-placeholder="taches_input_placeholder"
               placeholder="Nouvelle tâche…"
               onkeydown="if (event.key === 'Enter') addTask();"
             />
             <select id="taskPriority">
-              <option value="normal">Normal</option>
-              <option value="urgent">Urgent</option>
-              <option value="later">Plus tard</option>
+              <option value="normal" data-i18n="taches_priority_normal">Normal</option>
+              <option value="urgent" data-i18n="taches_priority_urgent">Urgent</option>
+              <option value="later" data-i18n="taches_priority_later">Plus tard</option>
             </select>
             <button onclick="addTask()">+</button>
           </div>
 
           <!-- Filtres -->
           <div class="filters">
-            <button class="active" onclick="setFilter('all', this)">Tout</button>
-            <button onclick="setFilter('todo', this)">À faire</button>
-            <button onclick="setFilter('done', this)">Fait</button>
-            <button onclick="setFilter('urgent', this)">Urgent</button>
-            <button onclick="setFilter('normal', this)">Normal</button>
-            <button onclick="setFilter('later', this)">Plus tard</button>
+            <button class="active" onclick="setFilter('all', this)" data-i18n="taches_filter_all">Tout</button>
+            <button onclick="setFilter('todo', this)" data-i18n="taches_filter_todo">À faire</button>
+            <button onclick="setFilter('done', this)" data-i18n="taches_filter_done">Fait</button>
+            <button onclick="setFilter('urgent', this)" data-i18n="taches_filter_urgent">Urgent</button>
+            <button onclick="setFilter('normal', this)" data-i18n="taches_filter_normal">Normal</button>
+            <button onclick="setFilter('later', this)" data-i18n="taches_filter_later">Plus tard</button>
           </div>
 
           <!-- Liste -->
@@ -53,13 +54,13 @@
        ╚══════════════════════════════════════╝ -->
       <div class="panel panel-left">
         <div class="inner">
-          <h1>mesNotes<span class="accent">.</span></h1>
-          <p class="subtitle">tout ce que je dois hélas retenir</p>
+          <h1><span data-i18n="panel_notes_title">mesNotes</span><span class="accent">.</span></h1>
+          <p class="subtitle" data-i18n="notes_subtitle">tout ce que je dois hélas retenir</p>
 
           <div class="liens-toolbar">
-            <button class="btn-save" id="btnSaveNotes" onclick="enregistrerModificationsNotes()">enregistrer les modifications</button>
-            <button class="btn-edit-mode" id="btnEditModeNotes" onclick="toggleEditModeNotes()">passer en mode édition</button>
-            <button class="btn-add-note" onclick="openModalNote()">+ nouvelle note</button>
+            <button class="btn-save" id="btnSaveNotes" onclick="enregistrerModificationsNotes()" data-i18n="notes_btn_save">enregistrer les modifications</button>
+            <button class="btn-edit-mode" id="btnEditModeNotes" onclick="toggleEditModeNotes()" data-i18n="notes_btn_edit_mode">passer en mode édition</button>
+            <button class="btn-add-note" onclick="openModalNote()" data-i18n="notes_btn_add">+ nouvelle note</button>
           </div>
 
           <div id="notesContainer"></div>
@@ -71,13 +72,13 @@
        ╚══════════════════════════════════════╝ -->
       <div class="panel">
         <div class="inner">
-          <h1>mesLiens<span class="accent">.</span></h1>
-          <p class="subtitle">tout ce que je ne veux pas perdre</p>
+          <h1><span data-i18n="panel_liens_title">mesLiens</span><span class="accent">.</span></h1>
+          <p class="subtitle" data-i18n="liens_subtitle">tout ce que je ne veux pas perdre</p>
 
           <div class="liens-toolbar">
-            <button class="btn-save" id="btnSave" onclick="enregistrerModifications()">enregistrer les modifications</button>
-            <button class="btn-edit-mode" id="btnEditMode" onclick="toggleEditMode()">passer en mode édition</button>
-            <button class="btn-add-cat" onclick="openModalCategorie()">+ nouvelle catégorie</button>
+            <button class="btn-save" id="btnSave" onclick="enregistrerModifications()" data-i18n="liens_btn_save">enregistrer les modifications</button>
+            <button class="btn-edit-mode" id="btnEditMode" onclick="toggleEditMode()" data-i18n="liens_btn_edit_mode">passer en mode édition</button>
+            <button class="btn-add-cat" onclick="openModalCategorie()" data-i18n="liens_btn_add_cat">+ nouvelle catégorie</button>
           </div>
 
           <div id="linksContainer"></div>
@@ -88,21 +89,21 @@
     <!-- ── Modale ajout catégorie ── -->
     <div class="modal-backdrop" id="modalCategorie">
       <div class="modal">
-        <h3>Nouvelle catégorie</h3>
-        <label for="catNom">Nom</label>
-        <input type="text" id="catNom" placeholder="ex : Lectures…" onkeydown="if(event.key==='Enter') confirmerCategorie();" />
-        <label for="catCouleur">Couleur</label>
+        <h3 data-i18n="modal_cat_title">Nouvelle catégorie</h3>
+        <label for="catNom" data-i18n="modal_cat_label_name">Nom</label>
+        <input type="text" id="catNom" data-i18n-placeholder="modal_cat_placeholder_name" placeholder="ex : Lectures…" onkeydown="if(event.key==='Enter') confirmerCategorie();" />
+        <label for="catCouleur" data-i18n="modal_cat_label_color">Couleur</label>
         <select id="catCouleur">
-          <option value="t-green">Vert</option>
-          <option value="t-violet">Violet</option>
-          <option value="t-amber">Ambre</option>
-          <option value="t-sky">Bleu ciel</option>
-          <option value="t-rose">Rose</option>
-          <option value="t-teal">Teal</option>
+          <option value="t-green" data-i18n="color_green">Vert</option>
+          <option value="t-violet" data-i18n="color_violet">Violet</option>
+          <option value="t-amber" data-i18n="color_amber">Ambre</option>
+          <option value="t-sky" data-i18n="color_sky">Bleu ciel</option>
+          <option value="t-rose" data-i18n="color_rose">Rose</option>
+          <option value="t-teal" data-i18n="color_teal">Teal</option>
         </select>
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="closeModalCategorie()">Annuler</button>
-          <button class="btn-confirm" onclick="confirmerCategorie()">Ajouter</button>
+          <button class="btn-cancel" onclick="closeModalCategorie()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerCategorie()" data-i18n="modal_cat_btn_add">Ajouter</button>
         </div>
       </div>
     </div>
@@ -110,16 +111,16 @@
     <!-- ── Modale ajout d'un lien dans une catégorie ── -->
     <div class="modal-backdrop" id="modalLien">
       <div class="modal">
-        <h3>Nouveau lien</h3>
-        <label for="lienNom">Nom</label>
-        <input type="text" id="lienNom" placeholder="ex : Figma" />
-        <label for="lienDesc">Description</label>
-        <input type="text" id="lienDesc" placeholder="ex : Outil de design UI" />
-        <label for="lienUrl">URL</label>
+        <h3 data-i18n="modal_lien_title">Nouveau lien</h3>
+        <label for="lienNom" data-i18n="modal_lien_label_name">Nom</label>
+        <input type="text" id="lienNom" data-i18n-placeholder="modal_lien_placeholder_name" placeholder="ex : Figma" />
+        <label for="lienDesc" data-i18n="modal_lien_label_desc">Description</label>
+        <input type="text" id="lienDesc" data-i18n-placeholder="modal_lien_placeholder_desc" placeholder="ex : Outil de design UI" />
+        <label for="lienUrl" data-i18n="modal_lien_label_url">URL</label>
         <input type="text" id="lienUrl" placeholder="https://…" onkeydown="if(event.key==='Enter') confirmerLien();" />
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerModalLien()">Annuler</button>
-          <button class="btn-confirm" onclick="confirmerLien()">Ajouter</button>
+          <button class="btn-cancel" onclick="fermerModalLien()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerLien()" data-i18n="modal_lien_btn_add">Ajouter</button>
         </div>
       </div>
     </div>
@@ -127,16 +128,16 @@
     <!-- ── Modale édition d'un lien ── -->
     <div class="modal-backdrop" id="modalEditLien">
       <div class="modal">
-        <h3>Modifier le lien</h3>
-        <label for="editLienNom">Nom</label>
-        <input type="text" id="editLienNom" placeholder="ex : Figma" />
-        <label for="editLienDesc">Description</label>
-        <input type="text" id="editLienDesc" placeholder="ex : Outil de design UI" />
-        <label for="editLienUrl">URL</label>
+        <h3 data-i18n="modal_edit_lien_title">Modifier le lien</h3>
+        <label for="editLienNom" data-i18n="modal_lien_label_name">Nom</label>
+        <input type="text" id="editLienNom" data-i18n-placeholder="modal_lien_placeholder_name" placeholder="ex : Figma" />
+        <label for="editLienDesc" data-i18n="modal_lien_label_desc">Description</label>
+        <input type="text" id="editLienDesc" data-i18n-placeholder="modal_lien_placeholder_desc" placeholder="ex : Outil de design UI" />
+        <label for="editLienUrl" data-i18n="modal_lien_label_url">URL</label>
         <input type="text" id="editLienUrl" placeholder="https://…" onkeydown="if(event.key==='Enter') confirmerEditLien();" />
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerModalEditLien()">Annuler</button>
-          <button class="btn-confirm" onclick="confirmerEditLien()">Enregistrer</button>
+          <button class="btn-cancel" onclick="fermerModalEditLien()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerEditLien()" data-i18n="modal_edit_lien_btn_save">Enregistrer</button>
         </div>
       </div>
     </div>
@@ -144,13 +145,13 @@
     <!-- ── Modale confirmation suppression lien ── -->
     <div class="modal-backdrop" id="modalConfirmSupprLien">
       <div class="modal">
-        <h3>Supprimer le lien ?</h3>
-        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;">
+        <h3 data-i18n="modal_suppr_lien_title">Supprimer le lien ?</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;" data-i18n="irreversible">
           Cette action est irréversible.
         </p>
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerConfirmSupprLien()">Annuler</button>
-          <button class="btn-confirm" style="background:#ef4444;" onclick="confirmerSupprLien()">Supprimer</button>
+          <button class="btn-cancel" onclick="fermerConfirmSupprLien()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" style="background:#ef4444;" onclick="confirmerSupprLien()" data-i18n="irreversible_delete">Supprimer</button>
         </div>
       </div>
     </div>
@@ -158,13 +159,13 @@
     <!-- ── Modale confirmation suppression catégorie ── -->
     <div class="modal-backdrop" id="modalConfirmSupprCat">
       <div class="modal">
-        <h3>Supprimer la catégorie ?</h3>
-        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;">
+        <h3 data-i18n="modal_suppr_cat_title">Supprimer la catégorie ?</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;" data-i18n="modal_suppr_cat_msg">
           Tous les liens de cette catégorie seront également supprimés. Cette action est irréversible.
         </p>
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerConfirmSupprCat()">Annuler</button>
-          <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerCategorie()">Supprimer</button>
+          <button class="btn-cancel" onclick="fermerConfirmSupprCat()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerCategorie()" data-i18n="irreversible_delete">Supprimer</button>
         </div>
       </div>
     </div>
@@ -172,25 +173,25 @@
     <!-- ── Modale première sauvegarde ── -->
     <div class="modal-backdrop" id="modalPremiereSauvegarde">
       <div class="modal">
-        <h3>Première sauvegarde</h3>
-        <p style="font-size:0.875rem;color:#78716c;margin-bottom:12px;">
+        <h3 data-i18n="modal_first_save_title">Première sauvegarde</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:12px;" data-i18n="modal_first_save_intro">
           Une boîte de dialogue va s'ouvrir pour sélectionner le dossier du projet.
         </p>
-        <p style="font-size:0.875rem;color:#292524;margin-bottom:8px;">
+        <p style="font-size:0.875rem;color:#292524;margin-bottom:8px;" data-i18n="modal_first_save_navigate">
           Navigue jusqu'au dossier contenant le fichier :
         </p>
         <p style="font-family:'Cascadia Code','SF Mono',Consolas,monospace;font-size:0.8rem;background:#f5f5f4;padding:8px 12px;border-radius:6px;margin-bottom:24px;color:#059669;">
           mesLiens.js
         </p>
-        <p style="font-size:0.8rem;color:#a8a29e;margin-bottom:24px;">
+        <p style="font-size:0.8rem;color:#a8a29e;margin-bottom:24px;" data-i18n="modal_first_save_once">
           Cette étape n'aura lieu qu'une seule fois. Les sauvegardes suivantes seront directes.
         </p>
-        <p id="erreurFichierLiens" style="display:none;font-size:0.8rem;color:#ef4444;background:#fef2f2;padding:8px 12px;border-radius:6px;margin-bottom:16px;">
+        <p id="erreurFichierLiens" style="display:none;font-size:0.8rem;color:#ef4444;background:#fef2f2;padding:8px 12px;border-radius:6px;margin-bottom:16px;" data-i18n-html="modal_first_save_error_liens">
           Fichier introuvable dans ce dossier. Sélectionne le dossier qui contient <strong>mesLiens.js</strong>.
         </p>
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerModalPremiereSauvegarde()">Annuler</button>
-          <button class="btn-confirm" onclick="ouvrirSelecteurFichier()">Choisir le dossier</button>
+          <button class="btn-cancel" onclick="fermerModalPremiereSauvegarde()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="ouvrirSelecteurFichier()" data-i18n="modal_first_save_btn_choose">Choisir le dossier</button>
         </div>
       </div>
     </div>
@@ -198,21 +199,21 @@
     <!-- ── Modale nouvelle note ── -->
     <div class="modal-backdrop" id="modalNote">
       <div class="modal">
-        <h3>Nouvelle note</h3>
-        <label for="noteNom">Titre</label>
-        <input type="text" id="noteNom" placeholder="ex : Raccourcis Git…" onkeydown="if(event.key==='Enter') confirmerNote();" />
-        <label for="noteCouleur">Couleur</label>
+        <h3 data-i18n="modal_note_title">Nouvelle note</h3>
+        <label for="noteNom" data-i18n="modal_note_label_titre">Titre</label>
+        <input type="text" id="noteNom" data-i18n-placeholder="modal_note_placeholder" placeholder="ex : Raccourcis Git…" onkeydown="if(event.key==='Enter') confirmerNote();" />
+        <label for="noteCouleur" data-i18n="modal_note_label_color">Couleur</label>
         <select id="noteCouleur">
-          <option value="t-green">Vert</option>
-          <option value="t-violet">Violet</option>
-          <option value="t-amber">Ambre</option>
-          <option value="t-sky">Bleu ciel</option>
-          <option value="t-rose">Rose</option>
-          <option value="t-teal">Teal</option>
+          <option value="t-green" data-i18n="color_green">Vert</option>
+          <option value="t-violet" data-i18n="color_violet">Violet</option>
+          <option value="t-amber" data-i18n="color_amber">Ambre</option>
+          <option value="t-sky" data-i18n="color_sky">Bleu ciel</option>
+          <option value="t-rose" data-i18n="color_rose">Rose</option>
+          <option value="t-teal" data-i18n="color_teal">Teal</option>
         </select>
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="closeModalNote()">Annuler</button>
-          <button class="btn-confirm" onclick="confirmerNote()">Créer</button>
+          <button class="btn-cancel" onclick="closeModalNote()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerNote()" data-i18n="modal_note_btn_create">Créer</button>
         </div>
       </div>
     </div>
@@ -220,21 +221,21 @@
     <!-- ── Modale édition note ── -->
     <div class="modal-backdrop" id="modalEditNote">
       <div class="modal">
-        <h3>Modifier la note</h3>
-        <label for="editNoteNom">Titre</label>
-        <input type="text" id="editNoteNom" placeholder="ex : Raccourcis Git…" onkeydown="if(event.key==='Enter') confirmerEditNote();" />
-        <label for="editNoteCouleur">Couleur</label>
+        <h3 data-i18n="modal_edit_note_title">Modifier la note</h3>
+        <label for="editNoteNom" data-i18n="modal_note_label_titre">Titre</label>
+        <input type="text" id="editNoteNom" data-i18n-placeholder="modal_note_placeholder" placeholder="ex : Raccourcis Git…" onkeydown="if(event.key==='Enter') confirmerEditNote();" />
+        <label for="editNoteCouleur" data-i18n="modal_note_label_color">Couleur</label>
         <select id="editNoteCouleur">
-          <option value="t-green">Vert</option>
-          <option value="t-violet">Violet</option>
-          <option value="t-amber">Ambre</option>
-          <option value="t-sky">Bleu ciel</option>
-          <option value="t-rose">Rose</option>
-          <option value="t-teal">Teal</option>
+          <option value="t-green" data-i18n="color_green">Vert</option>
+          <option value="t-violet" data-i18n="color_violet">Violet</option>
+          <option value="t-amber" data-i18n="color_amber">Ambre</option>
+          <option value="t-sky" data-i18n="color_sky">Bleu ciel</option>
+          <option value="t-rose" data-i18n="color_rose">Rose</option>
+          <option value="t-teal" data-i18n="color_teal">Teal</option>
         </select>
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerModalEditNote()">Annuler</button>
-          <button class="btn-confirm" onclick="confirmerEditNote()">Enregistrer</button>
+          <button class="btn-cancel" onclick="fermerModalEditNote()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerEditNote()" data-i18n="modal_edit_note_btn_save">Enregistrer</button>
         </div>
       </div>
     </div>
@@ -242,13 +243,13 @@
     <!-- ── Modale confirmation suppression note ── -->
     <div class="modal-backdrop" id="modalConfirmSupprNote">
       <div class="modal">
-        <h3>Supprimer la note ?</h3>
-        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;">
+        <h3 data-i18n="modal_suppr_note_title">Supprimer la note ?</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;" data-i18n="modal_suppr_note_msg">
           Tous les blocs de cette note seront également supprimés. Cette action est irréversible.
         </p>
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerConfirmSupprNote()">Annuler</button>
-          <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerNote()">Supprimer</button>
+          <button class="btn-cancel" onclick="fermerConfirmSupprNote()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerNote()" data-i18n="irreversible_delete">Supprimer</button>
         </div>
       </div>
     </div>
@@ -256,20 +257,20 @@
     <!-- ── Modale ajout / édition bloc ── -->
     <div class="modal-backdrop" id="modalBloc">
       <div class="modal">
-        <h3 id="modalBlocTitre">Nouveau bloc</h3>
-        <label for="blocType">Type</label>
+        <h3 id="modalBlocTitre" data-i18n="modal_bloc_new">Nouveau bloc</h3>
+        <label for="blocType" data-i18n="modal_bloc_label_type">Type</label>
         <select id="blocType" onchange="updateBlocPlaceholder()">
-          <option value="b">Titre</option>
-          <option value="p">Texte</option>
-          <option value="pre">Code</option>
-          <option value="ul">Liste à puces</option>
+          <option value="b" data-i18n="modal_bloc_type_b">Titre</option>
+          <option value="p" data-i18n="modal_bloc_type_p">Texte</option>
+          <option value="pre" data-i18n="modal_bloc_type_pre">Code</option>
+          <option value="ul" data-i18n="modal_bloc_type_ul">Liste à puces</option>
         </select>
-        <label for="blocContent">Contenu</label>
+        <label for="blocContent" data-i18n="modal_bloc_label_content">Contenu</label>
         <input type="text" id="blocContentInput" placeholder="Texte…" onkeydown="if(event.key==='Enter') confirmerBloc();" />
         <textarea id="blocContent" rows="6" placeholder="Texte…"></textarea>
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerModalBloc()">Annuler</button>
-          <button class="btn-confirm" onclick="confirmerBloc()">Enregistrer</button>
+          <button class="btn-cancel" onclick="fermerModalBloc()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerBloc()" data-i18n="modal_bloc_btn_save">Enregistrer</button>
         </div>
       </div>
     </div>
@@ -277,13 +278,13 @@
     <!-- ── Modale confirmation suppression bloc ── -->
     <div class="modal-backdrop" id="modalConfirmSupprBloc">
       <div class="modal">
-        <h3>Supprimer le bloc ?</h3>
-        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;">
+        <h3 data-i18n="modal_suppr_bloc_title">Supprimer le bloc ?</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;" data-i18n="irreversible">
           Cette action est irréversible.
         </p>
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerConfirmSupprBloc()">Annuler</button>
-          <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerBloc()">Supprimer</button>
+          <button class="btn-cancel" onclick="fermerConfirmSupprBloc()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerBloc()" data-i18n="irreversible_delete">Supprimer</button>
         </div>
       </div>
     </div>
@@ -291,30 +292,33 @@
     <!-- ── Modale première sauvegarde notes ── -->
     <div class="modal-backdrop" id="modalPremiereSauvegardeNotes">
       <div class="modal">
-        <h3>Première sauvegarde</h3>
-        <p style="font-size:0.875rem;color:#78716c;margin-bottom:12px;">
+        <h3 data-i18n="modal_first_save_title">Première sauvegarde</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:12px;" data-i18n="modal_first_save_intro">
           Une boîte de dialogue va s'ouvrir pour sélectionner le dossier du projet.
         </p>
-        <p style="font-size:0.875rem;color:#292524;margin-bottom:8px;">
+        <p style="font-size:0.875rem;color:#292524;margin-bottom:8px;" data-i18n="modal_first_save_navigate">
           Navigue jusqu'au dossier contenant le fichier :
         </p>
         <p style="font-family:'Cascadia Code','SF Mono',Consolas,monospace;font-size:0.8rem;background:#f5f5f4;padding:8px 12px;border-radius:6px;margin-bottom:24px;color:#059669;">
           mesNotes.js
         </p>
-        <p style="font-size:0.8rem;color:#a8a29e;margin-bottom:24px;">
+        <p style="font-size:0.8rem;color:#a8a29e;margin-bottom:24px;" data-i18n="modal_first_save_once">
           Cette étape n'aura lieu qu'une seule fois. Les sauvegardes suivantes seront directes.
         </p>
-        <p id="erreurFichierNotes" style="display:none;font-size:0.8rem;color:#ef4444;background:#fef2f2;padding:8px 12px;border-radius:6px;margin-bottom:16px;">
+        <p id="erreurFichierNotes" style="display:none;font-size:0.8rem;color:#ef4444;background:#fef2f2;padding:8px 12px;border-radius:6px;margin-bottom:16px;" data-i18n-html="modal_first_save_error_notes">
           Fichier introuvable dans ce dossier. Sélectionne le dossier qui contient <strong>mesNotes.js</strong>.
         </p>
         <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerModalPremiereSauvegardeNotes()">Annuler</button>
-          <button class="btn-confirm" onclick="ouvrirSelecteurFichierNotes()">Choisir le dossier</button>
+          <button class="btn-cancel" onclick="fermerModalPremiereSauvegardeNotes()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="ouvrirSelecteurFichierNotes()" data-i18n="modal_first_save_btn_choose">Choisir le dossier</button>
         </div>
       </div>
     </div>
 
-    <!-- Scripts : données → liens → tâches → notes -->
+    <!-- Scripts : i18n → données → liens → tâches → notes -->
+    <script src="i18n/fr.js"></script>
+    <script src="i18n/en.js"></script>
+    <script src="i18n/i18n.js"></script>
     <script src="mesLiens.js"></script>
     <script src="mesNotes.js"></script>
     <script src="liens.js"></script>

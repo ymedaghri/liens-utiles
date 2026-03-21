@@ -1,12 +1,13 @@
 {
-  "name": "kit-doc-survie",
-  "version": "2.0.0",
+  "name": "doc-survival-kit",
+  "version": "2.1.0",
   "description": "Dashboard personnel offline : tâches, notes et liens dans un seul fichier HTML — fonctionne sans serveur via file://",
   "bin": {
-    "kit-doc-survie": "./bin/cli.js"
+    "doc-survival-kit": "./bin/cli.js"
   },
   "files": [
     "bin/",
+    "i18n/",
     "index.html",
     "admin.html",
     "style.css",
@@ -32,6 +33,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ymedaghri/kit-doc-survie.git"
+    "url": "https://github.com/ymedaghri/doc-survival-kit.git"
   }
 }

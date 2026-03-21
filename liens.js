@@ -22,7 +22,7 @@ function checkDiff() {
 }
 
 // ── Persistance du FileSystemFileHandle via IndexedDB ────────────────
-const IDB_NAME = "kit-doc-survie-db";
+const IDB_NAME = "doc-survival-kit-db";
 const IDB_STORE = "fileHandles";
 const IDB_KEY = "mesLiens";
 
@@ -135,8 +135,8 @@ function renderLiens() {
         <div class="cat-header">
           <h2>${cat.titre}</h2>
           <div class="cat-actions">
-            <button class="btn-add-link" onclick="ouvrirModalLien(${idx})" title="Ajouter un lien">＋</button>
-            <button class="btn-del-cat" onclick="ouvrirConfirmSupprCat(${idx})" title="Supprimer la catégorie">✕</button>
+            <button class="btn-add-link" onclick="ouvrirModalLien(${idx})" title="${window.t.liens_add_link_title}">＋</button>
+            <button class="btn-del-cat" onclick="ouvrirConfirmSupprCat(${idx})" title="${window.t.liens_del_cat_title}">✕</button>
           </div>
         </div>
         <div class="links">
@@ -150,8 +150,8 @@ function renderLiens() {
             </div>
             <span class="arrow">↗</span>
             <div class="link-actions">
-              <button class="btn-edit-link" onclick="ouvrirModalEditLien(event, ${idx}, ${lidx})" title="Modifier le lien">✎</button>
-              <button class="btn-del-link" onclick="supprimerLien(event, ${idx}, ${lidx})" title="Supprimer le lien">✕</button>
+              <button class="btn-edit-link" onclick="ouvrirModalEditLien(event, ${idx}, ${lidx})" title="${window.t.liens_edit_link_title}">✎</button>
+              <button class="btn-del-link" onclick="supprimerLien(event, ${idx}, ${lidx})" title="${window.t.liens_del_link_title}">✕</button>
             </div>
           </a>`,
             )
@@ -346,6 +346,6 @@ function toggleEditMode() {
   const btn = document.getElementById("btnEditMode");
   const actif = container.classList.toggle("edit-mode");
   btn.textContent = actif
-    ? "quitter le mode édition"
-    : "passer en mode édition";
+    ? window.t.liens_btn_quit_edit_mode
+    : window.t.liens_btn_edit_mode;
 }
