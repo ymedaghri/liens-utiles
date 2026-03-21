@@ -26,7 +26,9 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background 0.15s, color 0.15s;
+        transition:
+          background 0.15s,
+          color 0.15s;
         line-height: 1;
       }
       .admin-back:hover {
@@ -76,7 +78,9 @@
         border: 1px solid #e7e5e4;
         background: #fff;
         cursor: pointer;
-        transition: border-color 0.15s, background 0.15s;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
       }
       .admin-check-label:hover {
         border-color: #f97316;
@@ -112,7 +116,10 @@
         background: #fef2f2;
         color: #ef4444;
         border: 1px solid #fecaca;
-        transition: background 0.15s, color 0.15s, border-color 0.15s;
+        transition:
+          background 0.15s,
+          color 0.15s,
+          border-color 0.15s;
         cursor: pointer;
       }
       .btn-execute:hover {
@@ -150,19 +157,23 @@
         <h2>Pourquoi cette page ?</h2>
         <p>
           L'application stocke tes données à deux endroits dans ton navigateur :
-          le <strong>localStorage</strong> (tâches, notes, liens)
-          et l'<strong>IndexedDB</strong> (le handle du fichier pour la sauvegarde directe).
+          le <strong>localStorage</strong> (tâches, notes, liens) et l'<strong
+            >IndexedDB</strong
+          >
+          (le handle du fichier pour la sauvegarde directe).
         </p>
         <p>
-          Ces données <strong>ne sont pas supprimées</strong> en vidant le cache classique ou en
-          fermant le navigateur. Cette page te permet de les effacer proprement,
-          par exemple pour repartir d'une installation vierge ou résoudre un problème
-          de synchronisation entre le fichier et le navigateur.
+          Ces données <strong>ne sont pas supprimées</strong> en vidant le cache
+          classique ou en fermant le navigateur. Cette page te permet de les
+          effacer proprement, par exemple pour repartir d'une installation
+          vierge ou résoudre un problème de synchronisation entre le fichier et
+          le navigateur.
         </p>
         <p>
-          <strong>Attention :</strong> ces actions sont irréversibles. Si tu n'as pas
-          sauvegardé tes modifications dans les fichiers <code>mesLiens.js</code>
-          et <code>mesNotes.js</code>, tes données seront perdues.
+          <strong>Attention :</strong> ces actions sont irréversibles. Si tu
+          n'as pas sauvegardé tes modifications dans les fichiers
+          <code>mesLiens.js</code> et <code>mesNotes.js</code>, tes données
+          seront perdues.
         </p>
       </div>
 
@@ -171,9 +182,12 @@
           <input type="checkbox" id="checkLocalStorage" />
           <div class="admin-check-text">
             <strong>Effacer le localStorage</strong>
-            <span>Supprime toutes les tâches, notes et liens mémorisés dans le navigateur.
-              Au prochain chargement, l'application repart des données par défaut
-              contenues dans <code>mesLiens.js</code> et <code>mesNotes.js</code>.</span>
+            <span
+              >Supprime toutes les tâches, notes et liens mémorisés dans le
+              navigateur. Au prochain chargement, l'application repart des
+              données par défaut contenues dans <code>mesLiens.js</code> et
+              <code>mesNotes.js</code>.</span
+            >
           </div>
         </label>
 
@@ -181,9 +195,11 @@
           <input type="checkbox" id="checkIndexedDB" />
           <div class="admin-check-text">
             <strong>Supprimer l'IndexedDB</strong>
-            <span>Efface le handle de fichier mémorisé pour la sauvegarde directe.
-              La prochaine sauvegarde te demandera à nouveau de sélectionner
-              le dossier du projet, comme lors de la première utilisation.</span>
+            <span
+              >Efface le handle de fichier mémorisé pour la sauvegarde directe.
+              La prochaine sauvegarde te demandera à nouveau de sélectionner le
+              dossier du projet, comme lors de la première utilisation.</span
+            >
           </div>
         </label>
       </div>
@@ -217,13 +233,15 @@
         }
 
         if (chkIDB.checked) {
-          indexedDB.deleteDatabase("liens-utiles-db");
+          indexedDB.deleteDatabase("kit-doc-survie-db");
           messages.push("IndexedDB supprimée.");
           chkIDB.checked = false;
         }
 
         updateBtn();
-        feedback.textContent = messages.join(" ") + " Retourne sur le dashboard pour constater les changements.";
+        feedback.textContent =
+          messages.join(" ") +
+          " Retourne sur le dashboard pour constater les changements.";
         feedback.className = "admin-feedback success";
         feedback.style.display = "block";
       }

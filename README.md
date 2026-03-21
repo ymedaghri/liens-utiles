@@ -72,6 +72,15 @@ Pour ne pas perdre vos données si vous videz le cache ou changez de machine, ch
 
 > **Première sauvegarde** : une modale vous demande de sélectionner le dossier du projet. Le fichier est ensuite mis à jour directement à chaque sauvegarde suivante, sans dialogue.
 
+## Page d'administration
+
+L'icône ⚙ en haut à droite du dashboard ouvre la page `admin.html`. Elle permet de réinitialiser proprement les données du navigateur :
+
+- **Effacer le localStorage** — repart des données par défaut de `mesLiens.js` et `mesNotes.js` au prochain chargement
+- **Supprimer l'IndexedDB** — efface le handle de fichier mémorisé ; la prochaine sauvegarde redemandera de sélectionner le dossier
+
+Les deux actions sont indépendantes, cochables séparément, et s'exécutent via un bouton unique. La page explique les conséquences avant d'agir.
+
 ---
 
 ## Démarrage rapide
@@ -88,9 +97,10 @@ Crée un dossier `kit-doc-survie/` dans le répertoire courant et ouvre l'applic
 
 ### Sans aucun outil
 
-1. Copier les fichiers suivant dans un nouveau dossier
+1. Copier les fichiers suivants dans un nouveau dossier
 
 - `index.html`
+- `admin.html`
 - `liens.js`
 - `mesLiens.js`
 - `mesNotes.js`
@@ -110,8 +120,8 @@ Des exemples sont déjà présents dans chaque panel pour vous donner une idée 
 3. C'est tout.
 
 ```bash
-git clone https://github.com/ymedaghri/liens-utiles.git
-cd liens-utiles
+git clone https://github.com/ymedaghri/kit-doc-survie.git
+cd kit-doc-survie
 open index.html   # macOS
 # ou
 start index.html  # Windows

@@ -22,7 +22,7 @@ function checkDiff() {
 }
 
 // ── Persistance du FileSystemFileHandle via IndexedDB ────────────────
-const IDB_NAME = "liens-utiles-db";
+const IDB_NAME = "kit-doc-survie-db";
 const IDB_STORE = "fileHandles";
 const IDB_KEY = "mesLiens";
 
@@ -106,7 +106,8 @@ async function ecrireFichier(handle) {
       return;
     }
     const data = loadLiens();
-    const content = "var mesLiensDefaut = " + JSON.stringify(data, null, 2) + ";\n";
+    const content =
+      "var mesLiensDefaut = " + JSON.stringify(data, null, 2) + ";\n";
     const writable = await handle.createWritable();
     await writable.write(content);
     await writable.close();
@@ -118,9 +119,11 @@ async function ecrireFichier(handle) {
   }
 }
 
-document.getElementById("modalPremiereSauvegarde").addEventListener("click", function (e) {
-  if (e.target === this) fermerModalPremiereSauvegarde();
-});
+document
+  .getElementById("modalPremiereSauvegarde")
+  .addEventListener("click", function (e) {
+    if (e.target === this) fermerModalPremiereSauvegarde();
+  });
 
 function renderLiens() {
   const data = loadLiens();
