@@ -8,6 +8,7 @@ const DEST_DIR = path.join(process.cwd(), "kit-doc-survie");
 const SRC_DIR = path.join(__dirname, "..");
 const APP_FILES = [
   "index.html",
+  "admin.html",
   "style.css",
   "liens.js",
   "taches.js",
