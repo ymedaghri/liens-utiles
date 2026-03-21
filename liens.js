@@ -65,6 +65,7 @@ async function enregistrerModifications() {
   const handle = await recupererHandle();
 
   if (!handle) {
+    document.getElementById("erreurFichierLiens").style.display = "none";
     document.getElementById("modalPremiereSauvegarde").classList.add("open");
     return;
   }
@@ -79,15 +80,17 @@ function fermerModalPremiereSauvegarde() {
 async function ouvrirSelecteurFichier() {
   fermerModalPremiereSauvegarde();
   try {
-    const handle = await window.showSaveFilePicker({
-      suggestedName: "mesLiens.js",
-      types: [{ description: "Fichier JavaScript", accept: { "text/javascript": [".js"] } }],
-    });
+    const dirHandle = await window.showDirectoryPicker();
+    const handle = await dirHandle.getFileHandle("mesLiens.js");
+    document.getElementById("erreurFichierLiens").style.display = "none";
     await sauvegarderHandle(handle);
     await ecrireFichier(handle);
   } catch (err) {
-    if (err.name !== "AbortError") {
-      console.error("Erreur lors de la sélection du fichier :", err);
+    if (err.name === "NotFoundError") {
+      document.getElementById("erreurFichierLiens").style.display = "block";
+      document.getElementById("modalPremiereSauvegarde").classList.add("open");
+    } else if (err.name !== "AbortError") {
+      console.error("Erreur lors de la sélection du dossier :", err);
     }
   }
 }

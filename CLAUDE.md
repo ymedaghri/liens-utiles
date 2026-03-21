@@ -8,21 +8,28 @@ Fichiers du projet :
 | Fichier | Rôle |
 |---|---|
 | `liens-utiles.html` | Structure HTML uniquement (markup + modales + balises `<script src>`) |
-| `style.css` | Tout le CSS (layout, typo, tâches, liens, thèmes, modales) |
-| `mesLiens.js` | Données par défaut (`var mesLiensDefaut`) — chargé en premier |
+| `style.css` | Tout le CSS (layout, typo, tâches, liens, notes, thèmes, modales) |
+| `mesLiens.js` | Données par défaut (`var mesLiensDefaut`) — chargé avant `liens.js` |
+| `mesNotes.js` | Données par défaut (`var mesNotesDefaut`) — chargé avant `notes.js` |
 | `liens.js` | Logique JS du panel mesLiens (CRUD catégories, liens, modales, mode édition, sauvegarde fichier) |
 | `taches.js` | Logique JS du panel mesTaches (CRUD tâches, filtres, rendu) |
+| `notes.js` | Logique JS du panel mesNotes (CRUD notes, blocs, modales, mode édition, sauvegarde fichier) |
 
 Ordre de chargement des scripts dans le HTML (important — dépendances) :
 ```html
 <script src="mesLiens.js"></script>  <!-- déclare mesLiensDefaut -->
+<script src="mesNotes.js"></script>  <!-- déclare mesNotesDefaut -->
 <script src="liens.js"></script>     <!-- utilise mesLiensDefaut -->
 <script src="taches.js"></script>
+<script src="notes.js"></script>     <!-- utilise mesNotesDefaut, esc() de taches.js -->
 ```
 
-Layout deux colonnes côte à côte (flex), responsive (colonne unique sous 860px) :
+Layout trois colonnes côte à côte (flex), responsive (colonne unique sous 860px) :
 - **Gauche** — `mesTaches` : gestionnaire de tâches avec priorités et filtres
+- **Milieu** — `mesNotes` : gestionnaire de notes composées de blocs
 - **Droite** — `mesLiens` : gestionnaire de liens organisés par catégories
+
+Les colonnes gauche et milieu ont la classe `panel panel-left` (border-right). Sur mobile, `panel-left` passe en `border-bottom`.
 
 ---
 
@@ -47,12 +54,78 @@ Stocké dans `localStorage` sous la clé `"mes_taches"`.
 | `remove(id)` | Supprime une tâche |
 | `setFilter(f, btn)` | Change le filtre actif |
 | `render()` | Restitue la liste filtrée dans `#taskList` |
-| `esc(s)` | Échappe le HTML pour éviter les injections |
+| `esc(s)` | Échappe le HTML pour éviter les injections — **globale, réutilisée par `notes.js`** |
 
 ### Couleurs par priorité (classes CSS)
 - `.task-urgent` — rouge rosé
 - `.task-normal` — bleu
 - `.task-later` — gris
+
+### Responsive add-bar
+`.add-bar` utilise `flex-wrap` avec `min-width: 0` sur l'input pour que la select et le bouton `+` restent sur une seule ligne même dans une colonne étroite.
+
+---
+
+## Panel milieu — mesNotes
+
+### Persistance
+Stocké dans `localStorage` sous la clé `"mes_notes"`.
+Au premier chargement, si la clé est absente, on initialise avec `mesNotesDefaut`.
+Sauvegarde également dans le fichier `mesNotes.js` via la File System Access API (même mécanisme que mesLiens).
+
+### Données par défaut
+`mesNotesDefaut` est déclaré dans **`mesNotes.js`** (variable globale `var`) et chargé avant `notes.js`.
+
+### Structure des données
+```json
+[
+  {
+    "id": 1700000000000,
+    "theme": "t-green",
+    "titre": "Titre de la note",
+    "blocs": [
+      { "type": "b", "content": "Titre gras" },
+      { "type": "p", "content": "Texte libre" },
+      { "type": "pre", "content": "code..." },
+      { "type": "ul", "items": ["item 1", "item 2"] }
+    ]
+  }
+]
+```
+
+### Types de blocs
+| Type | Balise rendue | Saisie |
+|---|---|---|
+| `b` | `<b>` (display:block) | Champ texte simple |
+| `p` | `<p>` | Champ texte simple |
+| `pre` | `<pre>` | Textarea, prend toute la largeur |
+| `ul` | `<ul><li>…` | Textarea, un élément par ligne |
+
+Les blocs `pre` prennent toute la largeur grâce à `.bloc-actions` en `position: absolute` sur le `.bloc-wrapper`. En mode édition, un `padding-right: 72px` est ajouté au wrapper pour éviter que le texte passe sous les boutons.
+
+### Fonctions JS clés (`notes.js`)
+| Fonction | Rôle |
+|---|---|
+| `loadNotes()` | Lit le tableau depuis localStorage (fallback sur `mesNotesDefaut`) |
+| `saveNotes(data)` | Persiste dans localStorage + appelle `checkDiffNotes()` |
+| `renderNotes()` | Génère le HTML de toutes les notes, préserve `.edit-mode` |
+| `checkDiffNotes()` | Compare localStorage avec `mesNotesDefaut` — affiche/masque `#btnSaveNotes` |
+| `enregistrerModificationsNotes()` | Récupère le handle IndexedDB ; si absent, ouvre la modale d'instruction |
+| `ouvrirSelecteurFichierNotes()` | Ouvre `showSaveFilePicker`, vérifie que le nom est `mesNotes.js`, stocke le handle, écrit |
+| `ecrireFichierNotes(handle)` | Écrit dans `mesNotes.js`, met à jour `mesNotesDefaut` en mémoire, appelle `checkDiffNotes()` |
+| `toggleEditModeNotes()` | Active / désactive le mode édition sur `#notesContainer` |
+| `openModalNote()` | Ouvre la modale de création de note |
+| `confirmerNote()` | Valide et persiste la nouvelle note |
+| `ouvrirModalEditNote(idx)` | Ouvre la modale d'édition de note pré-remplie |
+| `confirmerEditNote()` | Sauvegarde titre/thème modifiés |
+| `ouvrirConfirmSupprNote(idx)` | Ouvre la confirmation de suppression de note |
+| `supprimerNote()` | Supprime la note à `noteIdxASupprimer` |
+| `ouvrirModalBloc(noteIdx)` | Ouvre la modale d'ajout de bloc |
+| `ouvrirModalEditBloc(noteIdx, blocIdx)` | Ouvre la modale d'édition de bloc pré-remplie |
+| `confirmerBloc()` | Ajoute ou modifie un bloc |
+| `ouvrirConfirmSupprBloc(noteIdx, blocIdx)` | Ouvre la confirmation de suppression de bloc |
+| `supprimerBloc()` | Supprime le bloc à `supprBlocNoteIdx / supprBlocBlocIdx` |
+| `updateBlocPlaceholder()` | Met à jour le placeholder du textarea selon le type sélectionné |
 
 ---
 
@@ -86,7 +159,7 @@ Au premier chargement, si la clé est absente, on initialise avec `mesLiensDefau
 | `renderLiens()` | Génère tout le HTML des sections + appelle `checkDiff()` |
 | `checkDiff()` | Compare localStorage avec `mesLiensDefaut` en mémoire — affiche/masque `#btnSave` |
 | `enregistrerModifications()` | Récupère le handle IndexedDB ; si absent, ouvre la modale d'instruction |
-| `ouvrirSelecteurFichier()` | Ouvre `showSaveFilePicker`, stocke le handle, écrit le fichier |
+| `ouvrirSelecteurFichier()` | Ouvre `showSaveFilePicker`, vérifie que le nom est `mesLiens.js`, stocke le handle, écrit |
 | `ecrireFichier(handle)` | Écrit le contenu dans `mesLiens.js`, met à jour `mesLiensDefaut` en mémoire, appelle `checkDiff()` |
 | `openModalCategorie()` | Ouvre la modale d'ajout de catégorie |
 | `confirmerCategorie()` | Valide et persiste la nouvelle catégorie |
@@ -100,7 +173,7 @@ Au premier chargement, si la clé est absente, on initialise avec `mesLiensDefau
 | `confirmerEditLien()` | Sauvegarde les modifications du lien édité |
 | `toggleEditMode()` | Active / désactive le mode édition |
 
-### Thèmes de catégories (classes CSS)
+### Thèmes de catégories / notes (classes CSS)
 | Classe | Couleur |
 |---|---|
 | `t-green` | Vert |
@@ -110,39 +183,45 @@ Au premier chargement, si la clé est absente, on initialise avec `mesLiensDefau
 | `t-rose` | Rose |
 | `t-teal` | Teal |
 
+Les mêmes thèmes s'appliquent aux notes (`.note.t-green`, etc.) et aux sections de liens (`.t-green`). La règle `.t-green h2` colore les titres des deux panels.
+
 ---
 
-## Bouton "enregistrer les modifications"
+## Boutons "enregistrer les modifications"
 
-Le bouton `#btnSave` apparaît dans la toolbar de mesLiens quand le contenu du localStorage diffère de `mesLiensDefaut` en mémoire.
+### mesLiens — `#btnSave` / mesNotes — `#btnSaveNotes`
+Apparaissent dans leur toolbar respective quand le localStorage diffère des données par défaut en mémoire.
 
-### Comportement
-- **Visible** (vert foncé plein) dès qu'une différence est détectée par `checkDiff()`
-- **Masqué** après une sauvegarde réussie (via mise à jour de `mesLiensDefaut` + `checkDiff()`)
+### Comportement (commun aux deux)
+- **Visible** (vert foncé plein) dès qu'une différence est détectée par `checkDiff()` / `checkDiffNotes()`
+- **Masqué** après une sauvegarde réussie (mise à jour de la variable défaut en mémoire + `checkDiff*()`)
 
 ### Mécanisme de sauvegarde du fichier (`File System Access API`)
-- Utilise `showSaveFilePicker` (Chrome/Edge Chromium uniquement)
-- Le `FileSystemFileHandle` est persisté en **IndexedDB** (`liens-utiles-db` / store `fileHandles` / clé `mesLiens`)
-- **1ère utilisation** : modale `#modalPremiereSauvegarde` explique à l'utilisateur qu'il doit naviguer jusqu'à `mesLiens.js` → dialogue natif → handle sauvegardé
-- **Utilisations suivantes** : sauvegarde directe sans dialogue (le handle est récupéré depuis IndexedDB, la permission est vérifiée/redemandée si nécessaire)
-- Après écriture réussie : `mesLiensDefaut` est mis à jour en mémoire et `checkDiff()` est rappelé pour masquer le bouton
+- Utilise `showDirectoryPicker` (Chrome/Edge Chromium uniquement)
+- Le `FileSystemFileHandle` est persisté en **IndexedDB** (base `liens-utiles-db` / store `fileHandles`)
+  - clé `"mesLiens"` pour `mesLiens.js`
+  - clé `"mesNotes"` pour `mesNotes.js`
+- **1ère utilisation** : modale d'instruction → `showDirectoryPicker()` (l'utilisateur sélectionne le **dossier** du projet) → `dirHandle.getFileHandle("mesLiens.js")` récupère le fichier par nom → handle sauvegardé en IndexedDB
+- **Sécurité** : on ne manipule jamais directement un fichier via le sélecteur — le fichier cible est obtenu programmatiquement par son nom depuis le dossier. Si le fichier est absent du dossier sélectionné (`NotFoundError`), la modale se ré-ouvre avec un message d'erreur rouge. Aucun fichier n'est écrasé accidentellement.
+- **Utilisations suivantes** : sauvegarde directe sans dialogue (handle récupéré depuis IndexedDB, permission vérifiée/redemandée si nécessaire)
 
 ---
 
 ## Mode édition
 
-Le mode édition est piloté par la classe CSS `.edit-mode` posée sur `#linksContainer`.
+Piloté par la classe CSS `.edit-mode` posée sur le conteneur du panel (`#linksContainer` ou `#notesContainer`).
 
-- **Hors mode édition** : les boutons d'action (`.cat-actions`, `.link-actions`) sont masqués (`opacity: 0`). Le bouton "nouvelle catégorie" est également masqué (`display: none`).
-- **En mode édition** : `.edit-mode .cat-actions` et `.edit-mode .link-actions` passent en `opacity: 1`. Le bouton "nouvelle catégorie" réapparaît via `.inner:has(#linksContainer.edit-mode) .btn-add-cat`.
-- Le bouton toggle `#btnEditMode` change uniquement son texte ("passer en mode édition" / "quitter le mode édition"), sans changement d'apparence visuelle.
+- **Hors mode édition** : les boutons d'action sont masqués (`opacity: 0`). Les boutons "nouvelle catégorie" / "nouvelle note" sont masqués (`display: none`).
+- **En mode édition** : les actions passent en `opacity: 1`. Les boutons d'ajout réapparaissent via `.inner:has(#linksContainer.edit-mode) .btn-add-cat` et `.inner:has(#notesContainer.edit-mode) .btn-add-note`.
+- Le bouton toggle change uniquement son texte, sans changement d'apparence visuelle.
 
 ---
 
 ## Modales
 
-Toutes les modales partagent la même structure `.modal-backdrop > .modal` et la classe `.open` pour l'affichage.
+Toutes les modales partagent la même structure `.modal-backdrop > .modal` et la classe `.open` pour l'affichage. Toutes se ferment en cliquant sur le fond (`.modal-backdrop`).
 
+### mesLiens
 | ID | Rôle |
 |---|---|
 | `#modalCategorie` | Ajout d'une catégorie (nom + sélecteur de couleur) |
@@ -150,9 +229,17 @@ Toutes les modales partagent la même structure `.modal-backdrop > .modal` et la
 | `#modalLien` | Ajout d'un lien (nom, description, url) |
 | `#modalConfirmSupprLien` | Confirmation de suppression d'un lien |
 | `#modalEditLien` | Édition d'un lien existant (pré-rempli) |
-| `#modalPremiereSauvegarde` | Instructions pour la première sauvegarde de `mesLiens.js` |
+| `#modalPremiereSauvegarde` | Instructions pour la première sauvegarde de `mesLiens.js` (avec `#erreurFichierLiens`) |
 
-Toutes les modales se ferment en cliquant sur le fond (`.modal-backdrop`).
+### mesNotes
+| ID | Rôle |
+|---|---|
+| `#modalNote` | Création d'une note (titre + couleur) |
+| `#modalEditNote` | Édition titre/couleur d'une note existante |
+| `#modalConfirmSupprNote` | Confirmation de suppression de note |
+| `#modalBloc` | Ajout ou édition d'un bloc (type + textarea) — titre dynamique via `#modalBlocTitre` |
+| `#modalConfirmSupprBloc` | Confirmation de suppression de bloc |
+| `#modalPremiereSauvegardeNotes` | Instructions pour la première sauvegarde de `mesNotes.js` (avec `#erreurFichierNotes`) |
 
 ---
 

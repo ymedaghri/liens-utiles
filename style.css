@@ -444,7 +444,9 @@ section {
   background: #fff7ed;
   color: #f97316;
   flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 .btn-add-link:hover {
   background: #f97316;
@@ -457,7 +459,9 @@ section {
   background: #fef2f2;
   color: #ef4444;
   flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 .btn-del-cat:hover {
   background: #ef4444;
@@ -480,7 +484,9 @@ section {
   padding: 3px 7px;
   border-radius: 5px;
   font-weight: 600;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 .btn-edit-link {
   background: #fff7ed;
@@ -517,7 +523,9 @@ section {
   text-transform: uppercase;
   padding: 7px 14px;
   border-radius: 8px;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 .btn-add-cat {
   border: 1px dashed #d6d3d1;
@@ -643,6 +651,253 @@ section {
 }
 .btn-confirm:hover {
   background: #f97316;
+}
+
+/* ══════════════════════════════════════
+   PANEL MILIEU — Notes
+   ══════════════════════════════════════ */
+
+.btn-add-note {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px dashed #d6d3d1;
+  color: #a8a29e;
+  display: none;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.inner:has(#notesContainer.edit-mode) .btn-add-note {
+  display: flex;
+}
+.btn-add-note:hover {
+  background: #f97316;
+  border-color: #f97316;
+  color: #fff;
+}
+
+.note {
+  border-radius: 10px;
+  border: 1px solid #e7e5e4;
+  margin-bottom: 16px;
+}
+.note-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e7e5e4;
+}
+.note-header h2 {
+  margin-bottom: 0;
+}
+.note-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.edit-mode .note-actions {
+  opacity: 1;
+}
+.note-content {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.note-content b {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #292524;
+}
+.note-content p {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #292524;
+}
+.note-content pre {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.78rem;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 10px 12px;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #292524;
+}
+.note-content ul {
+  padding-left: 18px;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+.bloc-wrapper {
+  position: relative;
+}
+.bloc-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.edit-mode .bloc-actions {
+  opacity: 1;
+}
+.edit-mode .bloc-wrapper {
+  padding-right: 72px;
+}
+.note-footer {
+  padding: 8px 16px 12px;
+  display: none;
+}
+.edit-mode .note-footer {
+  display: block;
+}
+.btn-add-bloc {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px dashed #d6d3d1;
+  color: #a8a29e;
+  transition: all 0.15s;
+}
+.btn-add-bloc:hover {
+  background: #f97316;
+  border-color: #f97316;
+  color: #fff;
+}
+.btn-edit-note {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #fff7ed;
+  color: #f97316;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-edit-note:hover {
+  background: #f97316;
+  color: #fff;
+}
+.btn-del-note {
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #fef2f2;
+  color: #ef4444;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-del-note:hover {
+  background: #ef4444;
+  color: #fff;
+}
+.btn-edit-bloc {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #fff7ed;
+  color: #f97316;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-edit-bloc:hover {
+  background: #f97316;
+  color: #fff;
+}
+.btn-del-bloc {
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #fef2f2;
+  color: #ef4444;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-del-bloc:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* Couleurs des notes par thème */
+.note.t-green {
+  border-color: #d1fae5;
+  background: rgba(209, 250, 229, 0.12);
+}
+.note.t-green .note-header {
+  border-bottom-color: #d1fae5;
+}
+.note.t-violet {
+  border-color: #ede9fe;
+  background: rgba(237, 233, 254, 0.12);
+}
+.note.t-violet .note-header {
+  border-bottom-color: #ede9fe;
+}
+.note.t-amber {
+  border-color: #fef3c7;
+  background: rgba(254, 243, 199, 0.12);
+}
+.note.t-amber .note-header {
+  border-bottom-color: #fef3c7;
+}
+.note.t-sky {
+  border-color: #e0f2fe;
+  background: rgba(224, 242, 254, 0.12);
+}
+.note.t-sky .note-header {
+  border-bottom-color: #e0f2fe;
+}
+.note.t-rose {
+  border-color: #ffe4e6;
+  background: rgba(255, 228, 230, 0.12);
+}
+.note.t-rose .note-header {
+  border-bottom-color: #ffe4e6;
+}
+.note.t-teal {
+  border-color: #ccfbf1;
+  background: rgba(204, 251, 241, 0.12);
+}
+.note.t-teal .note-header {
+  border-bottom-color: #ccfbf1;
+}
+
+/* Textarea dans les modales */
+.modal textarea {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  border: 1px solid #d6d3d1;
+  border-radius: 8px;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.15s;
+  resize: vertical;
+}
+.modal textarea:focus {
+  border-color: #f97316;
 }
 
 /* ── Swatch couleur dans le select ── */

@@ -54,6 +54,14 @@
         <div class="inner">
           <h1>mesNotes<span class="accent">.</span></h1>
           <p class="subtitle">tout ce que je dois hélas retenir</p>
+
+          <div class="liens-toolbar">
+            <button class="btn-save" id="btnSaveNotes" onclick="enregistrerModificationsNotes()">enregistrer les modifications</button>
+            <button class="btn-edit-mode" id="btnEditModeNotes" onclick="toggleEditModeNotes()">passer en mode édition</button>
+            <button class="btn-add-note" onclick="openModalNote()">+ nouvelle note</button>
+          </div>
+
+          <div id="notesContainer"></div>
         </div>
       </div>
 
@@ -165,10 +173,10 @@
       <div class="modal">
         <h3>Première sauvegarde</h3>
         <p style="font-size:0.875rem;color:#78716c;margin-bottom:12px;">
-          Une boîte de dialogue va s'ouvrir pour choisir le fichier à écraser.
+          Une boîte de dialogue va s'ouvrir pour sélectionner le dossier du projet.
         </p>
         <p style="font-size:0.875rem;color:#292524;margin-bottom:8px;">
-          Navigue jusqu'au dossier du projet et sélectionne le fichier :
+          Navigue jusqu'au dossier contenant le fichier :
         </p>
         <p style="font-family:'Cascadia Code','SF Mono',Consolas,monospace;font-size:0.8rem;background:#f5f5f4;padding:8px 12px;border-radius:6px;margin-bottom:24px;color:#059669;">
           mesLiens.js
@@ -176,16 +184,139 @@
         <p style="font-size:0.8rem;color:#a8a29e;margin-bottom:24px;">
           Cette étape n'aura lieu qu'une seule fois. Les sauvegardes suivantes seront directes.
         </p>
+        <p id="erreurFichierLiens" style="display:none;font-size:0.8rem;color:#ef4444;background:#fef2f2;padding:8px 12px;border-radius:6px;margin-bottom:16px;">
+          Fichier introuvable dans ce dossier. Sélectionne le dossier qui contient <strong>mesLiens.js</strong>.
+        </p>
         <div class="modal-actions">
           <button class="btn-cancel" onclick="fermerModalPremiereSauvegarde()">Annuler</button>
-          <button class="btn-confirm" onclick="ouvrirSelecteurFichier()">Choisir le fichier</button>
+          <button class="btn-confirm" onclick="ouvrirSelecteurFichier()">Choisir le dossier</button>
         </div>
       </div>
     </div>
 
-    <!-- Scripts : données → liens → tâches -->
+    <!-- ── Modale nouvelle note ── -->
+    <div class="modal-backdrop" id="modalNote">
+      <div class="modal">
+        <h3>Nouvelle note</h3>
+        <label for="noteNom">Titre</label>
+        <input type="text" id="noteNom" placeholder="ex : Raccourcis Git…" onkeydown="if(event.key==='Enter') confirmerNote();" />
+        <label for="noteCouleur">Couleur</label>
+        <select id="noteCouleur">
+          <option value="t-green">Vert</option>
+          <option value="t-violet">Violet</option>
+          <option value="t-amber">Ambre</option>
+          <option value="t-sky">Bleu ciel</option>
+          <option value="t-rose">Rose</option>
+          <option value="t-teal">Teal</option>
+        </select>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="closeModalNote()">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerNote()">Créer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale édition note ── -->
+    <div class="modal-backdrop" id="modalEditNote">
+      <div class="modal">
+        <h3>Modifier la note</h3>
+        <label for="editNoteNom">Titre</label>
+        <input type="text" id="editNoteNom" placeholder="ex : Raccourcis Git…" onkeydown="if(event.key==='Enter') confirmerEditNote();" />
+        <label for="editNoteCouleur">Couleur</label>
+        <select id="editNoteCouleur">
+          <option value="t-green">Vert</option>
+          <option value="t-violet">Violet</option>
+          <option value="t-amber">Ambre</option>
+          <option value="t-sky">Bleu ciel</option>
+          <option value="t-rose">Rose</option>
+          <option value="t-teal">Teal</option>
+        </select>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerModalEditNote()">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerEditNote()">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale confirmation suppression note ── -->
+    <div class="modal-backdrop" id="modalConfirmSupprNote">
+      <div class="modal">
+        <h3>Supprimer la note ?</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;">
+          Tous les blocs de cette note seront également supprimés. Cette action est irréversible.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerConfirmSupprNote()">Annuler</button>
+          <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerNote()">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale ajout / édition bloc ── -->
+    <div class="modal-backdrop" id="modalBloc">
+      <div class="modal">
+        <h3 id="modalBlocTitre">Nouveau bloc</h3>
+        <label for="blocType">Type</label>
+        <select id="blocType" onchange="updateBlocPlaceholder()">
+          <option value="b">Titre</option>
+          <option value="p">Texte</option>
+          <option value="pre">Code</option>
+          <option value="ul">Liste à puces</option>
+        </select>
+        <label for="blocContent">Contenu</label>
+        <textarea id="blocContent" rows="6" placeholder="Texte…"></textarea>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerModalBloc()">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerBloc()">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale confirmation suppression bloc ── -->
+    <div class="modal-backdrop" id="modalConfirmSupprBloc">
+      <div class="modal">
+        <h3>Supprimer le bloc ?</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;">
+          Cette action est irréversible.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerConfirmSupprBloc()">Annuler</button>
+          <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerBloc()">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale première sauvegarde notes ── -->
+    <div class="modal-backdrop" id="modalPremiereSauvegardeNotes">
+      <div class="modal">
+        <h3>Première sauvegarde</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:12px;">
+          Une boîte de dialogue va s'ouvrir pour sélectionner le dossier du projet.
+        </p>
+        <p style="font-size:0.875rem;color:#292524;margin-bottom:8px;">
+          Navigue jusqu'au dossier contenant le fichier :
+        </p>
+        <p style="font-family:'Cascadia Code','SF Mono',Consolas,monospace;font-size:0.8rem;background:#f5f5f4;padding:8px 12px;border-radius:6px;margin-bottom:24px;color:#059669;">
+          mesNotes.js
+        </p>
+        <p style="font-size:0.8rem;color:#a8a29e;margin-bottom:24px;">
+          Cette étape n'aura lieu qu'une seule fois. Les sauvegardes suivantes seront directes.
+        </p>
+        <p id="erreurFichierNotes" style="display:none;font-size:0.8rem;color:#ef4444;background:#fef2f2;padding:8px 12px;border-radius:6px;margin-bottom:16px;">
+          Fichier introuvable dans ce dossier. Sélectionne le dossier qui contient <strong>mesNotes.js</strong>.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerModalPremiereSauvegardeNotes()">Annuler</button>
+          <button class="btn-confirm" onclick="ouvrirSelecteurFichierNotes()">Choisir le dossier</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts : données → liens → tâches → notes -->
     <script src="mesLiens.js"></script>
+    <script src="mesNotes.js"></script>
     <script src="liens.js"></script>
     <script src="taches.js"></script>
+    <script src="notes.js"></script>
   </body>
 </html>
