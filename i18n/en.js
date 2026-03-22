@@ -24,7 +24,6 @@ var i18n_en = {
 
   // mesNotes
   notes_subtitle: "everything I need to remember",
-  notes_btn_save: "save changes",
   notes_btn_edit_mode: "enter edit mode",
   notes_btn_quit_edit_mode: "exit edit mode",
   notes_btn_add: "+ new note",
@@ -37,7 +36,6 @@ var i18n_en = {
 
   // mesLiens
   liens_subtitle: "everything I don't want to lose",
-  liens_btn_save: "save changes",
   liens_btn_edit_mode: "enter edit mode",
   liens_btn_quit_edit_mode: "exit edit mode",
   liens_btn_add_cat: "+ new category",
@@ -87,19 +85,6 @@ var i18n_en = {
   modal_suppr_cat_msg:
     "All links in this category will also be deleted. This action is irreversible.",
 
-  // Modal first save (links & notes)
-  modal_first_save_title: "First save",
-  modal_first_save_intro:
-    "A dialog box will open to select the project folder.",
-  modal_first_save_navigate: "Navigate to the folder containing the file:",
-  modal_first_save_once:
-    "This step will only happen once. Subsequent saves will be direct.",
-  modal_first_save_error_liens:
-    "File not found in this folder. Please select the folder containing <strong>mesLiens.js</strong>.",
-  modal_first_save_error_notes:
-    "File not found in this folder. Please select the folder containing <strong>mesNotes.js</strong>.",
-  modal_first_save_btn_choose: "Choose folder",
-
   // Modal note
   modal_note_title: "New note",
   modal_note_label_titre: "Title",
@@ -138,7 +123,6 @@ var i18n_en = {
 
   // Diagrams
   diag_page_title: "Diagrams",
-  diag_btn_save: "save",
   diag_btn_new: "+ New",
   diag_my_diagrams: "My diagrams",
   diag_new_diagram: "New diagram",
@@ -150,27 +134,34 @@ var i18n_en = {
   diag_tool_text:    "Free text",
   diag_tool_arrow:   "Arrow (click source → click target, or drag from a connection dot)",
   diag_tool_delete:  "Delete selection (Del)",
-  diag_first_save_error: "File not found. Select the folder containing <strong>diagrammes.js</strong>.",
   diag_edit_text: "Edit text",
 
+  // Auto-save indicator
+  save_indicator: "Saved",
+
   // Admin
-  admin_subtitle: "data reset",
-  admin_why_title: "Why this page?",
+  admin_subtitle: "data management",
+  admin_why_title: "Auto-save",
   admin_why_p1:
-    "The application stores your data in two places in your browser: <strong>localStorage</strong> (tasks, notes, links) and <strong>IndexedDB</strong> (the file handle for direct saving).",
+    "The application automatically saves your data to the browser's <strong>localStorage</strong> on every change.",
   admin_why_p2:
-    "This data <strong>is not deleted</strong> by clearing the cache or closing the browser. This page lets you erase it cleanly, for example to start fresh or resolve a sync issue between the file and the browser.",
+    "This data <strong>persists</strong> even when closing the browser. Use JSON export to create an external backup.",
   admin_why_p3:
-    "<strong>Warning:</strong> these actions are irreversible. If you haven't saved your changes to <code>mesLiens.js</code> and <code>mesNotes.js</code>, your data will be lost.",
+    "<strong>Warning:</strong> clearing localStorage is irreversible. Export your data first if you want to keep it.",
+  admin_export_title: "Export / Import",
+  admin_export_btn: "Export (JSON)",
+  admin_export_desc: "Download all your data (tasks, notes, links, diagrams) as a JSON file.",
+  admin_import_btn: "Import (JSON)",
+  admin_import_desc: "Restore your data from a previously exported JSON file.",
+  admin_import_confirm: "Import will replace all current data. Continue?",
+  admin_import_success: "Import successful! The page will reload.",
+  admin_import_error: "Error during import. Please check that the file is valid.",
+  admin_reset_title: "Reset",
   admin_ls_label: "Clear localStorage",
   admin_ls_desc:
-    "Deletes all tasks, notes and links stored in the browser. On next load, the application will start from the default data in <code>mesLiens.js</code> and <code>mesNotes.js</code>.",
-  admin_idb_label: "Delete IndexedDB",
-  admin_idb_desc:
-    "Clears the stored file handle for direct saving. The next save will prompt you to select the project folder again, as on first use.",
-  admin_execute_btn: "execute selected actions",
+    "Deletes all tasks, notes, links and diagrams. The application will restart with default data.",
+  admin_execute_btn: "clear data",
   admin_feedback_ls: "localStorage cleared.",
-  admin_feedback_idb: "IndexedDB deleted.",
   admin_feedback_return: "Return to the dashboard to see the changes.",
   admin_lang_title: "Langue / Language",
   admin_lang_applied: "Language applied.",

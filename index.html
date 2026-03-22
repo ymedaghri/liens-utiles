@@ -67,7 +67,7 @@
           <p class="subtitle" data-i18n="notes_subtitle">tout ce que je dois hélas retenir</p>
 
           <div class="liens-toolbar">
-            <button class="btn-save" id="btnSaveNotes" onclick="enregistrerModificationsNotes()" data-i18n="notes_btn_save">enregistrer les modifications</button>
+            <span id="saveIndicatorNotes" class="save-indicator" data-i18n="save_indicator">Enregistré</span>
             <button class="btn-edit-mode" id="btnEditModeNotes" onclick="toggleEditModeNotes()" data-i18n="notes_btn_edit_mode">passer en mode édition</button>
             <button class="btn-add-note" onclick="openModalNote()" data-i18n="notes_btn_add">+ nouvelle note</button>
           </div>
@@ -85,7 +85,7 @@
           <p class="subtitle" data-i18n="liens_subtitle">tout ce que je ne veux pas perdre</p>
 
           <div class="liens-toolbar">
-            <button class="btn-save" id="btnSave" onclick="enregistrerModifications()" data-i18n="liens_btn_save">enregistrer les modifications</button>
+            <span id="saveIndicatorLiens" class="save-indicator" data-i18n="save_indicator">Enregistré</span>
             <button class="btn-edit-mode" id="btnEditMode" onclick="toggleEditMode()" data-i18n="liens_btn_edit_mode">passer en mode édition</button>
             <button class="btn-add-cat" onclick="openModalCategorie()" data-i18n="liens_btn_add_cat">+ nouvelle catégorie</button>
           </div>
@@ -175,32 +175,6 @@
         <div class="modal-actions">
           <button class="btn-cancel" onclick="fermerConfirmSupprCat()" data-i18n="cancel">Annuler</button>
           <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerCategorie()" data-i18n="irreversible_delete">Supprimer</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Modale première sauvegarde ── -->
-    <div class="modal-backdrop" id="modalPremiereSauvegarde">
-      <div class="modal">
-        <h3 data-i18n="modal_first_save_title">Première sauvegarde</h3>
-        <p style="font-size:0.875rem;color:#78716c;margin-bottom:12px;" data-i18n="modal_first_save_intro">
-          Une boîte de dialogue va s'ouvrir pour sélectionner le dossier du projet.
-        </p>
-        <p style="font-size:0.875rem;color:#292524;margin-bottom:8px;" data-i18n="modal_first_save_navigate">
-          Navigue jusqu'au dossier contenant le fichier :
-        </p>
-        <p style="font-family:'Cascadia Code','SF Mono',Consolas,monospace;font-size:0.8rem;background:#f5f5f4;padding:8px 12px;border-radius:6px;margin-bottom:24px;color:#059669;">
-          mesLiens.js
-        </p>
-        <p style="font-size:0.8rem;color:#a8a29e;margin-bottom:24px;" data-i18n="modal_first_save_once">
-          Cette étape n'aura lieu qu'une seule fois. Les sauvegardes suivantes seront directes.
-        </p>
-        <p id="erreurFichierLiens" style="display:none;font-size:0.8rem;color:#ef4444;background:#fef2f2;padding:8px 12px;border-radius:6px;margin-bottom:16px;" data-i18n-html="modal_first_save_error_liens">
-          Fichier introuvable dans ce dossier. Sélectionne le dossier qui contient <strong>mesLiens.js</strong>.
-        </p>
-        <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerModalPremiereSauvegarde()" data-i18n="cancel">Annuler</button>
-          <button class="btn-confirm" onclick="ouvrirSelecteurFichier()" data-i18n="modal_first_save_btn_choose">Choisir le dossier</button>
         </div>
       </div>
     </div>
@@ -295,32 +269,6 @@
         <div class="modal-actions">
           <button class="btn-cancel" onclick="fermerConfirmSupprBloc()" data-i18n="cancel">Annuler</button>
           <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerBloc()" data-i18n="irreversible_delete">Supprimer</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Modale première sauvegarde notes ── -->
-    <div class="modal-backdrop" id="modalPremiereSauvegardeNotes">
-      <div class="modal">
-        <h3 data-i18n="modal_first_save_title">Première sauvegarde</h3>
-        <p style="font-size:0.875rem;color:#78716c;margin-bottom:12px;" data-i18n="modal_first_save_intro">
-          Une boîte de dialogue va s'ouvrir pour sélectionner le dossier du projet.
-        </p>
-        <p style="font-size:0.875rem;color:#292524;margin-bottom:8px;" data-i18n="modal_first_save_navigate">
-          Navigue jusqu'au dossier contenant le fichier :
-        </p>
-        <p style="font-family:'Cascadia Code','SF Mono',Consolas,monospace;font-size:0.8rem;background:#f5f5f4;padding:8px 12px;border-radius:6px;margin-bottom:24px;color:#059669;">
-          mesNotes.js
-        </p>
-        <p style="font-size:0.8rem;color:#a8a29e;margin-bottom:24px;" data-i18n="modal_first_save_once">
-          Cette étape n'aura lieu qu'une seule fois. Les sauvegardes suivantes seront directes.
-        </p>
-        <p id="erreurFichierNotes" style="display:none;font-size:0.8rem;color:#ef4444;background:#fef2f2;padding:8px 12px;border-radius:6px;margin-bottom:16px;" data-i18n-html="modal_first_save_error_notes">
-          Fichier introuvable dans ce dossier. Sélectionne le dossier qui contient <strong>mesNotes.js</strong>.
-        </p>
-        <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerModalPremiereSauvegardeNotes()" data-i18n="cancel">Annuler</button>
-          <button class="btn-confirm" onclick="ouvrirSelecteurFichierNotes()" data-i18n="modal_first_save_btn_choose">Choisir le dossier</button>
         </div>
       </div>
     </div>

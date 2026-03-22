@@ -11,119 +11,20 @@ function loadLiens() {
 
 function saveLiens(data) {
   localStorage.setItem(LIENS_KEY, JSON.stringify(data));
+  showSavedLiens();
 }
 
-function checkDiff() {
-  const stored = localStorage.getItem(LIENS_KEY);
-  const areDifferent = stored !== JSON.stringify(mesLiensDefaut);
-  document.getElementById("btnSave").style.display = areDifferent
-    ? "inline-flex"
-    : "none";
+// ── Indicateur de sauvegarde ─────────────────────────────────────────
+var _saveTimeoutLiens = null;
+function showSavedLiens() {
+  var el = document.getElementById("saveIndicatorLiens");
+  if (!el) return;
+  el.classList.add("visible");
+  if (_saveTimeoutLiens) clearTimeout(_saveTimeoutLiens);
+  _saveTimeoutLiens = setTimeout(function () {
+    el.classList.remove("visible");
+  }, 1500);
 }
-
-// ── Persistance du FileSystemFileHandle via IndexedDB ────────────────
-const IDB_NAME = "doc-survival-kit-db";
-const IDB_STORE = "fileHandles";
-const IDB_KEY = "mesLiens";
-
-function ouvrirDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(IDB_NAME, 1);
-    req.onupgradeneeded = (e) => e.target.result.createObjectStore(IDB_STORE);
-    req.onsuccess = (e) => resolve(e.target.result);
-    req.onerror = (e) => reject(e.target.error);
-  });
-}
-
-async function sauvegarderHandle(handle) {
-  const db = await ouvrirDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(IDB_STORE, "readwrite");
-    tx.objectStore(IDB_STORE).put(handle, IDB_KEY);
-    tx.oncomplete = resolve;
-    tx.onerror = (e) => reject(e.target.error);
-  });
-}
-
-async function recupererHandle() {
-  const db = await ouvrirDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(IDB_STORE, "readonly");
-    const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
-    req.onsuccess = (e) => resolve(e.target.result || null);
-    req.onerror = (e) => reject(e.target.error);
-  });
-}
-
-// ── Enregistrement du fichier mesLiens.js ────────────────────────────
-async function enregistrerModifications() {
-  if (!("showSaveFilePicker" in window)) {
-    console.error("File System Access API non disponible dans ce navigateur.");
-    return;
-  }
-
-  const handle = await recupererHandle();
-
-  if (!handle) {
-    document.getElementById("erreurFichierLiens").style.display = "none";
-    document.getElementById("modalPremiereSauvegarde").classList.add("open");
-    return;
-  }
-
-  await ecrireFichier(handle);
-}
-
-function fermerModalPremiereSauvegarde() {
-  document.getElementById("modalPremiereSauvegarde").classList.remove("open");
-}
-
-async function ouvrirSelecteurFichier() {
-  fermerModalPremiereSauvegarde();
-  try {
-    const dirHandle = await window.showDirectoryPicker();
-    const handle = await dirHandle.getFileHandle("mesLiens.js");
-    document.getElementById("erreurFichierLiens").style.display = "none";
-    await sauvegarderHandle(handle);
-    await ecrireFichier(handle);
-  } catch (err) {
-    if (err.name === "NotFoundError") {
-      document.getElementById("erreurFichierLiens").style.display = "block";
-      document.getElementById("modalPremiereSauvegarde").classList.add("open");
-    } else if (err.name !== "AbortError") {
-      console.error("Erreur lors de la sélection du dossier :", err);
-    }
-  }
-}
-
-async function ecrireFichier(handle) {
-  try {
-    let permission = await handle.queryPermission({ mode: "readwrite" });
-    if (permission !== "granted") {
-      permission = await handle.requestPermission({ mode: "readwrite" });
-    }
-    if (permission !== "granted") {
-      console.error("Permission d'écriture refusée.");
-      return;
-    }
-    const data = loadLiens();
-    const content =
-      "var mesLiensDefaut = " + JSON.stringify(data, null, 2) + ";\n";
-    const writable = await handle.createWritable();
-    await writable.write(content);
-    await writable.close();
-    mesLiensDefaut = data;
-    checkDiff();
-    console.log("mesLiens.js enregistré avec succès.", data);
-  } catch (err) {
-    console.error("Erreur lors de l'enregistrement :", err);
-  }
-}
-
-document
-  .getElementById("modalPremiereSauvegarde")
-  .addEventListener("click", function (e) {
-    if (e.target === this) fermerModalPremiereSauvegarde();
-  });
 
 function renderLiens() {
   const data = loadLiens();
@@ -160,7 +61,6 @@ function renderLiens() {
       </section>`,
     )
     .join("");
-  checkDiff();
 }
 
 if (!localStorage.getItem(LIENS_KEY)) {

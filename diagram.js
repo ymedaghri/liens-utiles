@@ -65,104 +65,19 @@ function loadDiagrammes() {
 
 function saveDiagrammes() {
   localStorage.setItem("mes_diagrammes", JSON.stringify(diagramsList));
-  checkDiffDiagrammes();
+  showSavedDiagram();
 }
 
-function checkDiffDiagrammes() {
-  var stored = localStorage.getItem("mes_diagrammes");
-  var diff = stored !== JSON.stringify(diagrammesDefaut);
-  document.getElementById("btnSaveDiagram").style.display = diff ? "inline-flex" : "none";
-}
-
-// ── File System Access API ──
-var IDB_KEY_DIAG = "diagrammes";
-
-function ouvrirDB_Diag() {
-  return new Promise(function (resolve, reject) {
-    var req = indexedDB.open("doc-survival-kit-db", 1);
-    req.onupgradeneeded = function (e) {
-      e.target.result.createObjectStore("fileHandles");
-    };
-    req.onsuccess = function (e) { resolve(e.target.result); };
-    req.onerror  = function (e) { reject(e.target.error); };
-  });
-}
-
-function sauvegarderHandle_Diag(handle) {
-  return ouvrirDB_Diag().then(function (db) {
-    return new Promise(function (resolve, reject) {
-      var tx = db.transaction("fileHandles", "readwrite");
-      tx.objectStore("fileHandles").put(handle, IDB_KEY_DIAG);
-      tx.oncomplete = resolve;
-      tx.onerror = function (e) { reject(e.target.error); };
-    });
-  });
-}
-
-function recupererHandle_Diag() {
-  return ouvrirDB_Diag().then(function (db) {
-    return new Promise(function (resolve, reject) {
-      var tx = db.transaction("fileHandles", "readonly");
-      var req = tx.objectStore("fileHandles").get(IDB_KEY_DIAG);
-      req.onsuccess = function (e) { resolve(e.target.result || null); };
-      req.onerror  = function (e) { reject(e.target.error); };
-    });
-  });
-}
-
-function enregistrerDiagrammes() {
-  if (!("showDirectoryPicker" in window)) return;
-  recupererHandle_Diag().then(function (handle) {
-    if (!handle) {
-      document.getElementById("erreurFichierDiag").style.display = "none";
-      document.getElementById("modalPremiereSauvegardeDiag").classList.add("open");
-    } else {
-      ecrireFichierDiag(handle);
-    }
-  });
-}
-
-function fermerModalSauvegardeDiag() {
-  document.getElementById("modalPremiereSauvegardeDiag").classList.remove("open");
-}
-
-function ouvrirSelecteurFichierDiag() {
-  fermerModalSauvegardeDiag();
-  window.showDirectoryPicker()
-    .then(function (dir) { return dir.getFileHandle("diagrammes.js"); })
-    .then(function (handle) {
-      document.getElementById("erreurFichierDiag").style.display = "none";
-      return sauvegarderHandle_Diag(handle).then(function () {
-        return ecrireFichierDiag(handle);
-      });
-    })
-    .catch(function (err) {
-      if (err.name === "NotFoundError") {
-        document.getElementById("erreurFichierDiag").style.display = "block";
-        document.getElementById("modalPremiereSauvegardeDiag").classList.add("open");
-      } else if (err.name !== "AbortError") {
-        console.error(err);
-      }
-    });
-}
-
-function ecrireFichierDiag(handle) {
-  return handle.queryPermission({ mode: "readwrite" })
-    .then(function (p) {
-      if (p !== "granted") return handle.requestPermission({ mode: "readwrite" });
-      return p;
-    })
-    .then(function (p) {
-      if (p !== "granted") return;
-      var content = "var diagrammesDefaut = " + JSON.stringify(diagramsList, null, 2) + ";\n";
-      return handle.createWritable().then(function (w) {
-        return w.write(content).then(function () { return w.close(); });
-      }).then(function () {
-        diagrammesDefaut = JSON.parse(JSON.stringify(diagramsList));
-        checkDiffDiagrammes();
-      });
-    })
-    .catch(function (err) { console.error(err); });
+// ── Indicateur de sauvegarde ──
+var _saveTimeoutDiag = null;
+function showSavedDiagram() {
+  var el = document.getElementById("saveIndicatorDiag");
+  if (!el) return;
+  el.classList.add("visible");
+  if (_saveTimeoutDiag) clearTimeout(_saveTimeoutDiag);
+  _saveTimeoutDiag = setTimeout(function () {
+    el.classList.remove("visible");
+  }, 1500);
 }
 
 // ── Coordonnées SVG ──
@@ -809,16 +724,18 @@ function onMouseMove(e) {
 function onMouseUp(e) {
   var pt = svgPoint(e.clientX, e.clientY);
 
-  // Fin de tracé de flèche via conn-dot
+  // Fin de tracé de flèche via conn-dot ou outil arrow
   if (arrowSrcId && !dragState) {
     document.getElementById("tempArrow").style.display = "none";
-    if (currentTool !== "arrow") {
-      var target = shapeAt(pt.x, pt.y);
-      if (target && target.id !== arrowSrcId) {
-        createArrow(arrowSrcId, target.id);
-      }
+    var target = shapeAt(pt.x, pt.y);
+    if (target && target.id !== arrowSrcId) {
+      createArrow(arrowSrcId, target.id);
+      arrowSrcId = null;
+    } else if (currentTool !== "arrow") {
+      // Annuler le drag raté (seulement si pas en mode arrow)
       arrowSrcId = null;
     }
+    // Si en mode arrow et pas de cible → garder arrowSrcId pour le 2ème clic
   }
 
   if (dragState) {
@@ -841,7 +758,6 @@ function onWheel(e) {
 document.addEventListener("DOMContentLoaded", function () {
   diagramsList = loadDiagrammes();
   if (!localStorage.getItem("mes_diagrammes")) saveDiagrammes();
-  checkDiffDiagrammes();
   renderAll();
 
   var canvas = document.getElementById("canvas");
@@ -875,9 +791,5 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("tempArrow").style.display = "none";
       setTool("select");
     }
-  });
-
-  document.getElementById("modalPremiereSauvegardeDiag").addEventListener("click", function (e) {
-    if (e.target === this) this.classList.remove("open");
   });
 });

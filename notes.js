@@ -1,5 +1,5 @@
 // ══════════════════════════════════════
-//  mesNotes — CRUD notes (localStorage + fichier)
+//  mesNotes — CRUD notes (localStorage)
 // ══════════════════════════════════════
 
 var noteIdxASupprimer = null;
@@ -19,145 +19,19 @@ function loadNotes() {
 
 function saveNotes(data) {
   localStorage.setItem("mes_notes", JSON.stringify(data));
-  checkDiffNotes();
+  showSavedNotes();
 }
 
-function checkDiffNotes() {
-  var stored = localStorage.getItem("mes_notes");
-  var areDifferent = stored !== JSON.stringify(mesNotesDefaut);
-  document.getElementById("btnSaveNotes").style.display = areDifferent
-    ? "inline-flex"
-    : "none";
-}
-
-// ── Persistance FileSystemFileHandle via IndexedDB ──
-var IDB_KEY_NOTES = "mesNotes";
-
-function ouvrirDBNotes() {
-  return new Promise(function (resolve, reject) {
-    var req = indexedDB.open("doc-survival-kit-db", 1);
-    req.onupgradeneeded = function (e) {
-      e.target.result.createObjectStore("fileHandles");
-    };
-    req.onsuccess = function (e) {
-      resolve(e.target.result);
-    };
-    req.onerror = function (e) {
-      reject(e.target.error);
-    };
-  });
-}
-
-function sauvegarderHandleNotes(handle) {
-  return ouvrirDBNotes().then(function (db) {
-    return new Promise(function (resolve, reject) {
-      var tx = db.transaction("fileHandles", "readwrite");
-      tx.objectStore("fileHandles").put(handle, IDB_KEY_NOTES);
-      tx.oncomplete = resolve;
-      tx.onerror = function (e) {
-        reject(e.target.error);
-      };
-    });
-  });
-}
-
-function recupererHandleNotes() {
-  return ouvrirDBNotes().then(function (db) {
-    return new Promise(function (resolve, reject) {
-      var tx = db.transaction("fileHandles", "readonly");
-      var req = tx.objectStore("fileHandles").get(IDB_KEY_NOTES);
-      req.onsuccess = function (e) {
-        resolve(e.target.result || null);
-      };
-      req.onerror = function (e) {
-        reject(e.target.error);
-      };
-    });
-  });
-}
-
-// ── Enregistrement du fichier mesNotes.js ──
-function enregistrerModificationsNotes() {
-  if (!("showSaveFilePicker" in window)) {
-    console.error("File System Access API non disponible dans ce navigateur.");
-    return;
-  }
-  recupererHandleNotes().then(function (handle) {
-    if (!handle) {
-      document.getElementById("erreurFichierNotes").style.display = "none";
-      document
-        .getElementById("modalPremiereSauvegardeNotes")
-        .classList.add("open");
-    } else {
-      ecrireFichierNotes(handle);
-    }
-  });
-}
-
-function fermerModalPremiereSauvegardeNotes() {
-  document
-    .getElementById("modalPremiereSauvegardeNotes")
-    .classList.remove("open");
-}
-
-function ouvrirSelecteurFichierNotes() {
-  fermerModalPremiereSauvegardeNotes();
-  window
-    .showDirectoryPicker()
-    .then(function (dirHandle) {
-      return dirHandle.getFileHandle("mesNotes.js");
-    })
-    .then(function (handle) {
-      document.getElementById("erreurFichierNotes").style.display = "none";
-      return sauvegarderHandleNotes(handle).then(function () {
-        return ecrireFichierNotes(handle);
-      });
-    })
-    .catch(function (err) {
-      if (err.name === "NotFoundError") {
-        document.getElementById("erreurFichierNotes").style.display = "block";
-        document
-          .getElementById("modalPremiereSauvegardeNotes")
-          .classList.add("open");
-      } else if (err.name !== "AbortError") {
-        console.error("Erreur lors de la sélection du dossier :", err);
-      }
-    });
-}
-
-function ecrireFichierNotes(handle) {
-  return handle
-    .queryPermission({ mode: "readwrite" })
-    .then(function (permission) {
-      if (permission !== "granted") {
-        return handle.requestPermission({ mode: "readwrite" });
-      }
-      return permission;
-    })
-    .then(function (permission) {
-      if (permission !== "granted") {
-        console.error("Permission d'écriture refusée.");
-        return;
-      }
-      var data = loadNotes();
-      var content =
-        "var mesNotesDefaut = " + JSON.stringify(data, null, 2) + ";\n";
-      return handle
-        .createWritable()
-        .then(function (writable) {
-          return writable.write(content).then(function () {
-            return writable.close();
-          });
-        })
-        .then(function () {
-          mesNotesDefaut = data;
-          checkDiffNotes();
-          console.log("mesNotes.js enregistré avec succès.", data);
-        });
-    })
-    .catch(function (err) {
-      console.error("Erreur lors de l'enregistrement :", err);
-    });
+// ── Indicateur de sauvegarde ──
+var _saveTimeoutNotes = null;
+function showSavedNotes() {
+  var el = document.getElementById("saveIndicatorNotes");
+  if (!el) return;
+  el.classList.add("visible");
+  if (_saveTimeoutNotes) clearTimeout(_saveTimeoutNotes);
+  _saveTimeoutNotes = setTimeout(function () {
+    el.classList.remove("visible");
+  }, 1500);
 }
 
 function renderNotes() {
@@ -499,14 +373,12 @@ document.addEventListener("DOMContentLoaded", function () {
     saveNotes(mesNotesDefaut);
   }
   renderNotes();
-  checkDiffNotes();
   [
     "modalNote",
     "modalEditNote",
     "modalConfirmSupprNote",
     "modalBloc",
     "modalConfirmSupprBloc",
-    "modalPremiereSauvegardeNotes",
   ].forEach(function (id) {
     var el = document.getElementById(id);
     if (el)

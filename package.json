@@ -5,6 +5,9 @@
   "bin": {
     "doc-survival-kit": "./bin/cli.js"
   },
+  "scripts": {
+    "build": "node bin/build.js"
+  },
   "files": [
     "bin/",
     "i18n/",

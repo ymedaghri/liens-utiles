@@ -24,7 +24,6 @@ var i18n_fr = {
 
   // mesNotes
   notes_subtitle: "tout ce que je dois hélas retenir",
-  notes_btn_save: "enregistrer les modifications",
   notes_btn_edit_mode: "passer en mode édition",
   notes_btn_quit_edit_mode: "quitter le mode édition",
   notes_btn_add: "+ nouvelle note",
@@ -37,7 +36,6 @@ var i18n_fr = {
 
   // mesLiens
   liens_subtitle: "tout ce que je ne veux pas perdre",
-  liens_btn_save: "enregistrer les modifications",
   liens_btn_edit_mode: "passer en mode édition",
   liens_btn_quit_edit_mode: "quitter le mode édition",
   liens_btn_add_cat: "+ nouvelle catégorie",
@@ -87,19 +85,6 @@ var i18n_fr = {
   modal_suppr_cat_msg:
     "Tous les liens de cette catégorie seront également supprimés. Cette action est irréversible.",
 
-  // Modal première sauvegarde (liens & notes)
-  modal_first_save_title: "Première sauvegarde",
-  modal_first_save_intro:
-    "Une boîte de dialogue va s'ouvrir pour sélectionner le dossier du projet.",
-  modal_first_save_navigate: "Navigue jusqu'au dossier contenant le fichier :",
-  modal_first_save_once:
-    "Cette étape n'aura lieu qu'une seule fois. Les sauvegardes suivantes seront directes.",
-  modal_first_save_error_liens:
-    "Fichier introuvable dans ce dossier. Sélectionne le dossier qui contient <strong>mesLiens.js</strong>.",
-  modal_first_save_error_notes:
-    "Fichier introuvable dans ce dossier. Sélectionne le dossier qui contient <strong>mesNotes.js</strong>.",
-  modal_first_save_btn_choose: "Choisir le dossier",
-
   // Modal note
   modal_note_title: "Nouvelle note",
   modal_note_label_titre: "Titre",
@@ -138,7 +123,6 @@ var i18n_fr = {
 
   // Diagrammes
   diag_page_title: "Diagrammes",
-  diag_btn_save: "enregistrer",
   diag_btn_new: "+ Nouveau",
   diag_my_diagrams: "Mes diagrammes",
   diag_new_diagram: "Nouveau diagramme",
@@ -150,27 +134,34 @@ var i18n_fr = {
   diag_tool_text:    "Texte libre",
   diag_tool_arrow:   "Flèche (clic source → clic cible, ou drag depuis un point de connexion)",
   diag_tool_delete:  "Supprimer la sélection (Del)",
-  diag_first_save_error: "Fichier introuvable. Sélectionne le dossier contenant <strong>diagrammes.js</strong>.",
   diag_edit_text: "Modifier le texte",
 
+  // Sauvegarde automatique
+  save_indicator: "Enregistré",
+
   // Admin
-  admin_subtitle: "réinitialisation des données",
-  admin_why_title: "Pourquoi cette page ?",
+  admin_subtitle: "gestion des données",
+  admin_why_title: "Sauvegarde automatique",
   admin_why_p1:
-    "L'application stocke tes données à deux endroits dans ton navigateur : le <strong>localStorage</strong> (tâches, notes, liens) et l'<strong>IndexedDB</strong> (le handle du fichier pour la sauvegarde directe).",
+    "L'application sauvegarde automatiquement tes données dans le <strong>localStorage</strong> du navigateur à chaque modification.",
   admin_why_p2:
-    "Ces données <strong>ne sont pas supprimées</strong> en vidant le cache classique ou en fermant le navigateur. Cette page te permet de les effacer proprement, par exemple pour repartir d'une installation vierge ou résoudre un problème de synchronisation entre le fichier et le navigateur.",
+    "Ces données <strong>persistent</strong> même en fermant le navigateur. Utilise l'export JSON pour créer une sauvegarde externe.",
   admin_why_p3:
-    "<strong>Attention :</strong> ces actions sont irréversibles. Si tu n'as pas sauvegardé tes modifications dans les fichiers <code>mesLiens.js</code> et <code>mesNotes.js</code>, tes données seront perdues.",
+    "<strong>Attention :</strong> effacer le localStorage est irréversible. Exporte tes données avant si tu veux les conserver.",
+  admin_export_title: "Export / Import",
+  admin_export_btn: "Exporter (JSON)",
+  admin_export_desc: "Télécharge toutes tes données (tâches, notes, liens, diagrammes) dans un fichier JSON.",
+  admin_import_btn: "Importer (JSON)",
+  admin_import_desc: "Restaure tes données depuis un fichier JSON exporté précédemment.",
+  admin_import_confirm: "L'import va remplacer toutes les données actuelles. Continuer ?",
+  admin_import_success: "Import réussi ! La page va se recharger.",
+  admin_import_error: "Erreur lors de l'import. Vérifie que le fichier est valide.",
+  admin_reset_title: "Réinitialisation",
   admin_ls_label: "Effacer le localStorage",
   admin_ls_desc:
-    "Supprime toutes les tâches, notes et liens mémorisés dans le navigateur. Au prochain chargement, l'application repart des données par défaut contenues dans <code>mesLiens.js</code> et <code>mesNotes.js</code>.",
-  admin_idb_label: "Supprimer l'IndexedDB",
-  admin_idb_desc:
-    "Efface le handle de fichier mémorisé pour la sauvegarde directe. La prochaine sauvegarde te demandera à nouveau de sélectionner le dossier du projet, comme lors de la première utilisation.",
-  admin_execute_btn: "exécuter les actions sélectionnées",
+    "Supprime toutes les tâches, notes, liens et diagrammes. L'application repart des données par défaut.",
+  admin_execute_btn: "effacer les données",
   admin_feedback_ls: "localStorage effacé.",
-  admin_feedback_idb: "IndexedDB supprimée.",
   admin_feedback_return:
     "Retourne sur le dashboard pour constater les changements.",
   admin_lang_title: "Langue / Language",
