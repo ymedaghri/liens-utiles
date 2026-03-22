@@ -209,65 +209,69 @@
       </div>
 
       <div class="admin-intro">
-        <h2 data-i18n="admin_why_title">Pourquoi cette page ?</h2>
+        <h2 data-i18n="admin_why_title">Sauvegarde automatique</h2>
         <p data-i18n-html="admin_why_p1">
-          L'application stocke tes données à deux endroits dans ton navigateur :
-          le <strong>localStorage</strong> (tâches, notes, liens) et l'<strong
-            >IndexedDB</strong
-          >
-          (le handle du fichier pour la sauvegarde directe).
+          L'application sauvegarde automatiquement tes données dans le
+          <strong>localStorage</strong> du navigateur à chaque modification.
         </p>
         <p data-i18n-html="admin_why_p2">
-          Ces données <strong>ne sont pas supprimées</strong> en vidant le cache
-          classique ou en fermant le navigateur. Cette page te permet de les
-          effacer proprement, par exemple pour repartir d'une installation
-          vierge ou résoudre un problème de synchronisation entre le fichier et
-          le navigateur.
+          Ces données <strong>persistent</strong> même en fermant le navigateur.
+          Utilise l'export JSON pour créer une sauvegarde externe.
         </p>
         <p data-i18n-html="admin_why_p3">
-          <strong>Attention :</strong> ces actions sont irréversibles. Si tu
-          n'as pas sauvegardé tes modifications dans les fichiers
-          <code>mesLiens.js</code> et <code>mesNotes.js</code>, tes données
-          seront perdues.
+          <strong>Attention :</strong> effacer le localStorage est irréversible.
+          Exporte tes données avant si tu veux les conserver.
         </p>
       </div>
 
-      <div class="admin-actions">
-        <label class="admin-check-label">
-          <input type="checkbox" id="checkLocalStorage" />
-          <div class="admin-check-text">
-            <strong data-i18n="admin_ls_label">Effacer le localStorage</strong>
-            <span data-i18n-html="admin_ls_desc"
-              >Supprime toutes les tâches, notes et liens mémorisés dans le
-              navigateur. Au prochain chargement, l'application repart des
-              données par défaut contenues dans <code>mesLiens.js</code> et
-              <code>mesNotes.js</code>.</span
-            >
+      <!-- Section Export/Import -->
+      <div class="admin-lang-section">
+        <h2 data-i18n="admin_export_title">Export / Import</h2>
+        <div class="admin-actions" style="margin-bottom:0">
+          <div class="admin-check-label" style="cursor:default">
+            <div class="admin-check-text" style="flex:1">
+              <strong data-i18n="admin_export_btn">Exporter (JSON)</strong>
+              <span data-i18n="admin_export_desc">Télécharge toutes tes données dans un fichier JSON.</span>
+            </div>
+            <button class="btn-lang" onclick="exportData()" style="flex-shrink:0">
+              <span data-i18n="admin_export_btn">Exporter</span>
+            </button>
           </div>
-        </label>
-
-        <label class="admin-check-label">
-          <input type="checkbox" id="checkIndexedDB" />
-          <div class="admin-check-text">
-            <strong data-i18n="admin_idb_label">Supprimer l'IndexedDB</strong>
-            <span data-i18n="admin_idb_desc"
-              >Efface le handle de fichier mémorisé pour la sauvegarde directe.
-              La prochaine sauvegarde te demandera à nouveau de sélectionner le
-              dossier du projet, comme lors de la première utilisation.</span
-            >
+          <div class="admin-check-label" style="cursor:default">
+            <div class="admin-check-text" style="flex:1">
+              <strong data-i18n="admin_import_btn">Importer (JSON)</strong>
+              <span data-i18n="admin_import_desc">Restaure tes données depuis un fichier JSON.</span>
+            </div>
+            <label class="btn-lang" style="flex-shrink:0;cursor:pointer">
+              <span data-i18n="admin_import_btn">Importer</span>
+              <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this.files[0])" />
+            </label>
           </div>
-        </label>
+        </div>
       </div>
 
-      <button
-        class="btn-execute"
-        id="btnExecute"
-        disabled
-        onclick="executer()"
-        data-i18n="admin_execute_btn"
-      >
-        exécuter les actions sélectionnées
-      </button>
+      <!-- Section Reset -->
+      <div class="admin-lang-section">
+        <h2 data-i18n="admin_reset_title">Réinitialisation</h2>
+        <div class="admin-actions" style="margin-bottom:16px">
+          <label class="admin-check-label">
+            <input type="checkbox" id="checkLocalStorage" />
+            <div class="admin-check-text">
+              <strong data-i18n="admin_ls_label">Effacer le localStorage</strong>
+              <span data-i18n="admin_ls_desc">Supprime toutes les tâches, notes, liens et diagrammes. L'application repart des données par défaut.</span>
+            </div>
+          </label>
+        </div>
+        <button
+          class="btn-execute"
+          id="btnExecute"
+          disabled
+          onclick="executer()"
+          data-i18n="admin_execute_btn"
+        >
+          effacer les données
+        </button>
+      </div>
 
       <div class="admin-feedback" id="adminFeedback"></div>
     </div>
@@ -277,16 +281,16 @@
     <script src="i18n/i18n.js"></script>
     <script>
       var chkLS = document.getElementById("checkLocalStorage");
-      var chkIDB = document.getElementById("checkIndexedDB");
       var btn = document.getElementById("btnExecute");
       var feedback = document.getElementById("adminFeedback");
 
-      // Highlight active language button
+      // Highlight active language button (only if on admin page)
       (function () {
+        var btnFr = document.getElementById("btnLangFr");
+        var btnEn = document.getElementById("btnLangEn");
+        if (!btnFr || !btnEn) return;
         var lang = localStorage.getItem("lang") || "fr";
-        document
-          .getElementById(lang === "en" ? "btnLangEn" : "btnLangFr")
-          .classList.add("active");
+        (lang === "en" ? btnEn : btnFr).classList.add("active");
       })();
 
       function setLang(lang) {
@@ -295,34 +299,64 @@
       }
 
       function updateBtn() {
-        btn.disabled = !chkLS.checked && !chkIDB.checked;
+        if (btn && chkLS) btn.disabled = !chkLS.checked;
       }
-      chkLS.addEventListener("change", updateBtn);
-      chkIDB.addEventListener("change", updateBtn);
+      if (chkLS) chkLS.addEventListener("change", updateBtn);
 
       function executer() {
-        var messages = [];
-
         if (chkLS.checked) {
           localStorage.clear();
           // Restore lang setting so the page stays in the right language
           var lang = window.t === i18n_en ? "en" : "fr";
           localStorage.setItem("lang", lang);
-          messages.push(window.t.admin_feedback_ls);
           chkLS.checked = false;
+          updateBtn();
+          feedback.textContent = window.t.admin_feedback_ls + " " + window.t.admin_feedback_return;
+          feedback.className = "admin-feedback success";
+          feedback.style.display = "block";
         }
+      }
 
-        if (chkIDB.checked) {
-          indexedDB.deleteDatabase("doc-survival-kit-db");
-          messages.push(window.t.admin_feedback_idb);
-          chkIDB.checked = false;
+      // Export data
+      function exportData() {
+        var data = {
+          taches: JSON.parse(localStorage.getItem("mes_taches") || "[]"),
+          notes: JSON.parse(localStorage.getItem("mes_notes") || "[]"),
+          liens: JSON.parse(localStorage.getItem("mes_liens") || "[]"),
+          diagrammes: JSON.parse(localStorage.getItem("mes_diagrammes") || "[]")
+        };
+        var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "doc-survival-kit-backup.json";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // Import data
+      function importData(file) {
+        if (!file) return;
+        if (!confirm(window.t.admin_import_confirm)) {
+          document.getElementById("importFile").value = "";
+          return;
         }
-
-        updateBtn();
-        feedback.textContent =
-          messages.join(" ") + " " + window.t.admin_feedback_return;
-        feedback.className = "admin-feedback success";
-        feedback.style.display = "block";
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            var data = JSON.parse(e.target.result);
+            if (data.taches) localStorage.setItem("mes_taches", JSON.stringify(data.taches));
+            if (data.notes) localStorage.setItem("mes_notes", JSON.stringify(data.notes));
+            if (data.liens) localStorage.setItem("mes_liens", JSON.stringify(data.liens));
+            if (data.diagrammes) localStorage.setItem("mes_diagrammes", JSON.stringify(data.diagrammes));
+            alert(window.t.admin_import_success);
+            window.location.reload();
+          } catch (err) {
+            alert(window.t.admin_import_error);
+            document.getElementById("importFile").value = "";
+          }
+        };
+        reader.readAsText(file);
       }
     </script>
   </body>

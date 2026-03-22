@@ -69,8 +69,8 @@
       <button class="diagram-tool" onclick="resetZoom()" title="⊡">⊡</button>
       <span class="diagram-sep">|</span>
 
-      <!-- Enregistrer -->
-      <button class="btn-save diagram-btn-save" id="btnSaveDiagram" style="display:none" onclick="enregistrerDiagrammes()" data-i18n="diag_btn_save">enregistrer</button>
+      <!-- Indicateur sauvegarde -->
+      <span id="saveIndicatorDiag" class="save-indicator" data-i18n="save_indicator">Enregistré</span>
     </div>
 
     <!-- Panneau liste des diagrammes -->
@@ -118,32 +118,6 @@
              background:rgba(255,255,255,0.92);border:1.5px solid #f97316;border-radius:5px;
              outline:none;text-align:center;font-family:'Segoe UI',system-ui,sans-serif;
              font-weight:600;padding:2px 6px;" />
-    </div>
-
-    <!-- Modale première sauvegarde -->
-    <div class="modal-backdrop" id="modalPremiereSauvegardeDiag">
-      <div class="modal">
-        <h3 data-i18n="modal_first_save_title">Première sauvegarde</h3>
-        <p style="font-size:.875rem;color:#78716c;margin-bottom:12px;" data-i18n="modal_first_save_intro">
-          Une boîte de dialogue va s'ouvrir pour sélectionner le dossier du projet.
-        </p>
-        <p style="font-size:.875rem;color:#292524;margin-bottom:8px;" data-i18n="modal_first_save_navigate">
-          Navigue jusqu'au dossier contenant le fichier :
-        </p>
-        <p style="font-family:'Cascadia Code',monospace;font-size:.8rem;background:#f5f5f4;padding:8px 12px;border-radius:6px;margin-bottom:24px;color:#059669;">
-          diagrammes.js
-        </p>
-        <p style="font-size:.8rem;color:#a8a29e;margin-bottom:24px;" data-i18n="modal_first_save_once">
-          Cette étape n'aura lieu qu'une seule fois.
-        </p>
-        <p id="erreurFichierDiag" style="display:none;font-size:.8rem;color:#ef4444;background:#fef2f2;padding:8px 12px;border-radius:6px;margin-bottom:16px;" data-i18n-html="diag_first_save_error">
-          Fichier introuvable. Sélectionne le dossier contenant <strong>diagrammes.js</strong>.
-        </p>
-        <div class="modal-actions">
-          <button class="btn-cancel" onclick="fermerModalSauvegardeDiag()" data-i18n="cancel">Annuler</button>
-          <button class="btn-confirm" onclick="ouvrirSelecteurFichierDiag()" data-i18n="modal_first_save_btn_choose">Choisir le dossier</button>
-        </div>
-      </div>
     </div>
 
     <script src="i18n/fr.js"></script>

@@ -1,0 +1,4304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="page_title">Dashboard — doc-survival-kit v3.1.0</title>
+  <style>
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family:
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background: #fafaf9;
+  color: #292524;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+input,
+select {
+  font-family: inherit;
+}
+
+/* ── Bouton admin (roue crantée) ── */
+.btn-admin {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 50;
+  font-size: 1.4rem;
+  color: #78716c;
+  text-decoration: none;
+  background: #f5f5f4;
+  border: 1px solid #e7e5e4;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, transform 0.3s;
+  line-height: 1;
+}
+.btn-admin:hover {
+  background: #292524;
+  color: #fff;
+  border-color: #292524;
+  transform: rotate(60deg);
+}
+
+/* ── Layout deux colonnes ── */
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+.panel {
+  flex: 1;
+  padding: 60px 36px 80px;
+  overflow-y: auto;
+}
+.panel-left {
+  border-right: 1px solid #e7e5e4;
+}
+.inner {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+@media (max-width: 860px) {
+  .shell {
+    flex-direction: column;
+  }
+  .panel-left {
+    border-right: none;
+    border-bottom: 1px solid #e7e5e4;
+  }
+}
+
+/* ── Typo commune ── */
+h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.accent {
+  color: #f97316;
+}
+.subtitle {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #a8a29e;
+  margin-top: 4px;
+  margin-bottom: 40px;
+}
+h2 {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* ══════════════════════════════════
+   PANEL GAUCHE — Tâches
+   ══════════════════════════════════ */
+
+/* Barre d'ajout */
+.add-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.add-bar input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  border: 1px solid #d6d3d1;
+  border-radius: 8px;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.add-bar input[type="text"]:focus {
+  border-color: #f97316;
+}
+.add-bar select {
+  padding: 10px 10px;
+  font-size: 0.75rem;
+  border: 1px solid #d6d3d1;
+  border-radius: 8px;
+  background: #fff;
+  color: #78716c;
+  outline: none;
+}
+.add-bar button {
+  padding: 10px 18px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #292524;
+  color: #fafaf9;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.add-bar button:hover {
+  background: #f97316;
+}
+
+/* Filtres */
+.filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filters button {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid #e7e5e4;
+  color: #a8a29e;
+  transition: all 0.15s;
+}
+.filters button:hover {
+  border-color: #292524;
+  color: #292524;
+}
+.filters button.active {
+  background: #292524;
+  color: #fafaf9;
+  border-color: #292524;
+}
+
+/* Liste de tâches */
+.tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    opacity 0.15s;
+}
+.task.done {
+  opacity: 0.5;
+}
+.task.done .task-text {
+  text-decoration: line-through;
+  color: #a8a29e;
+}
+
+/* Checkbox custom */
+.check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.check:hover {
+  transform: scale(1.1);
+}
+.task.done .check {
+  background: currentColor;
+}
+.task.done .check::after {
+  content: "✓";
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.task-text {
+  flex: 1;
+  font-size: 0.875rem;
+}
+.task-tag {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+.task-del {
+  font-size: 0.8rem;
+  color: #d6d3d1;
+  transition: color 0.15s;
+  padding: 2px 4px;
+  flex-shrink: 0;
+}
+.task-del:hover {
+  color: #ef4444;
+}
+
+/* Couleurs tâches par catégorie */
+.task-urgent {
+  border-color: #fecdd3;
+  background: rgba(255, 228, 230, 0.3);
+  color: #e11d48;
+}
+.task-urgent .task-tag {
+  background: rgba(255, 228, 230, 0.6);
+  color: #be123c;
+}
+.task-normal {
+  border-color: #dbeafe;
+  background: rgba(219, 234, 254, 0.3);
+  color: #2563eb;
+}
+.task-normal .task-tag {
+  background: rgba(219, 234, 254, 0.6);
+  color: #1d4ed8;
+}
+.task-later {
+  border-color: #e7e5e4;
+  background: rgba(231, 229, 228, 0.3);
+  color: #78716c;
+}
+.task-later .task-tag {
+  background: rgba(231, 229, 228, 0.6);
+  color: #57534e;
+}
+
+.empty-msg {
+  text-align: center;
+  padding: 40px 0;
+  color: #a8a29e;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* ══════════════════════════════════
+   PANEL DROIT — Liens
+   ══════════════════════════════════ */
+section {
+  margin-bottom: 32px;
+}
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.link:hover .arrow {
+  opacity: 1;
+}
+.link-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+.link-desc {
+  font-size: 0.875rem;
+  color: #a8a29e;
+  margin-left: 8px;
+}
+.arrow {
+  opacity: 0;
+  font-size: 0.85rem;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.t-green h2 {
+  color: #059669;
+}
+.t-green .link {
+  border-color: #d1fae5;
+  background: rgba(209, 250, 229, 0.3);
+}
+.t-green .link:hover {
+  background: rgba(167, 243, 208, 0.35);
+}
+.t-green .link:hover .link-name {
+  color: #047857;
+}
+.t-green .arrow {
+  color: #6ee7b7;
+}
+
+.t-violet h2 {
+  color: #7c3aed;
+}
+.t-violet .link {
+  border-color: #ede9fe;
+  background: rgba(237, 233, 254, 0.3);
+}
+.t-violet .link:hover {
+  background: rgba(221, 214, 254, 0.4);
+}
+.t-violet .link:hover .link-name {
+  color: #6d28d9;
+}
+.t-violet .arrow {
+  color: #c4b5fd;
+}
+
+.t-amber h2 {
+  color: #d97706;
+}
+.t-amber .link {
+  border-color: #fef3c7;
+  background: rgba(254, 243, 199, 0.3);
+}
+.t-amber .link:hover {
+  background: rgba(253, 230, 138, 0.35);
+}
+.t-amber .link:hover .link-name {
+  color: #b45309;
+}
+.t-amber .arrow {
+  color: #fcd34d;
+}
+
+.t-sky h2 {
+  color: #0284c7;
+}
+.t-sky .link {
+  border-color: #e0f2fe;
+  background: rgba(224, 242, 254, 0.3);
+}
+.t-sky .link:hover {
+  background: rgba(186, 230, 253, 0.35);
+}
+.t-sky .link:hover .link-name {
+  color: #0369a1;
+}
+.t-sky .arrow {
+  color: #7dd3fc;
+}
+
+.t-rose h2 {
+  color: #e11d48;
+}
+.t-rose .link {
+  border-color: #ffe4e6;
+  background: rgba(255, 228, 230, 0.3);
+}
+.t-rose .link:hover {
+  background: rgba(254, 205, 211, 0.35);
+}
+.t-rose .link:hover .link-name {
+  color: #be123c;
+}
+.t-rose .arrow {
+  color: #fda4af;
+}
+
+.t-teal h2 {
+  color: #0d9488;
+}
+.t-teal .link {
+  border-color: #ccfbf1;
+  background: rgba(204, 251, 241, 0.3);
+}
+.t-teal .link:hover {
+  background: rgba(153, 246, 228, 0.3);
+}
+.t-teal .link:hover .link-name {
+  color: #0f766e;
+}
+.t-teal .arrow {
+  color: #5eead4;
+}
+
+/* ── Header catégorie avec corbeille ── */
+.cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.cat-header h2 {
+  margin-bottom: 0;
+}
+.cat-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.btn-add-link {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #fff7ed;
+  color: #f97316;
+  flex-shrink: 0;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-add-link:hover {
+  background: #f97316;
+  color: #fff;
+}
+.btn-del-cat {
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #fef2f2;
+  color: #ef4444;
+  flex-shrink: 0;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-del-cat:hover {
+  background: #ef4444;
+  color: #fff;
+}
+.link-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.link:hover .link-actions {
+  opacity: 1;
+}
+.btn-edit-link,
+.btn-del-link {
+  font-size: 0.75rem;
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-weight: 600;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-edit-link {
+  background: #fff7ed;
+  color: #f97316;
+}
+.btn-edit-link:hover {
+  background: #f97316;
+  color: #fff;
+}
+.btn-del-link {
+  background: #fef2f2;
+  color: #ef4444;
+}
+.btn-del-link:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* ── Barre d'actions liens ── */
+.liens-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+/* ── Bouton mode édition + bouton ajouter catégorie (styles communs) ── */
+.btn-add-cat,
+.btn-edit-mode {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 8px;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+.btn-add-cat {
+  border: 1px dashed #d6d3d1;
+  color: #a8a29e;
+  display: none;
+}
+.inner:has(#linksContainer.edit-mode) .btn-add-cat {
+  display: flex;
+}
+.btn-add-cat:hover {
+  background: #f97316;
+  border-color: #f97316;
+  color: #fff;
+}
+.btn-edit-mode {
+  border: 1px solid #e7e5e4;
+  color: #78716c;
+}
+.btn-edit-mode:hover {
+  border-color: #292524;
+  color: #292524;
+}
+
+/* ── Indicateur de sauvegarde automatique (style Google Docs) ── */
+.save-indicator {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.7rem;
+  color: #059669;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.save-indicator.visible {
+  opacity: 1;
+}
+
+/* ── Mode édition : rendre tous les boutons d'action visibles ── */
+.edit-mode .link-actions,
+.edit-mode .cat-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+.edit-mode .note-actions,
+.edit-mode .bloc-actions {
+  pointer-events: auto;
+}
+/* Masquer le hover hors mode édition */
+.link:hover .link-actions {
+  opacity: 0;
+}
+.edit-mode .link:hover .link-actions {
+  opacity: 1;
+}
+
+/* ── Modale ── */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(41, 37, 36, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.open {
+  display: flex;
+}
+.modal {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 32px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+.modal h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+.modal label {
+  display: block;
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a8a29e;
+  margin-bottom: 5px;
+}
+.modal input[type="text"],
+.modal select {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 0.875rem;
+  border: 1px solid #d6d3d1;
+  border-radius: 8px;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.15s;
+}
+.modal input[type="text"]:focus,
+.modal select:focus {
+  border-color: #f97316;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+.modal-actions button {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.btn-cancel {
+  border: 1px solid #e7e5e4;
+  color: #78716c;
+}
+.btn-cancel:hover {
+  background: #f5f5f4;
+}
+.btn-confirm {
+  background: #292524;
+  color: #fafaf9;
+}
+.btn-confirm:hover {
+  background: #f97316;
+}
+
+/* ══════════════════════════════════════
+   PANEL MILIEU — Notes
+   ══════════════════════════════════════ */
+
+.btn-add-note {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px dashed #d6d3d1;
+  color: #a8a29e;
+  display: none;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.inner:has(#notesContainer.edit-mode) .btn-add-note {
+  display: flex;
+}
+.btn-add-note:hover {
+  background: #f97316;
+  border-color: #f97316;
+  color: #fff;
+}
+
+.note {
+  border-radius: 10px;
+  border: 1px solid #e7e5e4;
+  margin-bottom: 16px;
+}
+.note-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e7e5e4;
+}
+.note-header h2 {
+  margin-bottom: 0;
+}
+.note-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.edit-mode .note-actions {
+  opacity: 1;
+}
+.note-content {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.note-content b {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #292524;
+}
+.note-content p {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #292524;
+}
+.note-content pre {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.78rem;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 10px 12px;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #292524;
+}
+.note-content ul {
+  padding-left: 18px;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+.bloc-wrapper {
+  position: relative;
+}
+.bloc-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.edit-mode .bloc-actions {
+  opacity: 1;
+}
+.edit-mode .bloc-wrapper {
+  padding-right: 72px;
+}
+.note-footer {
+  padding: 8px 16px 12px;
+  display: none;
+}
+.edit-mode .note-footer {
+  display: block;
+}
+.btn-add-bloc {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px dashed #d6d3d1;
+  color: #a8a29e;
+  transition: all 0.15s;
+}
+.btn-add-bloc:hover {
+  background: #f97316;
+  border-color: #f97316;
+  color: #fff;
+}
+.btn-edit-note {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #fff7ed;
+  color: #f97316;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-edit-note:hover {
+  background: #f97316;
+  color: #fff;
+}
+.btn-del-note {
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #fef2f2;
+  color: #ef4444;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-del-note:hover {
+  background: #ef4444;
+  color: #fff;
+}
+.btn-edit-bloc {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #fff7ed;
+  color: #f97316;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-edit-bloc:hover {
+  background: #f97316;
+  color: #fff;
+}
+.btn-del-bloc {
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #fef2f2;
+  color: #ef4444;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.btn-del-bloc:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* Couleurs des notes par thème */
+.note.t-green {
+  border-color: #d1fae5;
+  background: rgba(209, 250, 229, 0.12);
+}
+.note.t-green .note-header {
+  border-bottom-color: #d1fae5;
+}
+.note.t-violet {
+  border-color: #ede9fe;
+  background: rgba(237, 233, 254, 0.12);
+}
+.note.t-violet .note-header {
+  border-bottom-color: #ede9fe;
+}
+.note.t-amber {
+  border-color: #fef3c7;
+  background: rgba(254, 243, 199, 0.12);
+}
+.note.t-amber .note-header {
+  border-bottom-color: #fef3c7;
+}
+.note.t-sky {
+  border-color: #e0f2fe;
+  background: rgba(224, 242, 254, 0.12);
+}
+.note.t-sky .note-header {
+  border-bottom-color: #e0f2fe;
+}
+.note.t-rose {
+  border-color: #ffe4e6;
+  background: rgba(255, 228, 230, 0.12);
+}
+.note.t-rose .note-header {
+  border-bottom-color: #ffe4e6;
+}
+.note.t-teal {
+  border-color: #ccfbf1;
+  background: rgba(204, 251, 241, 0.12);
+}
+.note.t-teal .note-header {
+  border-bottom-color: #ccfbf1;
+}
+
+/* ── Bouton copier dans les blocs pre ── */
+.pre-wrapper {
+  position: relative;
+}
+.btn-copy-pre {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  color: #78716c;
+  opacity: 0;
+  transition:
+    opacity 0.15s,
+    background 0.15s,
+    color 0.15s;
+}
+.pre-wrapper:hover .btn-copy-pre {
+  opacity: 1;
+}
+.btn-copy-pre:hover {
+  background: rgba(0, 0, 0, 0.12);
+  color: #292524;
+}
+.btn-copy-pre.copied {
+  background: #d1fae5;
+  color: #047857;
+}
+
+/* ── Blocs tableau dans les notes ── */
+.table-wrapper {
+  overflow-x: auto;
+}
+.note-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.note-content table th,
+.note-content table td {
+  padding: 6px 10px;
+  border: 1px solid #e7e5e4;
+  text-align: left;
+  vertical-align: top;
+}
+.note-content table th {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.03);
+  color: #78716c;
+  font-weight: 600;
+}
+.note-content table tr:hover td {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* Textarea dans les modales */
+.modal textarea {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  border: 1px solid #d6d3d1;
+  border-radius: 8px;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.15s;
+  resize: vertical;
+}
+.modal textarea:focus {
+  border-color: #f97316;
+}
+
+/* ══════════════════════════════════════
+   PAGE DIAGRAMME
+   ══════════════════════════════════════ */
+
+.diagram-page {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* ── Barre d'outils ── */
+.diagram-topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 48px;
+  background: #fff;
+  border-bottom: 1px solid #e7e5e4;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 4px;
+  z-index: 20;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.diagram-topbar-back {
+  position: fixed;
+  top: 8px;
+  right: 16px;
+  z-index: 50;
+  font-size: 1rem;
+  color: #78716c;
+  text-decoration: none;
+  background: #f5f5f4;
+  border: 1px solid #e7e5e4;
+  border-radius: 7px;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+}
+.diagram-topbar-back:hover { background: #292524; color: #fff; border-color: #292524; }
+.diagram-tool {
+  font-size: 0.95rem;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  color: #78716c;
+  background: none;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  display: flex; align-items: center; justify-content: center;
+  min-width: 32px; height: 32px;
+  flex-shrink: 0;
+}
+.diagram-tool:hover  { background: #f5f5f4; color: #292524; border-color: #e7e5e4; }
+.diagram-tool.active { background: #292524; color: #fff; border-color: #292524; }
+.diagram-sep { color: #d6d3d1; font-size: 1rem; padding: 0 1px; flex-shrink: 0; }
+.diagram-title-input {
+  flex: 1;
+  min-width: 60px;
+  max-width: 260px;
+  font-family: "Cascadia Code", "SF Mono", Consolas, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 4px 10px;
+  background: transparent;
+  outline: none;
+  text-align: center;
+  color: #292524;
+  transition: border-color 0.15s, background 0.15s;
+}
+.diagram-title-input:hover { border-color: #e7e5e4; }
+.diagram-title-input:focus { border-color: #f97316; background: #fff; }
+.zoom-level {
+  font-family: "Cascadia Code", "SF Mono", Consolas, monospace;
+  font-size: 0.62rem;
+  color: #a8a29e;
+  min-width: 38px;
+  text-align: center;
+}
+/* ── Canvas SVG ── */
+.diagram-canvas {
+  position: fixed;
+  top: 48px; left: 0;
+  width: 100vw;
+  height: calc(100vh - 48px);
+  background: #fafaf9;
+  background-image: radial-gradient(circle, #d6d3d1 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 48px;
+  cursor: default;
+}
+.diagram-canvas[data-tool="rect"],
+.diagram-canvas[data-tool="rounded"],
+.diagram-canvas[data-tool="db"],
+.diagram-canvas[data-tool="cloud"],
+.diagram-canvas[data-tool="text"]  { cursor: cell; }
+.diagram-canvas[data-tool="arrow"] { cursor: crosshair; }
+
+/* ── Formes ── */
+.shape-group { cursor: grab; }
+.shape-group:active { cursor: grabbing; }
+.conn-dot {
+  opacity: 0;
+  transition: opacity 0.12s;
+  cursor: crosshair;
+}
+.shape-group:hover .conn-dot { opacity: 1; }
+.diagram-canvas[data-tool="arrow"] .conn-dot { opacity: 0.4; }
+.diagram-canvas[data-tool="arrow"] .shape-group:hover .conn-dot { opacity: 1; }
+.resize-grip { cursor: se-resize; }
+.arrow-group { cursor: pointer; }
+
+/* ── Panneau liste des diagrammes ── */
+.diagram-list-panel {
+  position: fixed;
+  top: 48px;
+  left: -240px;
+  width: 220px;
+  height: calc(100vh - 48px);
+  background: #fff;
+  border-right: 1px solid #e7e5e4;
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  transition: left 0.2s ease;
+  box-shadow: 3px 0 10px rgba(0,0,0,0.06);
+}
+.diagram-list-panel.open { left: 0; }
+.diagram-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e7e5e4;
+  font-family: "Cascadia Code", "SF Mono", Consolas, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a8a29e;
+}
+.diagram-list-header button {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #fff7ed;
+  color: #f97316;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.1s, color 0.1s;
+}
+.diagram-list-header button:hover { background: #f97316; color: #fff; }
+#diagramList { flex: 1; overflow-y: auto; padding: 8px; }
+.diagram-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  margin-bottom: 2px;
+  transition: background 0.1s;
+}
+.diagram-list-item:hover { background: #f5f5f4; }
+.diagram-list-item.active { background: #fff7ed; }
+.diagram-list-name {
+  font-size: 0.8rem;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #292524;
+}
+.diagram-list-del {
+  opacity: 0;
+  font-size: 0.8rem;
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: #ef4444;
+  background: #fef2f2;
+  cursor: pointer;
+  border: none;
+  flex-shrink: 0;
+  transition: opacity 0.1s, background 0.1s;
+}
+.diagram-list-item:hover .diagram-list-del { opacity: 1; }
+.diagram-list-del:hover { background: #ef4444; color: #fff; }
+
+/* ── Palette de couleurs ── */
+.diagram-color-panel {
+  position: fixed;
+  top: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid #e7e5e4;
+  border-radius: 10px;
+  padding: 7px 12px;
+  display: flex;
+  gap: 7px;
+  z-index: 30;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+.color-dot {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.6);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.12);
+  transition: transform 0.1s;
+}
+.color-dot:hover { transform: scale(1.25); }
+.color-dot.t-green  { background: #059669; }
+.color-dot.t-violet { background: #7c3aed; }
+.color-dot.t-amber  { background: #d97706; }
+.color-dot.t-sky    { background: #0284c7; }
+.color-dot.t-rose   { background: #e11d48; }
+.color-dot.t-teal   { background: #0d9488; }
+.diagram-color-edit {
+  font-size: 1rem;
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  border: 1px solid #e7e5e4;
+  background: #f5f5f4;
+  color: #78716c;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.1s, color 0.1s;
+  flex-shrink: 0;
+}
+.diagram-color-edit:hover { background: #292524; color: #fff; border-color: #292524; }
+
+/* ── Bouton diagramme dans index.html ── */
+.btn-diagram {
+  position: fixed;
+  top: 16px;
+  right: 68px;
+  z-index: 50;
+  font-size: 1.1rem;
+  color: #78716c;
+  text-decoration: none;
+  background: #f5f5f4;
+  border: 1px solid #e7e5e4;
+  border-radius: 8px;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+}
+.btn-diagram:hover { background: #292524; color: #fff; border-color: #292524; }
+
+/* ── Swatch couleur dans le select ── */
+.color-preview {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+
+/* ══════════════════════════════════════
+   Styles inline de admin.html
+   ══════════════════════════════════════ */
+
+
+      .admin-shell {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 60px 36px 80px;
+      }
+      .admin-back {
+        position: fixed;
+        top: 16px;
+        right: 20px;
+        font-size: 1.4rem;
+        color: #78716c;
+        text-decoration: none;
+        background: #f5f5f4;
+        border: 1px solid #e7e5e4;
+        border-radius: 8px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 0.15s,
+          color 0.15s;
+        line-height: 1;
+      }
+      .admin-back:hover {
+        background: #292524;
+        color: #fff;
+        border-color: #292524;
+      }
+      .admin-lang-section {
+        margin-bottom: 36px;
+      }
+      .admin-lang-section h2 {
+        font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #a8a29e;
+        margin-bottom: 12px;
+      }
+      .admin-lang-options {
+        display: flex;
+        gap: 8px;
+      }
+      .btn-lang {
+        font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        padding: 8px 20px;
+        border-radius: 8px;
+        border: 1px solid #e7e5e4;
+        background: #fff;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          border-color 0.15s,
+          color 0.15s;
+      }
+      .btn-lang:hover {
+        border-color: #f97316;
+        background: #fff7ed;
+      }
+      .btn-lang.active {
+        background: #f97316;
+        color: #fff;
+        border-color: #f97316;
+      }
+      .admin-intro {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: 10px;
+        padding: 20px 24px;
+        margin-bottom: 36px;
+      }
+      .admin-intro h2 {
+        font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #f97316;
+        margin-bottom: 12px;
+      }
+      .admin-intro p {
+        font-size: 0.875rem;
+        line-height: 1.65;
+        color: #57534e;
+        margin-bottom: 10px;
+      }
+      .admin-intro p:last-child {
+        margin-bottom: 0;
+      }
+      .admin-intro strong {
+        color: #292524;
+      }
+      .admin-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+      .admin-check-label {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 20px;
+        border-radius: 10px;
+        border: 1px solid #e7e5e4;
+        background: #fff;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+      }
+      .admin-check-label:hover {
+        border-color: #f97316;
+        background: #fff7ed;
+      }
+      .admin-check-label input[type="checkbox"] {
+        margin-top: 2px;
+        flex-shrink: 0;
+        width: 16px;
+        height: 16px;
+        accent-color: #f97316;
+        cursor: pointer;
+      }
+      .admin-check-text strong {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #292524;
+        margin-bottom: 3px;
+      }
+      .admin-check-text span {
+        font-size: 0.8rem;
+        color: #a8a29e;
+        line-height: 1.5;
+      }
+      .btn-execute {
+        font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background: #fef2f2;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+        transition:
+          background 0.15s,
+          color 0.15s,
+          border-color 0.15s;
+        cursor: pointer;
+      }
+      .btn-execute:hover {
+        background: #ef4444;
+        color: #fff;
+        border-color: #ef4444;
+      }
+      .btn-execute:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .admin-feedback {
+        display: none;
+        margin-top: 20px;
+        padding: 14px 18px;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        line-height: 1.5;
+      }
+      .admin-feedback.success {
+        background: #d1fae5;
+        color: #047857;
+        border: 1px solid #6ee7b7;
+      }
+    
+
+/* ══════════════════════════════════════
+   Système de navigation par vues
+   ══════════════════════════════════════ */
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+/* Ajustements pour la vue diagram */
+#view-diagram.active {
+  display: block;
+  position: fixed;
+  inset: 0;
+}
+
+/* Masquer les boutons de navigation dans admin et diagram */
+body:has(#view-admin.active) .btn-admin,
+body:has(#view-admin.active) .btn-diagram {
+  display: none;
+}
+
+body:has(#view-diagram.active) .btn-admin,
+body:has(#view-diagram.active) .btn-diagram {
+  display: none;
+}
+
+  </style>
+</head>
+<body>
+  <!-- Navigation globale -->
+  <a href="#diagram" onclick="navigateTo('diagram');return false;" class="btn-diagram" data-i18n-title="diag_page_title">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="1"   y="1"  width="6" height="4" rx="1"/>
+        <rect x="11"  y="1"  width="6" height="4" rx="1"/>
+        <rect x="5.5" y="13" width="7" height="4" rx="1"/>
+        <line x1="4"  y1="5"  x2="9"  y2="13"/>
+        <line x1="14" y1="5"  x2="9"  y2="13"/>
+      </svg>
+    </a>
+  <a href="#admin" onclick="navigateTo('admin');return false;" class="btn-admin" title="Administration">⚙</a>
+  
+
+  <!-- ══════════════════════════════════════
+       Vue Index (Dashboard principal)
+       ══════════════════════════════════════ -->
+  <div id="view-index" class="view active">
+    
+    
+    <div class="shell">
+      <!-- ╔══════════════════════════════════════╗
+       ║  GAUCHE — Tâches (localStorage)     ║
+       ╚══════════════════════════════════════╝ -->
+      <div class="panel panel-left">
+        <div class="inner">
+          <h1><span data-i18n="panel_taches_title">mesTaches</span><span class="accent">.</span></h1>
+          <p class="subtitle" data-i18n="taches_subtitle">tout ce que je dois faire</p>
+
+          <!-- Ajout -->
+          <div class="add-bar">
+            <input
+              type="text"
+              id="taskInput"
+              data-i18n-placeholder="taches_input_placeholder"
+              placeholder="Nouvelle tâche…"
+              onkeydown="if (event.key === 'Enter') addTask();"
+            />
+            <select id="taskPriority">
+              <option value="normal" data-i18n="taches_priority_normal">Normal</option>
+              <option value="urgent" data-i18n="taches_priority_urgent">Urgent</option>
+              <option value="later" data-i18n="taches_priority_later">Plus tard</option>
+            </select>
+            <button onclick="addTask()">+</button>
+          </div>
+
+          <!-- Filtres -->
+          <div class="filters">
+            <button class="active" onclick="setFilter('all', this)" data-i18n="taches_filter_all">Tout</button>
+            <button onclick="setFilter('todo', this)" data-i18n="taches_filter_todo">À faire</button>
+            <button onclick="setFilter('done', this)" data-i18n="taches_filter_done">Fait</button>
+            <button onclick="setFilter('urgent', this)" data-i18n="taches_filter_urgent">Urgent</button>
+            <button onclick="setFilter('normal', this)" data-i18n="taches_filter_normal">Normal</button>
+            <button onclick="setFilter('later', this)" data-i18n="taches_filter_later">Plus tard</button>
+          </div>
+
+          <!-- Liste -->
+          <div class="tasks" id="taskList"></div>
+        </div>
+      </div>
+
+      <!-- ╔══════════════════════════════════════╗
+       ║  MILIEU — Notes                     ║
+       ╚══════════════════════════════════════╝ -->
+      <div class="panel panel-left">
+        <div class="inner">
+          <h1><span data-i18n="panel_notes_title">mesNotes</span><span class="accent">.</span></h1>
+          <p class="subtitle" data-i18n="notes_subtitle">tout ce que je dois hélas retenir</p>
+
+          <div class="liens-toolbar">
+            <span id="saveIndicatorNotes" class="save-indicator" data-i18n="save_indicator">Enregistré</span>
+            <button class="btn-edit-mode" id="btnEditModeNotes" onclick="toggleEditModeNotes()" data-i18n="notes_btn_edit_mode">passer en mode édition</button>
+            <button class="btn-add-note" onclick="openModalNote()" data-i18n="notes_btn_add">+ nouvelle note</button>
+          </div>
+
+          <div id="notesContainer"></div>
+        </div>
+      </div>
+
+      <!-- ╔══════════════════════════════════════╗
+       ║  DROITE — Liens (localStorage)      ║
+       ╚══════════════════════════════════════╝ -->
+      <div class="panel">
+        <div class="inner">
+          <h1><span data-i18n="panel_liens_title">mesLiens</span><span class="accent">.</span></h1>
+          <p class="subtitle" data-i18n="liens_subtitle">tout ce que je ne veux pas perdre</p>
+
+          <div class="liens-toolbar">
+            <span id="saveIndicatorLiens" class="save-indicator" data-i18n="save_indicator">Enregistré</span>
+            <button class="btn-edit-mode" id="btnEditMode" onclick="toggleEditMode()" data-i18n="liens_btn_edit_mode">passer en mode édition</button>
+            <button class="btn-add-cat" onclick="openModalCategorie()" data-i18n="liens_btn_add_cat">+ nouvelle catégorie</button>
+          </div>
+
+          <div id="linksContainer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale ajout catégorie ── -->
+    <div class="modal-backdrop" id="modalCategorie">
+      <div class="modal">
+        <h3 data-i18n="modal_cat_title">Nouvelle catégorie</h3>
+        <label for="catNom" data-i18n="modal_cat_label_name">Nom</label>
+        <input type="text" id="catNom" data-i18n-placeholder="modal_cat_placeholder_name" placeholder="ex : Lectures…" onkeydown="if(event.key==='Enter') confirmerCategorie();" />
+        <label for="catCouleur" data-i18n="modal_cat_label_color">Couleur</label>
+        <select id="catCouleur">
+          <option value="t-green" data-i18n="color_green">Vert</option>
+          <option value="t-violet" data-i18n="color_violet">Violet</option>
+          <option value="t-amber" data-i18n="color_amber">Ambre</option>
+          <option value="t-sky" data-i18n="color_sky">Bleu ciel</option>
+          <option value="t-rose" data-i18n="color_rose">Rose</option>
+          <option value="t-teal" data-i18n="color_teal">Teal</option>
+        </select>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="closeModalCategorie()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerCategorie()" data-i18n="modal_cat_btn_add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale ajout d'un lien dans une catégorie ── -->
+    <div class="modal-backdrop" id="modalLien">
+      <div class="modal">
+        <h3 data-i18n="modal_lien_title">Nouveau lien</h3>
+        <label for="lienNom" data-i18n="modal_lien_label_name">Nom</label>
+        <input type="text" id="lienNom" data-i18n-placeholder="modal_lien_placeholder_name" placeholder="ex : Figma" />
+        <label for="lienDesc" data-i18n="modal_lien_label_desc">Description</label>
+        <input type="text" id="lienDesc" data-i18n-placeholder="modal_lien_placeholder_desc" placeholder="ex : Outil de design UI" />
+        <label for="lienUrl" data-i18n="modal_lien_label_url">URL</label>
+        <input type="text" id="lienUrl" placeholder="https://…" onkeydown="if(event.key==='Enter') confirmerLien();" />
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerModalLien()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerLien()" data-i18n="modal_lien_btn_add">Ajouter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale édition d'un lien ── -->
+    <div class="modal-backdrop" id="modalEditLien">
+      <div class="modal">
+        <h3 data-i18n="modal_edit_lien_title">Modifier le lien</h3>
+        <label for="editLienNom" data-i18n="modal_lien_label_name">Nom</label>
+        <input type="text" id="editLienNom" data-i18n-placeholder="modal_lien_placeholder_name" placeholder="ex : Figma" />
+        <label for="editLienDesc" data-i18n="modal_lien_label_desc">Description</label>
+        <input type="text" id="editLienDesc" data-i18n-placeholder="modal_lien_placeholder_desc" placeholder="ex : Outil de design UI" />
+        <label for="editLienUrl" data-i18n="modal_lien_label_url">URL</label>
+        <input type="text" id="editLienUrl" placeholder="https://…" onkeydown="if(event.key==='Enter') confirmerEditLien();" />
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerModalEditLien()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerEditLien()" data-i18n="modal_edit_lien_btn_save">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale confirmation suppression lien ── -->
+    <div class="modal-backdrop" id="modalConfirmSupprLien">
+      <div class="modal">
+        <h3 data-i18n="modal_suppr_lien_title">Supprimer le lien ?</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;" data-i18n="irreversible">
+          Cette action est irréversible.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerConfirmSupprLien()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" style="background:#ef4444;" onclick="confirmerSupprLien()" data-i18n="irreversible_delete">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale confirmation suppression catégorie ── -->
+    <div class="modal-backdrop" id="modalConfirmSupprCat">
+      <div class="modal">
+        <h3 data-i18n="modal_suppr_cat_title">Supprimer la catégorie ?</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;" data-i18n="modal_suppr_cat_msg">
+          Tous les liens de cette catégorie seront également supprimés. Cette action est irréversible.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerConfirmSupprCat()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerCategorie()" data-i18n="irreversible_delete">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale nouvelle note ── -->
+    <div class="modal-backdrop" id="modalNote">
+      <div class="modal">
+        <h3 data-i18n="modal_note_title">Nouvelle note</h3>
+        <label for="noteNom" data-i18n="modal_note_label_titre">Titre</label>
+        <input type="text" id="noteNom" data-i18n-placeholder="modal_note_placeholder" placeholder="ex : Raccourcis Git…" onkeydown="if(event.key==='Enter') confirmerNote();" />
+        <label for="noteCouleur" data-i18n="modal_note_label_color">Couleur</label>
+        <select id="noteCouleur">
+          <option value="t-green" data-i18n="color_green">Vert</option>
+          <option value="t-violet" data-i18n="color_violet">Violet</option>
+          <option value="t-amber" data-i18n="color_amber">Ambre</option>
+          <option value="t-sky" data-i18n="color_sky">Bleu ciel</option>
+          <option value="t-rose" data-i18n="color_rose">Rose</option>
+          <option value="t-teal" data-i18n="color_teal">Teal</option>
+        </select>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="closeModalNote()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerNote()" data-i18n="modal_note_btn_create">Créer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale édition note ── -->
+    <div class="modal-backdrop" id="modalEditNote">
+      <div class="modal">
+        <h3 data-i18n="modal_edit_note_title">Modifier la note</h3>
+        <label for="editNoteNom" data-i18n="modal_note_label_titre">Titre</label>
+        <input type="text" id="editNoteNom" data-i18n-placeholder="modal_note_placeholder" placeholder="ex : Raccourcis Git…" onkeydown="if(event.key==='Enter') confirmerEditNote();" />
+        <label for="editNoteCouleur" data-i18n="modal_note_label_color">Couleur</label>
+        <select id="editNoteCouleur">
+          <option value="t-green" data-i18n="color_green">Vert</option>
+          <option value="t-violet" data-i18n="color_violet">Violet</option>
+          <option value="t-amber" data-i18n="color_amber">Ambre</option>
+          <option value="t-sky" data-i18n="color_sky">Bleu ciel</option>
+          <option value="t-rose" data-i18n="color_rose">Rose</option>
+          <option value="t-teal" data-i18n="color_teal">Teal</option>
+        </select>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerModalEditNote()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerEditNote()" data-i18n="modal_edit_note_btn_save">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale confirmation suppression note ── -->
+    <div class="modal-backdrop" id="modalConfirmSupprNote">
+      <div class="modal">
+        <h3 data-i18n="modal_suppr_note_title">Supprimer la note ?</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;" data-i18n="modal_suppr_note_msg">
+          Tous les blocs de cette note seront également supprimés. Cette action est irréversible.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerConfirmSupprNote()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerNote()" data-i18n="irreversible_delete">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale ajout / édition bloc ── -->
+    <div class="modal-backdrop" id="modalBloc">
+      <div class="modal">
+        <h3 id="modalBlocTitre" data-i18n="modal_bloc_new">Nouveau bloc</h3>
+        <label for="blocType" data-i18n="modal_bloc_label_type">Type</label>
+        <select id="blocType" onchange="updateBlocPlaceholder()">
+          <option value="b" data-i18n="modal_bloc_type_b">Titre</option>
+          <option value="p" data-i18n="modal_bloc_type_p">Texte</option>
+          <option value="pre" data-i18n="modal_bloc_type_pre">Code</option>
+          <option value="ul" data-i18n="modal_bloc_type_ul">Liste à puces</option>
+          <option value="table" data-i18n="modal_bloc_type_table">Tableau</option>
+        </select>
+        <label for="blocContent" data-i18n="modal_bloc_label_content">Contenu</label>
+        <input type="text" id="blocContentInput" placeholder="Texte…" onkeydown="if(event.key==='Enter') confirmerBloc();" />
+        <textarea id="blocContent" rows="6" placeholder="Texte…"></textarea>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerModalBloc()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" onclick="confirmerBloc()" data-i18n="modal_bloc_btn_save">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modale confirmation suppression bloc ── -->
+    <div class="modal-backdrop" id="modalConfirmSupprBloc">
+      <div class="modal">
+        <h3 data-i18n="modal_suppr_bloc_title">Supprimer le bloc ?</h3>
+        <p style="font-size:0.875rem;color:#78716c;margin-bottom:24px;" data-i18n="irreversible">
+          Cette action est irréversible.
+        </p>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="fermerConfirmSupprBloc()" data-i18n="cancel">Annuler</button>
+          <button class="btn-confirm" style="background:#ef4444;" onclick="supprimerBloc()" data-i18n="irreversible_delete">Supprimer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts : i18n → données → liens → tâches → notes -->
+  </div>
+
+  <!-- ══════════════════════════════════════
+       Vue Admin
+       ══════════════════════════════════════ -->
+  <div id="view-admin" class="view">
+    <a href="#index" onclick="navigateTo('index');return false;" class="admin-back" title="Retour au dashboard">←</a>
+
+    <div class="admin-shell">
+      <h1>admin<span class="accent">.</span></h1>
+      <p class="subtitle" data-i18n="admin_subtitle">
+        réinitialisation des données
+      </p>
+
+      <!-- ── Sélecteur de langue ── -->
+      <div class="admin-lang-section">
+        <h2 data-i18n="admin_lang_title">Langue / Language</h2>
+        <div class="admin-lang-options">
+          <button class="btn-lang" id="btnLangFr" onclick="setLang('fr')">
+            Français
+          </button>
+          <button class="btn-lang" id="btnLangEn" onclick="setLang('en')">
+            English
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-intro">
+        <h2 data-i18n="admin_why_title">Sauvegarde automatique</h2>
+        <p data-i18n-html="admin_why_p1">
+          L'application sauvegarde automatiquement tes données dans le
+          <strong>localStorage</strong> du navigateur à chaque modification.
+        </p>
+        <p data-i18n-html="admin_why_p2">
+          Ces données <strong>persistent</strong> même en fermant le navigateur.
+          Utilise l'export JSON pour créer une sauvegarde externe.
+        </p>
+        <p data-i18n-html="admin_why_p3">
+          <strong>Attention :</strong> effacer le localStorage est irréversible.
+          Exporte tes données avant si tu veux les conserver.
+        </p>
+      </div>
+
+      <!-- Section Export/Import -->
+      <div class="admin-lang-section">
+        <h2 data-i18n="admin_export_title">Export / Import</h2>
+        <div class="admin-actions" style="margin-bottom:0">
+          <div class="admin-check-label" style="cursor:default">
+            <div class="admin-check-text" style="flex:1">
+              <strong data-i18n="admin_export_btn">Exporter (JSON)</strong>
+              <span data-i18n="admin_export_desc">Télécharge toutes tes données dans un fichier JSON.</span>
+            </div>
+            <button class="btn-lang" onclick="exportData()" style="flex-shrink:0">
+              <span data-i18n="admin_export_btn">Exporter</span>
+            </button>
+          </div>
+          <div class="admin-check-label" style="cursor:default">
+            <div class="admin-check-text" style="flex:1">
+              <strong data-i18n="admin_import_btn">Importer (JSON)</strong>
+              <span data-i18n="admin_import_desc">Restaure tes données depuis un fichier JSON.</span>
+            </div>
+            <label class="btn-lang" style="flex-shrink:0;cursor:pointer">
+              <span data-i18n="admin_import_btn">Importer</span>
+              <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this.files[0])" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Reset -->
+      <div class="admin-lang-section">
+        <h2 data-i18n="admin_reset_title">Réinitialisation</h2>
+        <div class="admin-actions" style="margin-bottom:16px">
+          <label class="admin-check-label">
+            <input type="checkbox" id="checkLocalStorage" />
+            <div class="admin-check-text">
+              <strong data-i18n="admin_ls_label">Effacer le localStorage</strong>
+              <span data-i18n="admin_ls_desc">Supprime toutes les tâches, notes, liens et diagrammes. L'application repart des données par défaut.</span>
+            </div>
+          </label>
+        </div>
+        <button
+          class="btn-execute"
+          id="btnExecute"
+          disabled
+          onclick="executer()"
+          data-i18n="admin_execute_btn"
+        >
+          effacer les données
+        </button>
+      </div>
+
+      <div class="admin-feedback" id="adminFeedback"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       Vue Diagram
+       ══════════════════════════════════════ -->
+  <div id="view-diagram" class="view">
+    <!-- Bouton retour — fixe en haut à droite (comme ⚙ sur index.html) -->
+    <a href="#index" onclick="navigateTo('index');return false;" class="diagram-topbar-back" title="Retour">←</a>
+
+    <!-- Barre d'outils -->
+    <div class="diagram-topbar">
+
+      <!-- ☰ Liste des diagrammes — premier à gauche -->
+      <button class="diagram-tool" onclick="toggleDiagramList()" data-i18n-title="diag_my_diagrams">☰</button>
+      <span class="diagram-sep">|</span>
+
+      <!-- Outils formes -->
+      <button class="diagram-tool active" id="toolSelect" onclick="setTool('select')" data-i18n-title="diag_tool_select">
+        <svg width="12" height="14" viewBox="0 0 12 14" fill="currentColor" stroke="none">
+          <path d="M1 1 L1 13 L4.5 9.5 L7 14 L9 13 L6.5 8.5 L11 8.5 Z"/>
+        </svg>
+      </button>
+      <button class="diagram-tool" id="toolRect" onclick="setTool('rect')" data-i18n-title="diag_tool_rect">
+        <svg width="18" height="11" viewBox="0 0 18 11" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="1" width="16" height="9" rx="1"/>
+        </svg>
+      </button>
+      <button class="diagram-tool" id="toolRounded" onclick="setTool('rounded')" data-i18n-title="diag_tool_rounded">
+        <svg width="18" height="11" viewBox="0 0 18 11" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="1" width="16" height="9" rx="4.5"/>
+        </svg>
+      </button>
+      <button class="diagram-tool" id="toolDb" onclick="setTool('db')" data-i18n-title="diag_tool_db">
+        <svg width="14" height="17" viewBox="0 0 14 17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <ellipse cx="7" cy="3.5" rx="5.5" ry="2.5"/>
+          <path d="M1.5 3.5v10c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5V3.5"/>
+          <path d="M12.5 8.5c0 1.4-2.5 2.5-5.5 2.5S1.5 9.9 1.5 8.5"/>
+        </svg>
+      </button>
+      <button class="diagram-tool" id="toolCloud" onclick="setTool('cloud')" data-i18n-title="diag_tool_cloud">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3,2">
+          <ellipse cx="9" cy="6" rx="8" ry="5"/>
+        </svg>
+      </button>
+      <button class="diagram-tool" id="toolText" onclick="setTool('text')" data-i18n-title="diag_tool_text">T</button>
+      <span class="diagram-sep">|</span>
+
+      <!-- Outil flèche -->
+      <button class="diagram-tool" id="toolArrow" onclick="setTool('arrow')" data-i18n-title="diag_tool_arrow">→</button>
+      <span class="diagram-sep">|</span>
+
+      <!-- Supprimer -->
+      <button class="diagram-tool" id="btnDelSelected" onclick="deleteSelected()" data-i18n-title="diag_tool_delete">✕</button>
+      <span class="diagram-sep">|</span>
+
+      <!-- Titre (prend l'espace restant) -->
+      <input type="text" id="diagramTitle" class="diagram-title-input" />
+
+      <span class="diagram-sep">|</span>
+
+      <!-- Zoom -->
+      <button class="diagram-tool" onclick="zoomOut()" title="−">−</button>
+      <span id="zoomLevel" class="zoom-level">100%</span>
+      <button class="diagram-tool" onclick="zoomIn()" title="+">+</button>
+      <button class="diagram-tool" onclick="resetZoom()" title="⊡">⊡</button>
+      <span class="diagram-sep">|</span>
+
+      <!-- Indicateur sauvegarde -->
+      <span id="saveIndicatorDiag" class="save-indicator" data-i18n="save_indicator">Enregistré</span>
+    </div>
+
+    <!-- Panneau liste des diagrammes -->
+    <div id="diagramListPanel" class="diagram-list-panel">
+      <div class="diagram-list-header">
+        <span data-i18n="diag_my_diagrams">Mes diagrammes</span>
+        <button onclick="creerDiagramme()" data-i18n="diag_btn_new">+ Nouveau</button>
+      </div>
+      <div id="diagramList"></div>
+    </div>
+
+    <!-- Palette de couleurs (visible quand forme sélectionnée) -->
+    <div id="colorPanel" class="diagram-color-panel" style="display:none">
+      <button class="color-dot t-green"  onclick="setShapeColor('t-green')"></button>
+      <button class="color-dot t-violet" onclick="setShapeColor('t-violet')"></button>
+      <button class="color-dot t-amber"  onclick="setShapeColor('t-amber')"></button>
+      <button class="color-dot t-sky"    onclick="setShapeColor('t-sky')"></button>
+      <button class="color-dot t-rose"   onclick="setShapeColor('t-rose')"></button>
+      <button class="color-dot t-teal"   onclick="setShapeColor('t-teal')"></button>
+      <span style="width:1px;background:#e7e5e4;margin:0 4px;align-self:stretch;"></span>
+      <button class="diagram-color-edit" onclick="startTextEdit(selectedId)" data-i18n-title="diag_edit_text">✎</button>
+    </div>
+
+    <!-- Canvas SVG -->
+    <svg id="canvas" class="diagram-canvas">
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#a8a29e" />
+        </marker>
+        <marker id="arrowhead-sel" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#f97316" />
+        </marker>
+      </defs>
+      <g id="viewport">
+        <g id="arrowsLayer"></g>
+        <g id="shapesLayer"></g>
+        <line id="tempArrow" style="display:none" stroke="#f97316" stroke-width="1.5"
+              stroke-dasharray="6,4" marker-end="url(#arrowhead-sel)" />
+      </g>
+    </svg>
+
+    <!-- Éditeur de texte inline -->
+    <div id="textOverlay" style="display:none;position:fixed;inset:0;z-index:200;pointer-events:none;">
+      <input id="shapeTextInput" type="text" style="position:absolute;pointer-events:auto;
+             background:rgba(255,255,255,0.92);border:1.5px solid #f97316;border-radius:5px;
+             outline:none;text-align:center;font-family:'Segoe UI',system-ui,sans-serif;
+             font-weight:600;padding:2px 6px;" />
+    </div>
+  </div>
+
+  <script>
+// ══════════════════════════════════════
+//  doc-survival-kit v3.1.0 — Bundle standalone
+// ══════════════════════════════════════
+
+// ── i18n/fr.js ──
+var i18n_fr = {
+  page_title: "Dashboard",
+  page_title_admin: "Administration — doc-survival-kit",
+
+  // Titres des panels
+  panel_taches_title: "mesTaches",
+  panel_notes_title: "mesNotes",
+  panel_liens_title: "mesLiens",
+
+  // mesTaches
+  taches_subtitle: "tout ce que je dois faire",
+  taches_input_placeholder: "Nouvelle tâche…",
+  taches_priority_normal: "Normal",
+  taches_priority_urgent: "Urgent",
+  taches_priority_later: "Plus tard",
+  taches_filter_all: "Tout",
+  taches_filter_todo: "À faire",
+  taches_filter_done: "Fait",
+  taches_filter_urgent: "Urgent",
+  taches_filter_normal: "Normal",
+  taches_filter_later: "Plus tard",
+  taches_empty: "Rien ici pour l'instant.",
+  taches_delete_title: "Supprimer",
+
+  // mesNotes
+  notes_subtitle: "tout ce que je dois hélas retenir",
+  notes_btn_edit_mode: "passer en mode édition",
+  notes_btn_quit_edit_mode: "quitter le mode édition",
+  notes_btn_add: "+ nouvelle note",
+  notes_empty: "Aucune note pour l'instant.",
+  notes_btn_copy: "copier",
+  notes_btn_copied: "copié ✓",
+  notes_btn_edit_bloc: "modifier",
+  notes_btn_add_bloc: "+ ajouter un bloc",
+  notes_btn_edit_note: "modifier",
+
+  // mesLiens
+  liens_subtitle: "tout ce que je ne veux pas perdre",
+  liens_btn_edit_mode: "passer en mode édition",
+  liens_btn_quit_edit_mode: "quitter le mode édition",
+  liens_btn_add_cat: "+ nouvelle catégorie",
+  liens_add_link_title: "Ajouter un lien",
+  liens_del_cat_title: "Supprimer la catégorie",
+  liens_edit_link_title: "Modifier le lien",
+  liens_del_link_title: "Supprimer le lien",
+
+  // Couleurs
+  color_green: "Vert",
+  color_violet: "Violet",
+  color_amber: "Ambre",
+  color_sky: "Bleu ciel",
+  color_rose: "Rose",
+  color_teal: "Teal",
+
+  // Commun modales
+  cancel: "Annuler",
+  irreversible: "Cette action est irréversible.",
+  irreversible_delete: "Supprimer",
+
+  // Modal catégorie
+  modal_cat_title: "Nouvelle catégorie",
+  modal_cat_label_name: "Nom",
+  modal_cat_placeholder_name: "ex : Lectures…",
+  modal_cat_label_color: "Couleur",
+  modal_cat_btn_add: "Ajouter",
+
+  // Modal lien
+  modal_lien_title: "Nouveau lien",
+  modal_lien_label_name: "Nom",
+  modal_lien_placeholder_name: "ex : Figma",
+  modal_lien_label_desc: "Description",
+  modal_lien_placeholder_desc: "ex : Outil de design UI",
+  modal_lien_label_url: "URL",
+  modal_lien_btn_add: "Ajouter",
+
+  // Modal edit lien
+  modal_edit_lien_title: "Modifier le lien",
+  modal_edit_lien_btn_save: "Enregistrer",
+
+  // Modal confirm suppr lien
+  modal_suppr_lien_title: "Supprimer le lien ?",
+
+  // Modal confirm suppr cat
+  modal_suppr_cat_title: "Supprimer la catégorie ?",
+  modal_suppr_cat_msg:
+    "Tous les liens de cette catégorie seront également supprimés. Cette action est irréversible.",
+
+  // Modal note
+  modal_note_title: "Nouvelle note",
+  modal_note_label_titre: "Titre",
+  modal_note_placeholder: "ex : Raccourcis Git…",
+  modal_note_label_color: "Couleur",
+  modal_note_btn_create: "Créer",
+
+  // Modal edit note
+  modal_edit_note_title: "Modifier la note",
+  modal_edit_note_btn_save: "Enregistrer",
+
+  // Modal confirm suppr note
+  modal_suppr_note_title: "Supprimer la note ?",
+  modal_suppr_note_msg:
+    "Tous les blocs de cette note seront également supprimés. Cette action est irréversible.",
+
+  // Modal bloc
+  modal_bloc_label_type: "Type",
+  modal_bloc_type_b: "Titre",
+  modal_bloc_type_p: "Texte",
+  modal_bloc_type_pre: "Code",
+  modal_bloc_type_ul: "Liste à puces",
+  modal_bloc_type_table: "Tableau",
+  modal_bloc_label_content: "Contenu",
+  modal_bloc_new: "Nouveau bloc",
+  modal_bloc_edit: "Modifier le bloc",
+  modal_bloc_placeholder_ul: "Un élément par ligne…",
+  modal_bloc_placeholder_pre: "Code…",
+  modal_bloc_placeholder_b: "Titre…",
+  modal_bloc_placeholder_p: "Texte…",
+  modal_bloc_placeholder_table: "En-tête 1 | En-tête 2 | En-tête 3\nValeur A | Valeur B | Valeur C\nValeur D | Valeur E | Valeur F",
+  modal_bloc_btn_save: "Enregistrer",
+
+  // Modal confirm suppr bloc
+  modal_suppr_bloc_title: "Supprimer le bloc ?",
+
+  // Diagrammes
+  diag_page_title: "Diagrammes",
+  diag_btn_new: "+ Nouveau",
+  diag_my_diagrams: "Mes diagrammes",
+  diag_new_diagram: "Nouveau diagramme",
+  diag_tool_select:  "Sélectionner / Déplacer",
+  diag_tool_rect:    "Rectangle",
+  diag_tool_rounded: "Rectangle arrondi",
+  diag_tool_db:      "Base de données",
+  diag_tool_cloud:   "Service externe / Cloud",
+  diag_tool_text:    "Texte libre",
+  diag_tool_arrow:   "Flèche (clic source → clic cible, ou drag depuis un point de connexion)",
+  diag_tool_delete:  "Supprimer la sélection (Del)",
+  diag_edit_text: "Modifier le texte",
+
+  // Sauvegarde automatique
+  save_indicator: "Enregistré",
+
+  // Admin
+  admin_subtitle: "gestion des données",
+  admin_why_title: "Sauvegarde automatique",
+  admin_why_p1:
+    "L'application sauvegarde automatiquement tes données dans le <strong>localStorage</strong> du navigateur à chaque modification.",
+  admin_why_p2:
+    "Ces données <strong>persistent</strong> même en fermant le navigateur. Utilise l'export JSON pour créer une sauvegarde externe.",
+  admin_why_p3:
+    "<strong>Attention :</strong> effacer le localStorage est irréversible. Exporte tes données avant si tu veux les conserver.",
+  admin_export_title: "Export / Import",
+  admin_export_btn: "Exporter (JSON)",
+  admin_export_desc: "Télécharge toutes tes données (tâches, notes, liens, diagrammes) dans un fichier JSON.",
+  admin_import_btn: "Importer (JSON)",
+  admin_import_desc: "Restaure tes données depuis un fichier JSON exporté précédemment.",
+  admin_import_confirm: "L'import va remplacer toutes les données actuelles. Continuer ?",
+  admin_import_success: "Import réussi ! La page va se recharger.",
+  admin_import_error: "Erreur lors de l'import. Vérifie que le fichier est valide.",
+  admin_reset_title: "Réinitialisation",
+  admin_ls_label: "Effacer le localStorage",
+  admin_ls_desc:
+    "Supprime toutes les tâches, notes, liens et diagrammes. L'application repart des données par défaut.",
+  admin_execute_btn: "effacer les données",
+  admin_feedback_ls: "localStorage effacé.",
+  admin_feedback_return:
+    "Retourne sur le dashboard pour constater les changements.",
+  admin_lang_title: "Langue / Language",
+  admin_lang_applied: "Langue appliquée.",
+};
+
+
+// ── i18n/en.js ──
+var i18n_en = {
+  page_title: "Dashboard",
+  page_title_admin: "Administration — doc-survival-kit",
+
+  // Panel titles
+  panel_taches_title: "myTasks",
+  panel_notes_title: "myNotes",
+  panel_liens_title: "myLinks",
+
+  // mesTaches
+  taches_subtitle: "everything I need to do",
+  taches_input_placeholder: "New task…",
+  taches_priority_normal: "Normal",
+  taches_priority_urgent: "Urgent",
+  taches_priority_later: "Later",
+  taches_filter_all: "All",
+  taches_filter_todo: "To do",
+  taches_filter_done: "Done",
+  taches_filter_urgent: "Urgent",
+  taches_filter_normal: "Normal",
+  taches_filter_later: "Later",
+  taches_empty: "Nothing here yet.",
+  taches_delete_title: "Delete",
+
+  // mesNotes
+  notes_subtitle: "everything I need to remember",
+  notes_btn_edit_mode: "enter edit mode",
+  notes_btn_quit_edit_mode: "exit edit mode",
+  notes_btn_add: "+ new note",
+  notes_empty: "No notes yet.",
+  notes_btn_copy: "copy",
+  notes_btn_copied: "copied ✓",
+  notes_btn_edit_bloc: "edit",
+  notes_btn_add_bloc: "+ add a block",
+  notes_btn_edit_note: "edit",
+
+  // mesLiens
+  liens_subtitle: "everything I don't want to lose",
+  liens_btn_edit_mode: "enter edit mode",
+  liens_btn_quit_edit_mode: "exit edit mode",
+  liens_btn_add_cat: "+ new category",
+  liens_add_link_title: "Add a link",
+  liens_del_cat_title: "Delete category",
+  liens_edit_link_title: "Edit link",
+  liens_del_link_title: "Delete link",
+
+  // Colors
+  color_green: "Green",
+  color_violet: "Violet",
+  color_amber: "Amber",
+  color_sky: "Sky blue",
+  color_rose: "Rose",
+  color_teal: "Teal",
+
+  // Common modals
+  cancel: "Cancel",
+  irreversible: "This action is irreversible.",
+  irreversible_delete: "Delete",
+
+  // Modal category
+  modal_cat_title: "New category",
+  modal_cat_label_name: "Name",
+  modal_cat_placeholder_name: "e.g. Reading list…",
+  modal_cat_label_color: "Color",
+  modal_cat_btn_add: "Add",
+
+  // Modal link
+  modal_lien_title: "New link",
+  modal_lien_label_name: "Name",
+  modal_lien_placeholder_name: "e.g. Figma",
+  modal_lien_label_desc: "Description",
+  modal_lien_placeholder_desc: "e.g. UI design tool",
+  modal_lien_label_url: "URL",
+  modal_lien_btn_add: "Add",
+
+  // Modal edit link
+  modal_edit_lien_title: "Edit link",
+  modal_edit_lien_btn_save: "Save",
+
+  // Modal confirm delete link
+  modal_suppr_lien_title: "Delete this link?",
+
+  // Modal confirm delete category
+  modal_suppr_cat_title: "Delete this category?",
+  modal_suppr_cat_msg:
+    "All links in this category will also be deleted. This action is irreversible.",
+
+  // Modal note
+  modal_note_title: "New note",
+  modal_note_label_titre: "Title",
+  modal_note_placeholder: "e.g. Git shortcuts…",
+  modal_note_label_color: "Color",
+  modal_note_btn_create: "Create",
+
+  // Modal edit note
+  modal_edit_note_title: "Edit note",
+  modal_edit_note_btn_save: "Save",
+
+  // Modal confirm delete note
+  modal_suppr_note_title: "Delete this note?",
+  modal_suppr_note_msg:
+    "All blocks in this note will also be deleted. This action is irreversible.",
+
+  // Modal block
+  modal_bloc_label_type: "Type",
+  modal_bloc_type_b: "Title",
+  modal_bloc_type_p: "Text",
+  modal_bloc_type_pre: "Code",
+  modal_bloc_type_ul: "Bullet list",
+  modal_bloc_type_table: "Table",
+  modal_bloc_label_content: "Content",
+  modal_bloc_new: "New block",
+  modal_bloc_edit: "Edit block",
+  modal_bloc_placeholder_ul: "One item per line…",
+  modal_bloc_placeholder_pre: "Code…",
+  modal_bloc_placeholder_b: "Title…",
+  modal_bloc_placeholder_p: "Text…",
+  modal_bloc_placeholder_table: "Header 1 | Header 2 | Header 3\nValue A | Value B | Value C\nValue D | Value E | Value F",
+  modal_bloc_btn_save: "Save",
+
+  // Modal confirm delete block
+  modal_suppr_bloc_title: "Delete this block?",
+
+  // Diagrams
+  diag_page_title: "Diagrams",
+  diag_btn_new: "+ New",
+  diag_my_diagrams: "My diagrams",
+  diag_new_diagram: "New diagram",
+  diag_tool_select:  "Select / Move",
+  diag_tool_rect:    "Rectangle",
+  diag_tool_rounded: "Rounded rectangle",
+  diag_tool_db:      "Database",
+  diag_tool_cloud:   "External service / Cloud",
+  diag_tool_text:    "Free text",
+  diag_tool_arrow:   "Arrow (click source → click target, or drag from a connection dot)",
+  diag_tool_delete:  "Delete selection (Del)",
+  diag_edit_text: "Edit text",
+
+  // Auto-save indicator
+  save_indicator: "Saved",
+
+  // Admin
+  admin_subtitle: "data management",
+  admin_why_title: "Auto-save",
+  admin_why_p1:
+    "The application automatically saves your data to the browser's <strong>localStorage</strong> on every change.",
+  admin_why_p2:
+    "This data <strong>persists</strong> even when closing the browser. Use JSON export to create an external backup.",
+  admin_why_p3:
+    "<strong>Warning:</strong> clearing localStorage is irreversible. Export your data first if you want to keep it.",
+  admin_export_title: "Export / Import",
+  admin_export_btn: "Export (JSON)",
+  admin_export_desc: "Download all your data (tasks, notes, links, diagrams) as a JSON file.",
+  admin_import_btn: "Import (JSON)",
+  admin_import_desc: "Restore your data from a previously exported JSON file.",
+  admin_import_confirm: "Import will replace all current data. Continue?",
+  admin_import_success: "Import successful! The page will reload.",
+  admin_import_error: "Error during import. Please check that the file is valid.",
+  admin_reset_title: "Reset",
+  admin_ls_label: "Clear localStorage",
+  admin_ls_desc:
+    "Deletes all tasks, notes, links and diagrams. The application will restart with default data.",
+  admin_execute_btn: "clear data",
+  admin_feedback_ls: "localStorage cleared.",
+  admin_feedback_return: "Return to the dashboard to see the changes.",
+  admin_lang_title: "Langue / Language",
+  admin_lang_applied: "Language applied.",
+};
+
+
+// ── i18n/i18n.js ──
+(function () {
+  var lang = localStorage.getItem("lang") || "fr";
+  window.t = lang === "en" ? i18n_en : i18n_fr;
+
+  function applyI18n() {
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var key = el.getAttribute("data-i18n");
+      if (window.t[key] !== undefined) el.textContent = window.t[key];
+    });
+    document.querySelectorAll("[data-i18n-html]").forEach(function (el) {
+      var key = el.getAttribute("data-i18n-html");
+      if (window.t[key] !== undefined) el.innerHTML = window.t[key];
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(function (el) {
+      var key = el.getAttribute("data-i18n-placeholder");
+      if (window.t[key] !== undefined) el.placeholder = window.t[key];
+    });
+    document.querySelectorAll("[data-i18n-title]").forEach(function (el) {
+      var key = el.getAttribute("data-i18n-title");
+      if (window.t[key] !== undefined) el.title = window.t[key];
+    });
+    document.documentElement.lang = lang === "en" ? "en" : "fr";
+  }
+
+  window.applyI18n = applyI18n;
+  document.addEventListener("DOMContentLoaded", applyI18n);
+})();
+
+
+// ── mesLiens.js ──
+var mesLiensDefaut = [
+  {
+    theme: "t-green",
+    titre: "Dev & Code",
+    liens: [
+      {
+        nom: "Tailwind CSS",
+        desc: "Documentation officielle",
+        url: "https://tailwindcss.com/docs",
+      },
+      {
+        nom: "MDN Web Docs",
+        desc: "Référence HTML, CSS, JS",
+        url: "https://developer.mozilla.org/fr/",
+      },
+      {
+        nom: "GitHub",
+        desc: "Repos, issues, PRs",
+        url: "https://github.com",
+      },
+    ],
+  },
+  {
+    theme: "t-violet",
+    titre: "Design & Inspi",
+    liens: [
+      {
+        nom: "Unsplash",
+        desc: "Photos libres de droits",
+        url: "https://unsplash.com",
+      },
+      {
+        nom: "Dribbble",
+        desc: "Inspiration UI/UX",
+        url: "https://dribbble.com",
+      },
+    ],
+  },
+  {
+    theme: "t-amber",
+    titre: "Outils",
+    liens: [
+      {
+        nom: "Excalidraw",
+        desc: "Whiteboard hand-drawn",
+        url: "https://excalidraw.com",
+      },
+      {
+        nom: "Notion",
+        desc: "Notes et docs tout-en-un",
+        url: "https://notion.so",
+      },
+    ],
+  },
+  {
+    theme: "t-sky",
+    titre: "Veille",
+    liens: [
+      {
+        nom: "Hacker News",
+        desc: "Actu tech et startups",
+        url: "https://news.ycombinator.com",
+      },
+    ],
+  },
+];
+
+
+// ── mesNotes.js ──
+var mesNotesDefaut = [
+  {
+    "id": 1700000000001,
+    "theme": "t-green",
+    "titre": "Commandes Git",
+    "blocs": [
+      { "type": "b", "content": "Annuler le dernier commit (garder les modifs)" },
+      { "type": "pre", "content": "git reset --soft HEAD~1" },
+      { "type": "b", "content": "Stash — mettre de côté" },
+      { "type": "pre", "content": "git stash\ngit stash pop" },
+      { "type": "b", "content": "Rebaser sur main" },
+      { "type": "pre", "content": "git fetch origin\ngit rebase origin/main" },
+      { "type": "b", "content": "Voir les branches distantes" },
+      { "type": "pre", "content": "git branch -r" }
+    ]
+  },
+  {
+    "id": 1700000000002,
+    "theme": "t-sky",
+    "titre": "Raccourcis VS Code",
+    "blocs": [
+      { "type": "b", "content": "Édition" },
+      {
+        "type": "ul",
+        "items": [
+          "Ctrl+D — sélectionner le mot suivant",
+          "Alt+↑/↓ — déplacer la ligne",
+          "Ctrl+Shift+K — supprimer la ligne",
+          "Ctrl+/ — commenter / décommenter"
+        ]
+      },
+      { "type": "b", "content": "Navigation" },
+      {
+        "type": "ul",
+        "items": [
+          "Ctrl+P — ouvrir un fichier",
+          "Ctrl+Shift+F — recherche globale",
+          "Ctrl+` — ouvrir le terminal",
+          "Ctrl+B — afficher/masquer l'explorateur"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 1700000000003,
+    "theme": "t-amber",
+    "titre": "Regex utiles",
+    "blocs": [
+      {
+        "type": "table",
+        "headers": ["Sujet", "Expression"],
+        "rows": [
+          ["Email", "^[\\w.-]+@[\\w.-]+\\.[a-z]{2,}$"],
+          ["URL", "https?:\\/\\/[\\w\\-._~:/?#\\[\\]@!$&'()*+,;=%]+"],
+          ["Date JJ/MM/AAAA", "^(0[1-9]|[12]\\d|3[01])\\/(0[1-9]|1[0-2])\\/\\d{4}$"]
+        ]
+      },
+      {
+        "type": "table",
+        "headers": ["Flag", "Description"],
+        "rows": [
+          ["g", "global — toutes les occurrences"],
+          ["i", "insensible à la casse"],
+          ["m", "multiligne (^ et $ par ligne)"]
+        ]
+      }
+    ]
+  },
+  {
+    "id": 1700000000004,
+    "theme": "t-violet",
+    "titre": "Comment utiliser mesNotes",
+    "blocs": [
+      { "type": "p", "content": "Chaque note est composée de blocs que tu empiles librement." },
+      { "type": "b", "content": "Types de blocs disponibles" },
+      {
+        "type": "ul",
+        "items": [
+          "Titre — texte court mis en gras",
+          "Texte — paragraphe libre",
+          "Code — bloc monospace à fond gris",
+          "Liste — bullet points, un élément par ligne",
+          "Tableau — lignes séparées par |, 1re ligne = en-têtes"
+        ]
+      },
+      { "type": "b", "content": "Pour modifier" },
+      { "type": "p", "content": "Active le mode édition pour ajouter, modifier ou supprimer des blocs et des notes. N'oublie pas d'enregistrer les modifications dans le fichier." }
+    ]
+  }
+];
+
+
+// ── diagrammes.js ──
+var diagrammesDefaut = [
+  {
+    id: 1700000000010,
+    titre: "Architecture example",
+    shapes: [
+      {
+        id: "s1",
+        type: "rounded",
+        x: 78,
+        y: 131,
+        w: 130,
+        h: 50,
+        text: "Client Web",
+        color: "t-sky",
+      },
+      {
+        id: "s2",
+        type: "rect",
+        x: 281,
+        y: 134,
+        w: 130,
+        h: 50,
+        text: "API Gateway",
+        color: "t-green",
+      },
+      {
+        id: "s3",
+        type: "rect",
+        x: 506,
+        y: 38,
+        w: 130,
+        h: 50,
+        text: "Auth Service",
+        color: "t-violet",
+      },
+      {
+        id: "s4",
+        type: "rect",
+        x: 505,
+        y: 197,
+        w: 130,
+        h: 50,
+        text: "Data Service",
+        color: "t-amber",
+      },
+      {
+        id: "s5",
+        type: "db",
+        x: 771,
+        y: 223,
+        w: 100,
+        h: 65,
+        text: "PostgreSQL",
+        color: "t-rose",
+      },
+      {
+        id: "s6",
+        type: "cloud",
+        x: 725,
+        y: -4,
+        w: 110,
+        h: 65,
+        text: "OAuth 2.0",
+        color: "t-teal",
+      },
+    ],
+    arrows: [
+      {
+        id: "a1",
+        from: "s1",
+        to: "s2",
+        label: "HTTPS",
+      },
+      {
+        id: "a2",
+        from: "s2",
+        to: "s3",
+        label: "",
+      },
+      {
+        id: "a3",
+        from: "s2",
+        to: "s4",
+        label: "",
+      },
+      {
+        id: "a4",
+        from: "s4",
+        to: "s5",
+        label: "SQL",
+      },
+      {
+        id: "a5",
+        from: "s3",
+        to: "s6",
+        label: "",
+      },
+    ],
+  },
+];
+
+
+// ── taches.js ──
+// ── Données des tâches ───────────────────────────────────────────────
+const KEY = "mes_taches";
+let filter = "all";
+
+function load() {
+  try {
+    return JSON.parse(localStorage.getItem(KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function save(tasks) {
+  localStorage.setItem(KEY, JSON.stringify(tasks));
+}
+
+// ── Actions ──────────────────────────────────────────────────────────
+function addTask() {
+  const input = document.getElementById("taskInput");
+  const text = input.value.trim();
+  if (!text) return;
+  const priority = document.getElementById("taskPriority").value;
+  const tasks = load();
+  tasks.unshift({ id: Date.now(), text, priority, done: false });
+  save(tasks);
+  input.value = "";
+  render();
+}
+
+function toggle(id) {
+  const tasks = load();
+  const t = tasks.find((t) => t.id === id);
+  if (t) t.done = !t.done;
+  save(tasks);
+  render();
+}
+
+function remove(id) {
+  save(load().filter((t) => t.id !== id));
+  render();
+}
+
+function setFilter(f, btn) {
+  filter = f;
+  document
+    .querySelectorAll(".filters button")
+    .forEach((b) => b.classList.remove("active"));
+  btn.classList.add("active");
+  render();
+}
+
+// ── Rendu ────────────────────────────────────────────────────────────
+function render() {
+  const tasks = load();
+  const list = document.getElementById("taskList");
+
+  const filtered = tasks.filter((t) => {
+    if (filter === "todo") return !t.done;
+    if (filter === "done") return t.done;
+    if (filter === "urgent" || filter === "normal" || filter === "later")
+      return t.priority === filter;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<p class="empty-msg">' + window.t.taches_empty + '</p>';
+    return;
+  }
+
+  const labels = {
+    urgent: window.t.taches_priority_urgent,
+    normal: window.t.taches_priority_normal,
+    later: window.t.taches_priority_later,
+  };
+
+  list.innerHTML = filtered
+    .map(
+      (t) => `
+    <div class="task task-${t.priority} ${t.done ? "done" : ""}">
+      <div class="check" onclick="toggle(${t.id})"></div>
+      <span class="task-text">${esc(t.text)}</span>
+      <span class="task-tag">${labels[t.priority]}</span>
+      <button class="task-del" onclick="remove(${t.id})" title="${window.t.taches_delete_title}">✕</button>
+    </div>
+  `,
+    )
+    .join("");
+}
+
+function esc(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+render();
+
+
+// ── liens.js ──
+// ── Données des liens ────────────────────────────────────────────────
+const LIENS_KEY = "mes_liens";
+
+function loadLiens() {
+  try {
+    return JSON.parse(localStorage.getItem(LIENS_KEY)) || mesLiensDefaut;
+  } catch {
+    return mesLiensDefaut;
+  }
+}
+
+function saveLiens(data) {
+  localStorage.setItem(LIENS_KEY, JSON.stringify(data));
+  showSavedLiens();
+}
+
+// ── Indicateur de sauvegarde ─────────────────────────────────────────
+var _saveTimeoutLiens = null;
+function showSavedLiens() {
+  var el = document.getElementById("saveIndicatorLiens");
+  if (!el) return;
+  el.classList.add("visible");
+  if (_saveTimeoutLiens) clearTimeout(_saveTimeoutLiens);
+  _saveTimeoutLiens = setTimeout(function () {
+    el.classList.remove("visible");
+  }, 1500);
+}
+
+function renderLiens() {
+  const data = loadLiens();
+  const container = document.getElementById("linksContainer");
+  container.innerHTML = data
+    .map(
+      (cat, idx) => `
+      <section class="${cat.theme}">
+        <div class="cat-header">
+          <h2>${cat.titre}</h2>
+          <div class="cat-actions">
+            <button class="btn-add-link" onclick="ouvrirModalLien(${idx})" title="${window.t.liens_add_link_title}">＋</button>
+            <button class="btn-del-cat" onclick="ouvrirConfirmSupprCat(${idx})" title="${window.t.liens_del_cat_title}">✕</button>
+          </div>
+        </div>
+        <div class="links">
+          ${cat.liens
+            .map(
+              (l, lidx) => `
+          <a href="${l.url}" target="_blank" class="link">
+            <div>
+              <span class="link-name">${l.nom}</span
+              ><span class="link-desc">— ${l.desc}</span>
+            </div>
+            <span class="arrow">↗</span>
+            <div class="link-actions">
+              <button class="btn-edit-link" onclick="ouvrirModalEditLien(event, ${idx}, ${lidx})" title="${window.t.liens_edit_link_title}">✎</button>
+              <button class="btn-del-link" onclick="supprimerLien(event, ${idx}, ${lidx})" title="${window.t.liens_del_link_title}">✕</button>
+            </div>
+          </a>`,
+            )
+            .join("")}
+        </div>
+      </section>`,
+    )
+    .join("");
+}
+
+if (!localStorage.getItem(LIENS_KEY)) {
+  saveLiens(mesLiensDefaut);
+}
+
+renderLiens();
+
+// ── Ajout de catégorie ───────────────────────────────────────────────
+function openModalCategorie() {
+  document.getElementById("catNom").value = "";
+  document.getElementById("catCouleur").value = "t-green";
+  document.getElementById("modalCategorie").classList.add("open");
+  document.getElementById("catNom").focus();
+}
+
+function closeModalCategorie() {
+  document.getElementById("modalCategorie").classList.remove("open");
+}
+
+function confirmerCategorie() {
+  const nom = document.getElementById("catNom").value.trim();
+  if (!nom) {
+    document.getElementById("catNom").focus();
+    return;
+  }
+  const theme = document.getElementById("catCouleur").value;
+  const data = loadLiens();
+  data.push({ theme, titre: nom, liens: [] });
+  saveLiens(data);
+  renderLiens();
+  closeModalCategorie();
+}
+
+document
+  .getElementById("modalCategorie")
+  .addEventListener("click", function (e) {
+    if (e.target === this) closeModalCategorie();
+  });
+
+// ── Suppression de catégorie ─────────────────────────────────────────
+let idxCatASupprimer = null;
+
+function ouvrirConfirmSupprCat(idx) {
+  idxCatASupprimer = idx;
+  document.getElementById("modalConfirmSupprCat").classList.add("open");
+}
+
+function fermerConfirmSupprCat() {
+  idxCatASupprimer = null;
+  document.getElementById("modalConfirmSupprCat").classList.remove("open");
+}
+
+function supprimerCategorie() {
+  if (idxCatASupprimer === null) return;
+  const data = loadLiens();
+  data.splice(idxCatASupprimer, 1);
+  saveLiens(data);
+  renderLiens();
+  fermerConfirmSupprCat();
+}
+
+document
+  .getElementById("modalConfirmSupprCat")
+  .addEventListener("click", function (e) {
+    if (e.target === this) fermerConfirmSupprCat();
+  });
+
+// ── Ajout d'un lien dans une catégorie ──────────────────────────────
+let idxCatLien = null;
+
+function ouvrirModalLien(idx) {
+  idxCatLien = idx;
+  document.getElementById("lienNom").value = "";
+  document.getElementById("lienDesc").value = "";
+  document.getElementById("lienUrl").value = "";
+  document.getElementById("modalLien").classList.add("open");
+  document.getElementById("lienNom").focus();
+}
+
+function fermerModalLien() {
+  idxCatLien = null;
+  document.getElementById("modalLien").classList.remove("open");
+}
+
+function confirmerLien() {
+  const nom = document.getElementById("lienNom").value.trim();
+  const desc = document.getElementById("lienDesc").value.trim();
+  const url = document.getElementById("lienUrl").value.trim();
+  if (!nom || !url) {
+    document.getElementById(!nom ? "lienNom" : "lienUrl").focus();
+    return;
+  }
+  const data = loadLiens();
+  data[idxCatLien].liens.push({ nom, desc, url });
+  saveLiens(data);
+  renderLiens();
+  fermerModalLien();
+}
+
+document.getElementById("modalLien").addEventListener("click", function (e) {
+  if (e.target === this) fermerModalLien();
+});
+
+// ── Suppression d'un lien individuel ────────────────────────────────
+let supprLienCatIdx = null;
+let supprLienIdx = null;
+
+function supprimerLien(event, catIdx, lienIdx) {
+  event.preventDefault();
+  supprLienCatIdx = catIdx;
+  supprLienIdx = lienIdx;
+  document.getElementById("modalConfirmSupprLien").classList.add("open");
+}
+
+function fermerConfirmSupprLien() {
+  supprLienCatIdx = null;
+  supprLienIdx = null;
+  document.getElementById("modalConfirmSupprLien").classList.remove("open");
+}
+
+function confirmerSupprLien() {
+  if (supprLienCatIdx === null) return;
+  const data = loadLiens();
+  data[supprLienCatIdx].liens.splice(supprLienIdx, 1);
+  saveLiens(data);
+  renderLiens();
+  fermerConfirmSupprLien();
+}
+
+document
+  .getElementById("modalConfirmSupprLien")
+  .addEventListener("click", function (e) {
+    if (e.target === this) fermerConfirmSupprLien();
+  });
+
+// ── Édition d'un lien ────────────────────────────────────────────────
+let editLienCatIdx = null;
+let editLienIdx = null;
+
+function ouvrirModalEditLien(event, catIdx, lienIdx) {
+  event.preventDefault();
+  editLienCatIdx = catIdx;
+  editLienIdx = lienIdx;
+  const lien = loadLiens()[catIdx].liens[lienIdx];
+  document.getElementById("editLienNom").value = lien.nom;
+  document.getElementById("editLienDesc").value = lien.desc;
+  document.getElementById("editLienUrl").value = lien.url;
+  document.getElementById("modalEditLien").classList.add("open");
+  document.getElementById("editLienNom").focus();
+}
+
+function fermerModalEditLien() {
+  editLienCatIdx = null;
+  editLienIdx = null;
+  document.getElementById("modalEditLien").classList.remove("open");
+}
+
+function confirmerEditLien() {
+  const nom = document.getElementById("editLienNom").value.trim();
+  const desc = document.getElementById("editLienDesc").value.trim();
+  const url = document.getElementById("editLienUrl").value.trim();
+  if (!nom || !url) {
+    document.getElementById(!nom ? "editLienNom" : "editLienUrl").focus();
+    return;
+  }
+  const data = loadLiens();
+  data[editLienCatIdx].liens[editLienIdx] = { nom, desc, url };
+  saveLiens(data);
+  renderLiens();
+  fermerModalEditLien();
+}
+
+document
+  .getElementById("modalEditLien")
+  .addEventListener("click", function (e) {
+    if (e.target === this) fermerModalEditLien();
+  });
+
+// ── Mode édition ─────────────────────────────────────────────────────
+function toggleEditMode() {
+  const container = document.getElementById("linksContainer");
+  const btn = document.getElementById("btnEditMode");
+  const actif = container.classList.toggle("edit-mode");
+  btn.textContent = actif
+    ? window.t.liens_btn_quit_edit_mode
+    : window.t.liens_btn_edit_mode;
+}
+
+
+// ── notes.js ──
+// ══════════════════════════════════════
+//  mesNotes — CRUD notes (localStorage)
+// ══════════════════════════════════════
+
+var noteIdxASupprimer = null;
+var noteIdxEnEdition = null;
+var noteBlocNoteIdx = null;
+var noteBlocBlocIdx = null;
+var supprBlocNoteIdx = null;
+var supprBlocBlocIdx = null;
+
+function loadNotes() {
+  try {
+    return JSON.parse(localStorage.getItem("mes_notes")) || mesNotesDefaut;
+  } catch (e) {
+    return mesNotesDefaut;
+  }
+}
+
+function saveNotes(data) {
+  localStorage.setItem("mes_notes", JSON.stringify(data));
+  showSavedNotes();
+}
+
+// ── Indicateur de sauvegarde ──
+var _saveTimeoutNotes = null;
+function showSavedNotes() {
+  var el = document.getElementById("saveIndicatorNotes");
+  if (!el) return;
+  el.classList.add("visible");
+  if (_saveTimeoutNotes) clearTimeout(_saveTimeoutNotes);
+  _saveTimeoutNotes = setTimeout(function () {
+    el.classList.remove("visible");
+  }, 1500);
+}
+
+function renderNotes() {
+  var notes = loadNotes();
+  var container = document.getElementById("notesContainer");
+  if (!container) return;
+  var hadEditMode = container.classList.contains("edit-mode");
+
+  if (notes.length === 0) {
+    container.innerHTML =
+      '<p class="empty-msg">' + window.t.notes_empty + "</p>";
+  } else {
+    container.innerHTML = notes
+      .map(function (note, nIdx) {
+        var blocsHtml = note.blocs
+          .map(function (bloc, bIdx) {
+            var inner = "";
+            if (bloc.type === "b") {
+              inner = "<b>" + esc(bloc.content) + "</b>";
+            } else if (bloc.type === "p") {
+              inner = "<p>" + esc(bloc.content) + "</p>";
+            } else if (bloc.type === "pre") {
+              inner =
+                '<div class="pre-wrapper"><pre>' +
+                esc(bloc.content) +
+                "</pre>" +
+                '<button class="btn-copy-pre" onclick="copierBloc(this)">' +
+                window.t.notes_btn_copy +
+                "</button>" +
+                "</div>";
+            } else if (bloc.type === "ul") {
+              inner =
+                "<ul>" +
+                bloc.items
+                  .map(function (i) {
+                    return "<li>" + esc(i) + "</li>";
+                  })
+                  .join("") +
+                "</ul>";
+            } else if (bloc.type === "table") {
+              inner =
+                '<div class="table-wrapper"><table>' +
+                "<thead><tr>" +
+                bloc.headers.map(function(h) { return "<th>" + esc(h) + "</th>"; }).join("") +
+                "</tr></thead>" +
+                "<tbody>" +
+                bloc.rows.map(function(row) {
+                  return "<tr>" + row.map(function(c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>";
+                }).join("") +
+                "</tbody></table></div>";
+            }
+            return (
+              '<div class="bloc-wrapper">' +
+              inner +
+              '<div class="bloc-actions">' +
+              '<button class="btn-edit-bloc" onclick="ouvrirModalEditBloc(' +
+              nIdx +
+              "," +
+              bIdx +
+              ')">' +
+              window.t.notes_btn_edit_bloc +
+              "</button>" +
+              '<button class="btn-del-bloc" onclick="ouvrirConfirmSupprBloc(' +
+              nIdx +
+              "," +
+              bIdx +
+              ')">×</button>' +
+              "</div></div>"
+            );
+          })
+          .join("");
+
+        return (
+          '<div class="note ' +
+          esc(note.theme) +
+          '">' +
+          '<div class="note-header">' +
+          "<h2>" +
+          esc(note.titre) +
+          "</h2>" +
+          '<div class="note-actions">' +
+          '<button class="btn-edit-note" onclick="ouvrirModalEditNote(' +
+          nIdx +
+          ')">' +
+          window.t.notes_btn_edit_note +
+          "</button>" +
+          '<button class="btn-del-note" onclick="ouvrirConfirmSupprNote(' +
+          nIdx +
+          ')">×</button>' +
+          "</div></div>" +
+          '<div class="note-content">' +
+          (blocsHtml || "") +
+          "</div>" +
+          '<div class="note-footer">' +
+          '<button class="btn-add-bloc" onclick="ouvrirModalBloc(' +
+          nIdx +
+          ')">' +
+          window.t.notes_btn_add_bloc +
+          "</button>" +
+          "</div></div>"
+        );
+      })
+      .join("");
+  }
+
+  if (hadEditMode) container.classList.add("edit-mode");
+}
+
+// ── Toggle mode édition ──
+function toggleEditModeNotes() {
+  var container = document.getElementById("notesContainer");
+  var btn = document.getElementById("btnEditModeNotes");
+  if (container.classList.toggle("edit-mode")) {
+    btn.textContent = window.t.notes_btn_quit_edit_mode;
+  } else {
+    btn.textContent = window.t.notes_btn_edit_mode;
+  }
+}
+
+// ── Nouvelle note ──
+function openModalNote() {
+  document.getElementById("noteNom").value = "";
+  document.getElementById("noteCouleur").value = "t-green";
+  document.getElementById("modalNote").classList.add("open");
+  setTimeout(function () {
+    document.getElementById("noteNom").focus();
+  }, 50);
+}
+
+function closeModalNote() {
+  document.getElementById("modalNote").classList.remove("open");
+}
+
+function confirmerNote() {
+  var titre = document.getElementById("noteNom").value.trim();
+  if (!titre) return;
+  var notes = loadNotes();
+  notes.push({
+    id: Date.now(),
+    theme: document.getElementById("noteCouleur").value,
+    titre: titre,
+    blocs: [],
+  });
+  saveNotes(notes);
+  closeModalNote();
+  renderNotes();
+}
+
+// ── Édition note ──
+function ouvrirModalEditNote(idx) {
+  noteIdxEnEdition = idx;
+  var note = loadNotes()[idx];
+  document.getElementById("editNoteNom").value = note.titre;
+  document.getElementById("editNoteCouleur").value = note.theme;
+  document.getElementById("modalEditNote").classList.add("open");
+  setTimeout(function () {
+    document.getElementById("editNoteNom").focus();
+  }, 50);
+}
+
+function fermerModalEditNote() {
+  document.getElementById("modalEditNote").classList.remove("open");
+  noteIdxEnEdition = null;
+}
+
+function confirmerEditNote() {
+  if (noteIdxEnEdition === null) return;
+  var titre = document.getElementById("editNoteNom").value.trim();
+  if (!titre) return;
+  var notes = loadNotes();
+  notes[noteIdxEnEdition].titre = titre;
+  notes[noteIdxEnEdition].theme =
+    document.getElementById("editNoteCouleur").value;
+  saveNotes(notes);
+  fermerModalEditNote();
+  renderNotes();
+}
+
+// ── Suppression note ──
+function ouvrirConfirmSupprNote(idx) {
+  noteIdxASupprimer = idx;
+  document.getElementById("modalConfirmSupprNote").classList.add("open");
+}
+
+function fermerConfirmSupprNote() {
+  document.getElementById("modalConfirmSupprNote").classList.remove("open");
+  noteIdxASupprimer = null;
+}
+
+function supprimerNote() {
+  if (noteIdxASupprimer === null) return;
+  var notes = loadNotes();
+  notes.splice(noteIdxASupprimer, 1);
+  saveNotes(notes);
+  fermerConfirmSupprNote();
+  renderNotes();
+}
+
+// ── Ajout / édition bloc ──
+function updateBlocPlaceholder() {
+  var type = document.getElementById("blocType").value;
+  var ta = document.getElementById("blocContent");
+  var inp = document.getElementById("blocContentInput");
+  var useInput = type === "b" || type === "p";
+  inp.style.display = useInput ? "" : "none";
+  ta.style.display = useInput ? "none" : "";
+  if (type === "ul") ta.placeholder = window.t.modal_bloc_placeholder_ul;
+  else if (type === "pre") ta.placeholder = window.t.modal_bloc_placeholder_pre;
+  else if (type === "table") ta.placeholder = window.t.modal_bloc_placeholder_table;
+  else if (type === "b") inp.placeholder = window.t.modal_bloc_placeholder_b;
+  else inp.placeholder = window.t.modal_bloc_placeholder_p;
+}
+
+function ouvrirModalBloc(noteIdx) {
+  noteBlocNoteIdx = noteIdx;
+  noteBlocBlocIdx = null;
+  document.getElementById("modalBlocTitre").textContent =
+    window.t.modal_bloc_new;
+  document.getElementById("blocType").value = "p";
+  document.getElementById("blocContent").value = "";
+  document.getElementById("blocContentInput").value = "";
+  updateBlocPlaceholder();
+  document.getElementById("modalBloc").classList.add("open");
+  setTimeout(function () {
+    document.getElementById("blocContentInput").focus();
+  }, 50);
+}
+
+function ouvrirModalEditBloc(noteIdx, blocIdx) {
+  noteBlocNoteIdx = noteIdx;
+  noteBlocBlocIdx = blocIdx;
+  var bloc = loadNotes()[noteIdx].blocs[blocIdx];
+  document.getElementById("modalBlocTitre").textContent =
+    window.t.modal_bloc_edit;
+  document.getElementById("blocType").value = bloc.type;
+  var useInput = bloc.type === "b" || bloc.type === "p";
+  document.getElementById("blocContentInput").value = useInput
+    ? bloc.content
+    : "";
+  document.getElementById("blocContent").value = useInput
+    ? ""
+    : bloc.type === "ul"
+      ? bloc.items.join("\n")
+      : bloc.type === "table"
+        ? [bloc.headers.join(" | ")].concat(bloc.rows.map(function(r) { return r.join(" | "); })).join("\n")
+        : bloc.content;
+  updateBlocPlaceholder();
+  document.getElementById("modalBloc").classList.add("open");
+  setTimeout(function () {
+    document
+      .getElementById(useInput ? "blocContentInput" : "blocContent")
+      .focus();
+  }, 50);
+}
+
+function fermerModalBloc() {
+  document.getElementById("modalBloc").classList.remove("open");
+  noteBlocNoteIdx = null;
+  noteBlocBlocIdx = null;
+}
+
+function confirmerBloc() {
+  var type = document.getElementById("blocType").value;
+  var useInput = type === "b" || type === "p";
+  var raw = document.getElementById(
+    useInput ? "blocContentInput" : "blocContent",
+  ).value;
+  if (!raw.trim()) return;
+  var bloc;
+  if (type === "ul") {
+    var items = raw
+      .split("\n")
+      .map(function (s) {
+        return s.trim();
+      })
+      .filter(Boolean);
+    if (!items.length) return;
+    bloc = { type: "ul", items: items };
+  } else if (type === "table") {
+    var lines = raw.split("\n").map(function(l) { return l.trim(); }).filter(Boolean);
+    if (lines.length < 1) return;
+    var headers = lines[0].split("|").map(function(c) { return c.trim(); });
+    var rows = lines.slice(1).map(function(l) {
+      return l.split("|").map(function(c) { return c.trim(); });
+    });
+    bloc = { type: "table", headers: headers, rows: rows };
+  } else {
+    bloc = { type: type, content: raw };
+  }
+  var notes = loadNotes();
+  if (noteBlocBlocIdx === null) {
+    notes[noteBlocNoteIdx].blocs.push(bloc);
+  } else {
+    notes[noteBlocNoteIdx].blocs[noteBlocBlocIdx] = bloc;
+  }
+  saveNotes(notes);
+  fermerModalBloc();
+  renderNotes();
+}
+
+// ── Suppression bloc ──
+function ouvrirConfirmSupprBloc(noteIdx, blocIdx) {
+  supprBlocNoteIdx = noteIdx;
+  supprBlocBlocIdx = blocIdx;
+  document.getElementById("modalConfirmSupprBloc").classList.add("open");
+}
+
+function fermerConfirmSupprBloc() {
+  document.getElementById("modalConfirmSupprBloc").classList.remove("open");
+  supprBlocNoteIdx = null;
+  supprBlocBlocIdx = null;
+}
+
+function supprimerBloc() {
+  if (supprBlocNoteIdx === null || supprBlocBlocIdx === null) return;
+  var notes = loadNotes();
+  notes[supprBlocNoteIdx].blocs.splice(supprBlocBlocIdx, 1);
+  saveNotes(notes);
+  fermerConfirmSupprBloc();
+  renderNotes();
+}
+
+// ── Copier un bloc pre ──
+function copierBloc(btn) {
+  var content = btn.closest(".pre-wrapper").querySelector("pre").textContent;
+  navigator.clipboard.writeText(content).then(function () {
+    btn.textContent = window.t.notes_btn_copied;
+    btn.classList.add("copied");
+    setTimeout(function () {
+      btn.textContent = window.t.notes_btn_copy;
+      btn.classList.remove("copied");
+    }, 1500);
+  });
+}
+
+// ── Init ──
+document.addEventListener("DOMContentLoaded", function () {
+  if (!localStorage.getItem("mes_notes")) {
+    saveNotes(mesNotesDefaut);
+  }
+  renderNotes();
+  [
+    "modalNote",
+    "modalEditNote",
+    "modalConfirmSupprNote",
+    "modalBloc",
+    "modalConfirmSupprBloc",
+  ].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el)
+      el.addEventListener("click", function (e) {
+        if (e.target === el) el.classList.remove("open");
+      });
+  });
+});
+
+
+// ── diagram.js (avec lazy init) ──
+// ══════════════════════════════════════
+//  mesDiagrammes — Éditeur SVG
+// ══════════════════════════════════════
+
+// ── État global ──
+var currentTool = "select";
+var diagramsList = [];
+var currentDiagramIdx = 0;
+var viewTransform = { x: 60, y: 60, scale: 1 };
+var selectedId = null;
+var selectedType = null;   // "shape" | "arrow"
+var dragState = null;
+var panStart = null;
+var arrowSrcId = null;
+var editingShapeId = null;
+var lastClickTime = 0;
+var lastClickShapeId = null;
+var lastClickArrowId = null;
+var editingArrowId = null;
+
+// ── Palette ──
+var COLORS = {
+  "t-green":  { fill: "rgba(209,250,229,0.75)", stroke: "#059669", text: "#047857" },
+  "t-violet": { fill: "rgba(237,233,254,0.75)", stroke: "#7c3aed", text: "#6d28d9" },
+  "t-amber":  { fill: "rgba(254,243,199,0.75)", stroke: "#d97706", text: "#b45309" },
+  "t-sky":    { fill: "rgba(224,242,254,0.75)", stroke: "#0284c7", text: "#0369a1" },
+  "t-rose":   { fill: "rgba(255,228,230,0.75)", stroke: "#e11d48", text: "#be123c" },
+  "t-teal":   { fill: "rgba(204,251,241,0.75)", stroke: "#0d9488", text: "#0f766e" },
+};
+var DEFAULT_COLOR = "t-sky";
+
+var DEFAULT_SIZES = {
+  rect:    { w: 130, h: 50 },
+  rounded: { w: 130, h: 50 },
+  db:      { w: 100, h: 65 },
+  cloud:   { w: 110, h: 65 },
+  text:    { w: 110, h: 34 },
+};
+
+// ── Helpers ──
+function escDiag(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function createSVGEl(tag) {
+  return document.createElementNS("http://www.w3.org/2000/svg", tag);
+}
+
+function getCurrentDiagram() {
+  return diagramsList[currentDiagramIdx] || null;
+}
+
+// ── Persistance localStorage ──
+function loadDiagrammes() {
+  try {
+    var stored = JSON.parse(localStorage.getItem("mes_diagrammes"));
+    if (stored && stored.length) return stored;
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(diagrammesDefaut));
+}
+
+function saveDiagrammes() {
+  localStorage.setItem("mes_diagrammes", JSON.stringify(diagramsList));
+  showSavedDiagram();
+}
+
+// ── Indicateur de sauvegarde ──
+var _saveTimeoutDiag = null;
+function showSavedDiagram() {
+  var el = document.getElementById("saveIndicatorDiag");
+  if (!el) return;
+  el.classList.add("visible");
+  if (_saveTimeoutDiag) clearTimeout(_saveTimeoutDiag);
+  _saveTimeoutDiag = setTimeout(function () {
+    el.classList.remove("visible");
+  }, 1500);
+}
+
+// ── Coordonnées SVG ──
+function svgPoint(clientX, clientY) {
+  var svg = document.getElementById("canvas");
+  var rect = svg.getBoundingClientRect();
+  return {
+    x: (clientX - rect.left - viewTransform.x) / viewTransform.scale,
+    y: (clientY - rect.top  - viewTransform.y) / viewTransform.scale,
+  };
+}
+
+function updateViewport() {
+  var vp = document.getElementById("viewport");
+  vp.setAttribute(
+    "transform",
+    "translate(" + viewTransform.x + "," + viewTransform.y + ") scale(" + viewTransform.scale + ")"
+  );
+  document.getElementById("zoomLevel").textContent =
+    Math.round(viewTransform.scale * 100) + "%";
+}
+
+// ── Zoom ──
+function zoomIn()    { applyZoom(1.2, null, null); }
+function zoomOut()   { applyZoom(1 / 1.2, null, null); }
+function resetZoom() { viewTransform = { x: 60, y: 60, scale: 1 }; updateViewport(); }
+
+function applyZoom(factor, cx, cy) {
+  var newScale = Math.min(4, Math.max(0.15, viewTransform.scale * factor));
+  if (cx !== null && cy !== null) {
+    viewTransform.x = cx - (cx - viewTransform.x) * (newScale / viewTransform.scale);
+    viewTransform.y = cy - (cy - viewTransform.y) * (newScale / viewTransform.scale);
+  }
+  viewTransform.scale = newScale;
+  updateViewport();
+}
+
+// ── Rendu des formes ──
+function renderShape(shape) {
+  var c = COLORS[shape.color] || COLORS[DEFAULT_COLOR];
+  var isSel = selectedId === shape.id && selectedType === "shape";
+  var stroke = isSel ? "#f97316" : c.stroke;
+  var sw = isSel ? 2.5 : 1.5;
+
+  var g = createSVGEl("g");
+  g.setAttribute("data-id", shape.id);
+  g.setAttribute("data-type", "shape");
+  g.classList.add("shape-group");
+
+  // ── Fond selon le type ──
+  if (shape.type === "rect" || shape.type === "rounded") {
+    var rx = shape.type === "rounded" ? 12 : 3;
+    var r = createSVGEl("rect");
+    r.setAttribute("x", shape.x);       r.setAttribute("y", shape.y);
+    r.setAttribute("width", shape.w);   r.setAttribute("height", shape.h);
+    r.setAttribute("rx", rx);
+    r.setAttribute("fill", c.fill);     r.setAttribute("stroke", stroke);
+    r.setAttribute("stroke-width", sw);
+    g.appendChild(r);
+
+  } else if (shape.type === "db") {
+    var ry = Math.min(12, shape.h * 0.2);
+    var cx = shape.x + shape.w / 2;
+    // Corps : path latéral + arc bas
+    var body = createSVGEl("path");
+    body.setAttribute("d", [
+      "M", shape.x, shape.y + ry,
+      "L", shape.x, shape.y + shape.h - ry,
+      "A", shape.w / 2, ry, 0, 0, 0, shape.x + shape.w, shape.y + shape.h - ry,
+      "L", shape.x + shape.w, shape.y + ry,
+      "A", shape.w / 2, ry, 0, 0, 0, shape.x, shape.y + ry,
+      "Z",
+    ].join(" "));
+    body.setAttribute("fill", c.fill);
+    body.setAttribute("stroke", stroke);
+    body.setAttribute("stroke-width", sw);
+    g.appendChild(body);
+    // Ellipse du haut (face visible)
+    var topEl = createSVGEl("ellipse");
+    topEl.setAttribute("cx", cx);              topEl.setAttribute("cy", shape.y + ry);
+    topEl.setAttribute("rx", shape.w / 2);     topEl.setAttribute("ry", ry);
+    topEl.setAttribute("fill", c.fill);
+    topEl.setAttribute("stroke", stroke);      topEl.setAttribute("stroke-width", sw);
+    g.appendChild(topEl);
+
+  } else if (shape.type === "cloud") {
+    // Ellipse à bordure pointillée = service externe / cloud
+    var el = createSVGEl("ellipse");
+    el.setAttribute("cx", shape.x + shape.w / 2);
+    el.setAttribute("cy", shape.y + shape.h / 2);
+    el.setAttribute("rx", shape.w / 2);
+    el.setAttribute("ry", shape.h / 2);
+    el.setAttribute("fill", c.fill);
+    el.setAttribute("stroke", stroke);
+    el.setAttribute("stroke-width", sw);
+    el.setAttribute("stroke-dasharray", "5,3");
+    g.appendChild(el);
+
+  } else if (shape.type === "text") {
+    // pas de fond — juste le texte
+  }
+
+  // ── Texte ──
+  var textCy = shape.type === "db"
+    ? shape.y + shape.h * 0.62
+    : shape.y + shape.h / 2;
+  var txt = createSVGEl("text");
+  txt.setAttribute("x", shape.x + shape.w / 2);
+  txt.setAttribute("y", textCy);
+  txt.setAttribute("text-anchor", "middle");
+  txt.setAttribute("dominant-baseline", "middle");
+  txt.setAttribute("fill", shape.type === "text" ? "#292524" : c.text);
+  txt.setAttribute("font-size", shape.type === "text" ? "13" : "12");
+  txt.setAttribute("font-family", '"Segoe UI",system-ui,sans-serif');
+  txt.setAttribute("font-weight", shape.type === "text" ? "400" : "600");
+  txt.setAttribute("pointer-events", "none");
+  txt.textContent = shape.text || "";
+  g.appendChild(txt);
+
+  // ── Poignée de redimensionnement (coin bas-droit) ──
+  if (isSel) {
+    var grip = createSVGEl("rect");
+    grip.setAttribute("x", shape.x + shape.w - 5);
+    grip.setAttribute("y", shape.y + shape.h - 5);
+    grip.setAttribute("width", 10);   grip.setAttribute("height", 10);
+    grip.setAttribute("rx", 2);
+    grip.setAttribute("fill", "#f97316");
+    grip.setAttribute("stroke", "#fff");   grip.setAttribute("stroke-width", 1.5);
+    grip.classList.add("resize-grip");
+    grip.setAttribute("data-shape-id", shape.id);
+    g.appendChild(grip);
+  }
+
+  // ── Points de connexion (visibles au hover et en mode flèche) ──
+  var hcx = shape.x + shape.w / 2, hcy = shape.y + shape.h / 2;
+  [
+    [hcx, shape.y],
+    [hcx, shape.y + shape.h],
+    [shape.x, hcy],
+    [shape.x + shape.w, hcy],
+  ].forEach(function (pt) {
+    var dot = createSVGEl("circle");
+    dot.setAttribute("cx", pt[0]);  dot.setAttribute("cy", pt[1]);
+    dot.setAttribute("r", 5);
+    dot.setAttribute("fill", "#f97316");
+    dot.setAttribute("stroke", "#fff");  dot.setAttribute("stroke-width", 1.5);
+    dot.classList.add("conn-dot");
+    dot.setAttribute("data-shape-id", shape.id);
+    g.appendChild(dot);
+  });
+
+  return g;
+}
+
+// ── Rendu d'une flèche ──
+function getEdgePoint(shape, targetX, targetY) {
+  var cx = shape.x + shape.w / 2;
+  var cy = shape.y + shape.h / 2;
+  var dx = targetX - cx, dy = targetY - cy;
+  if (dx === 0 && dy === 0) return { x: cx, y: shape.y };
+  var hw = shape.w / 2, hh = shape.h / 2;
+  if (Math.abs(dx) * hh > Math.abs(dy) * hw) {
+    var sx = dx > 0 ? 1 : -1;
+    return { x: cx + sx * hw, y: cy + dy * hw / Math.abs(dx) };
+  } else {
+    var sy = dy > 0 ? 1 : -1;
+    return { x: cx + dx * hh / Math.abs(dy), y: cy + sy * hh };
+  }
+}
+
+function renderArrow(arrow, shapes) {
+  var from = shapes.find(function (s) { return s.id === arrow.from; });
+  var to   = shapes.find(function (s) { return s.id === arrow.to;   });
+  if (!from || !to) return null;
+
+  var toCx = to.x + to.w / 2, toCy = to.y + to.h / 2;
+  var frCx = from.x + from.w / 2, frCy = from.y + from.h / 2;
+  var fp = getEdgePoint(from, toCx, toCy);
+  var tp = getEdgePoint(to,   frCx, frCy);
+
+  // Raccourcir légèrement la pointe pour ne pas chevauchner la forme
+  var dx = tp.x - fp.x, dy = tp.y - fp.y;
+  var len = Math.sqrt(dx * dx + dy * dy);
+  if (len > 16) {
+    var off = 7 / len;
+    tp = { x: tp.x - dx * off, y: tp.y - dy * off };
+  }
+
+  var isSel = selectedId === arrow.id && selectedType === "arrow";
+  var stroke = isSel ? "#f97316" : "#a8a29e";
+  var markerId = isSel ? "arrowhead-sel" : "arrowhead";
+
+  var g = createSVGEl("g");
+  g.setAttribute("data-id", arrow.id);
+  g.setAttribute("data-type", "arrow");
+  g.classList.add("arrow-group");
+
+  var line = createSVGEl("line");
+  line.setAttribute("x1", fp.x);  line.setAttribute("y1", fp.y);
+  line.setAttribute("x2", tp.x);  line.setAttribute("y2", tp.y);
+  line.setAttribute("stroke", stroke);
+  line.setAttribute("stroke-width", isSel ? 2 : 1.5);
+  line.setAttribute("marker-end", "url(#" + markerId + ")");
+  g.appendChild(line);
+
+  // Zone de clic élargie
+  var hit = createSVGEl("line");
+  hit.setAttribute("x1", fp.x);  hit.setAttribute("y1", fp.y);
+  hit.setAttribute("x2", tp.x);  hit.setAttribute("y2", tp.y);
+  hit.setAttribute("stroke", "transparent");
+  hit.setAttribute("stroke-width", 14);
+  g.appendChild(hit);
+
+  // Label
+  if (arrow.label) {
+    var mx = (fp.x + tp.x) / 2, my = (fp.y + tp.y) / 2;
+    var lbl = createSVGEl("text");
+    lbl.setAttribute("x", mx);  lbl.setAttribute("y", my - 7);
+    lbl.setAttribute("text-anchor", "middle");
+    lbl.setAttribute("font-size", "10");
+    lbl.setAttribute("font-family", '"Cascadia Code","SF Mono",Consolas,monospace');
+    lbl.setAttribute("fill", "#a8a29e");
+    lbl.setAttribute("pointer-events", "none");
+    lbl.textContent = arrow.label;
+    g.appendChild(lbl);
+  }
+
+  return g;
+}
+
+// ── Rendu complet ──
+function renderAll() {
+  var diag = getCurrentDiagram();
+  if (!diag) return;
+
+  document.getElementById("diagramTitle").value = diag.titre;
+
+  var arrowsLayer = document.getElementById("arrowsLayer");
+  arrowsLayer.innerHTML = "";
+  (diag.arrows || []).forEach(function (a) {
+    var el = renderArrow(a, diag.shapes);
+    if (el) arrowsLayer.appendChild(el);
+  });
+
+  var shapesLayer = document.getElementById("shapesLayer");
+  shapesLayer.innerHTML = "";
+  (diag.shapes || []).forEach(function (s) {
+    shapesLayer.appendChild(renderShape(s));
+  });
+
+  updateViewport();
+  renderDiagramList();
+}
+
+function renderDiagramList() {
+  var el = document.getElementById("diagramList");
+  el.innerHTML = diagramsList.map(function (d, i) {
+    var active = i === currentDiagramIdx ? " active" : "";
+    return (
+      '<div class="diagram-list-item' + active + '" onclick="selectDiagramme(' + i + ')">' +
+      '<span class="diagram-list-name">' + escDiag(d.titre) + '</span>' +
+      (diagramsList.length > 1
+        ? '<button class="diagram-list-del" onclick="event.stopPropagation();supprimerDiagramme(' + i + ')">×</button>'
+        : "") +
+      "</div>"
+    );
+  }).join("");
+}
+
+// ── Gestion des diagrammes ──
+function selectDiagramme(idx) {
+  currentDiagramIdx = idx;
+  selectedId = null;  selectedType = null;
+  viewTransform = { x: 60, y: 60, scale: 1 };
+  document.getElementById("colorPanel").style.display = "none";
+  renderAll();
+}
+
+function creerDiagramme() {
+  var d = {
+    id: Date.now(),
+    titre: window.t ? window.t.diag_new_diagram : "Nouveau diagramme",
+    shapes: [],
+    arrows: [],
+  };
+  diagramsList.push(d);
+  saveDiagrammes();
+  selectDiagramme(diagramsList.length - 1);
+}
+
+function supprimerDiagramme(idx) {
+  if (diagramsList.length <= 1) return;
+  diagramsList.splice(idx, 1);
+  if (currentDiagramIdx >= diagramsList.length) currentDiagramIdx = diagramsList.length - 1;
+  saveDiagrammes();
+  renderAll();
+}
+
+function toggleDiagramList() {
+  document.getElementById("diagramListPanel").classList.toggle("open");
+}
+
+// ── Outil actif ──
+function setTool(tool) {
+  currentTool = tool;
+  document.querySelectorAll(".diagram-tool[id^='tool']").forEach(function (btn) {
+    btn.classList.remove("active");
+  });
+  var btnId = "tool" + tool.charAt(0).toUpperCase() + tool.slice(1);
+  var btn = document.getElementById(btnId);
+  if (btn) btn.classList.add("active");
+
+  arrowSrcId = null;
+  document.getElementById("tempArrow").style.display = "none";
+  document.getElementById("canvas").setAttribute(
+    "data-tool", tool
+  );
+  if (tool !== "select") {
+    document.getElementById("colorPanel").style.display = "none";
+  }
+  renderAll();
+}
+
+// ── Ajout d'une forme ──
+function addShape(type, x, y) {
+  var diag = getCurrentDiagram();
+  var size = DEFAULT_SIZES[type] || { w: 120, h: 50 };
+  var labels = { db: "Database", cloud: "Cloud", text: "Label" };
+  var shape = {
+    id: "s" + Date.now(),
+    type: type,
+    x: Math.round(x - size.w / 2),
+    y: Math.round(y - size.h / 2),
+    w: size.w,
+    h: size.h,
+    text: labels[type] || "Service",
+    color: DEFAULT_COLOR,
+  };
+  diag.shapes.push(shape);
+  saveDiagrammes();
+  selectedId = shape.id;  selectedType = "shape";
+  renderAll();
+  document.getElementById("colorPanel").style.display = "flex";
+  startTextEdit(shape.id);
+}
+
+// ── Suppression ──
+function deleteSelected() {
+  if (!selectedId) return;
+  var diag = getCurrentDiagram();
+  if (selectedType === "shape") {
+    diag.shapes = diag.shapes.filter(function (s) { return s.id !== selectedId; });
+    diag.arrows = diag.arrows.filter(function (a) {
+      return a.from !== selectedId && a.to !== selectedId;
+    });
+  } else if (selectedType === "arrow") {
+    diag.arrows = diag.arrows.filter(function (a) { return a.id !== selectedId; });
+  }
+  selectedId = null;  selectedType = null;
+  document.getElementById("colorPanel").style.display = "none";
+  saveDiagrammes();
+  renderAll();
+}
+
+// ── Couleur ──
+function setShapeColor(color) {
+  if (!selectedId || selectedType !== "shape") return;
+  var diag = getCurrentDiagram();
+  var shape = diag.shapes.find(function (s) { return s.id === selectedId; });
+  if (!shape) return;
+  shape.color = color;
+  saveDiagrammes();
+  renderAll();
+  document.getElementById("colorPanel").style.display = "flex";
+}
+
+// ── Édition texte inline ──
+function startTextEdit(shapeId) {
+  var diag = getCurrentDiagram();
+  var shape = diag.shapes.find(function (s) { return s.id === shapeId; });
+  if (!shape) return;
+  editingShapeId = shapeId;
+
+  var svg = document.getElementById("canvas");
+  var sr = svg.getBoundingClientRect();
+  var sx = shape.x * viewTransform.scale + viewTransform.x + sr.left;
+  var sy = shape.y * viewTransform.scale + viewTransform.y + sr.top;
+  var sw = shape.w * viewTransform.scale;
+  var sh = shape.h * viewTransform.scale;
+  var c = COLORS[shape.color] || COLORS[DEFAULT_COLOR];
+
+  var input = document.getElementById("shapeTextInput");
+  input.value = shape.text || "";
+  input.style.left   = (sx + sw * 0.08) + "px";
+  input.style.top    = (sy + sh * 0.22) + "px";
+  input.style.width  = (sw * 0.84) + "px";
+  input.style.fontSize   = Math.max(10, 12 * viewTransform.scale) + "px";
+  input.style.color      = c.text;
+
+  document.getElementById("textOverlay").style.display = "block";
+  setTimeout(function () {
+    input.focus();
+    input.select();
+  }, 10);
+}
+
+function confirmTextEdit() {
+  var input = document.getElementById("shapeTextInput");
+  var diag = getCurrentDiagram();
+  if (editingShapeId) {
+    var shape = diag.shapes.find(function (s) { return s.id === editingShapeId; });
+    if (shape) { shape.text = input.value; saveDiagrammes(); renderAll(); }
+    editingShapeId = null;
+  } else if (editingArrowId) {
+    var arrow = (diag.arrows || []).find(function (a) { return a.id === editingArrowId; });
+    if (arrow) { arrow.label = input.value; saveDiagrammes(); renderAll(); }
+    editingArrowId = null;
+  }
+  document.getElementById("textOverlay").style.display = "none";
+}
+
+function startArrowTextEdit(arrowId) {
+  var diag = getCurrentDiagram();
+  var arrow = (diag.arrows || []).find(function (a) { return a.id === arrowId; });
+  if (!arrow) return;
+  var from = diag.shapes.find(function (s) { return s.id === arrow.from; });
+  var to   = diag.shapes.find(function (s) { return s.id === arrow.to;   });
+  if (!from || !to) return;
+
+  var toCx = to.x + to.w / 2,   toCy = to.y + to.h / 2;
+  var frCx = from.x + from.w / 2, frCy = from.y + from.h / 2;
+  var fp = getEdgePoint(from, toCx, toCy);
+  var tp = getEdgePoint(to,   frCx, frCy);
+  var mx = (fp.x + tp.x) / 2;
+  var my = (fp.y + tp.y) / 2;
+
+  var svg = document.getElementById("canvas");
+  var sr = svg.getBoundingClientRect();
+  var sx = mx * viewTransform.scale + viewTransform.x + sr.left;
+  var sy = my * viewTransform.scale + viewTransform.y + sr.top;
+
+  editingArrowId = arrowId;
+  var input = document.getElementById("shapeTextInput");
+  input.value = arrow.label || "";
+  input.style.left     = (sx - 60) + "px";
+  input.style.top      = (sy - 12) + "px";
+  input.style.width    = "120px";
+  input.style.fontSize = Math.max(10, 11 * viewTransform.scale) + "px";
+  input.style.color    = "#78716c";
+
+  document.getElementById("textOverlay").style.display = "block";
+  setTimeout(function () { input.focus(); input.select(); }, 10);
+}
+
+// ── Hit-test ──
+function shapeAt(x, y) {
+  var diag = getCurrentDiagram();
+  if (!diag) return null;
+  for (var i = diag.shapes.length - 1; i >= 0; i--) {
+    var s = diag.shapes[i];
+    if (x >= s.x && x <= s.x + s.w && y >= s.y && y <= s.y + s.h) return s;
+  }
+  return null;
+}
+
+function arrowIdAt(x, y) {
+  var groups = document.querySelectorAll(".arrow-group");
+  for (var i = 0; i < groups.length; i++) {
+    var lines = groups[i].querySelectorAll("line");
+    if (lines.length < 2) continue;
+    var hit = lines[lines.length - 1];
+    var x1 = +hit.getAttribute("x1"), y1 = +hit.getAttribute("y1");
+    var x2 = +hit.getAttribute("x2"), y2 = +hit.getAttribute("y2");
+    if (distToSeg(x, y, x1, y1, x2, y2) < 8) {
+      return groups[i].getAttribute("data-id");
+    }
+  }
+  return null;
+}
+
+function distToSeg(px, py, x1, y1, x2, y2) {
+  var dx = x2 - x1, dy = y2 - y1;
+  var lenSq = dx * dx + dy * dy;
+  if (lenSq === 0) return Math.hypot(px - x1, py - y1);
+  var t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / lenSq));
+  return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+}
+
+// ── Créer une flèche ──
+function createArrow(fromId, toId) {
+  var diag = getCurrentDiagram();
+  if (diag.arrows.some(function (a) { return a.from === fromId && a.to === toId; })) return;
+  var arrow = { id: "a" + Date.now(), from: fromId, to: toId, label: "" };
+  diag.arrows.push(arrow);
+  saveDiagrammes();
+  selectedId = arrow.id;  selectedType = "arrow";
+  renderAll();
+  startArrowTextEdit(arrow.id);
+}
+
+// ── Renommer le diagramme ──
+function onTitleChange() {
+  var diag = getCurrentDiagram();
+  if (!diag) return;
+  diag.titre = document.getElementById("diagramTitle").value || "Diagramme";
+  saveDiagrammes();
+  renderDiagramList();
+}
+
+// ── Événements souris ──
+function onMouseDown(e) {
+  if (e.button !== 0) return;
+  if (editingShapeId || editingArrowId) { confirmTextEdit(); return; }
+
+  var pt = svgPoint(e.clientX, e.clientY);
+
+  // Clic sur un point de connexion → début de flèche
+  var connDot = e.target.closest(".conn-dot");
+  if (connDot) {
+    arrowSrcId = connDot.getAttribute("data-shape-id");
+    var srcShape = getCurrentDiagram().shapes.find(function (s) { return s.id === arrowSrcId; });
+    var ta = document.getElementById("tempArrow");
+    ta.setAttribute("x1", srcShape.x + srcShape.w / 2);
+    ta.setAttribute("y1", srcShape.y + srcShape.h / 2);
+    ta.setAttribute("x2", pt.x);  ta.setAttribute("y2", pt.y);
+    ta.style.display = "";
+    return;
+  }
+
+  // Clic sur la poignée de resize
+  var grip = e.target.closest(".resize-grip");
+  if (grip) {
+    var sid = grip.getAttribute("data-shape-id");
+    var shape = getCurrentDiagram().shapes.find(function (s) { return s.id === sid; });
+    if (shape) {
+      dragState = { type: "resize", id: sid, sx: pt.x, sy: pt.y, ow: shape.w, oh: shape.h };
+    }
+    return;
+  }
+
+  var shape = shapeAt(pt.x, pt.y);
+
+  if (currentTool === "select") {
+    if (shape) {
+      // Détection du double-clic par horodatage (avant tout renderAll)
+      var now = Date.now();
+      if (now - lastClickTime < 350 && lastClickShapeId === shape.id) {
+        lastClickTime = 0;  lastClickShapeId = null;
+        startTextEdit(shape.id);
+        return;
+      }
+      lastClickTime = now;  lastClickShapeId = shape.id;  lastClickArrowId = null;
+
+      dragState = { type: "move", id: shape.id, sx: pt.x, sy: pt.y, ox: shape.x, oy: shape.y };
+      selectedId = shape.id;  selectedType = "shape";
+      document.getElementById("colorPanel").style.display = "flex";
+      renderAll();
+    } else {
+      var aid = arrowIdAt(pt.x, pt.y);
+      if (aid) {
+        // Détection du double-clic sur une flèche
+        var now2 = Date.now();
+        if (now2 - lastClickTime < 350 && lastClickArrowId === aid) {
+          lastClickTime = 0;  lastClickArrowId = null;
+          selectedId = aid;  selectedType = "arrow";
+          renderAll();
+          startArrowTextEdit(aid);
+          return;
+        }
+        lastClickTime = now2;  lastClickArrowId = aid;
+
+        selectedId = aid;  selectedType = "arrow";
+        document.getElementById("colorPanel").style.display = "none";
+        renderAll();
+      } else {
+        // Pan
+        panStart = { cx: e.clientX, cy: e.clientY, px: viewTransform.x, py: viewTransform.y };
+        selectedId = null;  selectedType = null;
+        document.getElementById("colorPanel").style.display = "none";
+        renderAll();
+      }
+    }
+
+  } else if (currentTool === "arrow") {
+    if (shape) {
+      if (!arrowSrcId) {
+        arrowSrcId = shape.id;
+        var ta = document.getElementById("tempArrow");
+        ta.setAttribute("x1", shape.x + shape.w / 2);
+        ta.setAttribute("y1", shape.y + shape.h / 2);
+        ta.setAttribute("x2", pt.x);  ta.setAttribute("y2", pt.y);
+        ta.style.display = "";
+      } else if (arrowSrcId !== shape.id) {
+        createArrow(arrowSrcId, shape.id);
+        arrowSrcId = null;
+        document.getElementById("tempArrow").style.display = "none";
+      }
+    } else {
+      arrowSrcId = null;
+      document.getElementById("tempArrow").style.display = "none";
+    }
+
+  } else {
+    // Outils forme : placer au clic
+    addShape(currentTool, pt.x, pt.y);
+    setTool("select");
+  }
+}
+
+function onMouseMove(e) {
+  var pt = svgPoint(e.clientX, e.clientY);
+
+  // Mise à jour de la flèche temporaire
+  if (arrowSrcId) {
+    var ta = document.getElementById("tempArrow");
+    if (ta.style.display !== "none") {
+      ta.setAttribute("x2", pt.x);  ta.setAttribute("y2", pt.y);
+    }
+  }
+
+  if (dragState) {
+    var diag = getCurrentDiagram();
+    var shape = diag.shapes.find(function (s) { return s.id === dragState.id; });
+    if (!shape) return;
+    if (dragState.type === "move") {
+      shape.x = Math.round(dragState.ox + pt.x - dragState.sx);
+      shape.y = Math.round(dragState.oy + pt.y - dragState.sy);
+    } else if (dragState.type === "resize") {
+      shape.w = Math.max(60, Math.round(dragState.ow + pt.x - dragState.sx));
+      shape.h = Math.max(30, Math.round(dragState.oh + pt.y - dragState.sy));
+    }
+    renderAll();
+    // Repositionner la palette si visible
+    if (selectedId === shape.id && document.getElementById("colorPanel").style.display !== "none") {
+      // la palette est fixée en haut, pas besoin de la bouger
+    }
+  } else if (panStart) {
+    viewTransform.x = panStart.px + (e.clientX - panStart.cx);
+    viewTransform.y = panStart.py + (e.clientY - panStart.cy);
+    updateViewport();
+  }
+}
+
+function onMouseUp(e) {
+  var pt = svgPoint(e.clientX, e.clientY);
+
+  // Fin de tracé de flèche via conn-dot ou outil arrow
+  if (arrowSrcId && !dragState) {
+    document.getElementById("tempArrow").style.display = "none";
+    var target = shapeAt(pt.x, pt.y);
+    if (target && target.id !== arrowSrcId) {
+      createArrow(arrowSrcId, target.id);
+      arrowSrcId = null;
+    } else if (currentTool !== "arrow") {
+      // Annuler le drag raté (seulement si pas en mode arrow)
+      arrowSrcId = null;
+    }
+    // Si en mode arrow et pas de cible → garder arrowSrcId pour le 2ème clic
+  }
+
+  if (dragState) {
+    saveDiagrammes();
+    dragState = null;
+    renderAll();
+  }
+  panStart = null;
+}
+
+
+function onWheel(e) {
+  e.preventDefault();
+  var svg = document.getElementById("canvas");
+  var r = svg.getBoundingClientRect();
+  applyZoom(e.deltaY < 0 ? 1.12 : 1 / 1.12, e.clientX - r.left, e.clientY - r.top);
+}
+
+// ── Init ──
+var _diagramInitialized = false;
+function initDiagramView() {
+  if (_diagramInitialized) return;
+  _diagramInitialized = true;
+  // Contenu original du DOMContentLoaded:
+  diagramsList = loadDiagrammes();
+  if (!localStorage.getItem("mes_diagrammes")) saveDiagrammes();
+  renderAll();
+
+  var canvas = document.getElementById("canvas");
+  canvas.addEventListener("mousedown", onMouseDown);
+  canvas.addEventListener("mousemove", onMouseMove);
+  canvas.addEventListener("mouseup",   onMouseUp);
+  canvas.addEventListener("wheel",     onWheel, { passive: false });
+
+  var titleInput = document.getElementById("diagramTitle");
+  titleInput.addEventListener("change", onTitleChange);
+  titleInput.addEventListener("blur",   onTitleChange);
+
+  var textInput = document.getElementById("shapeTextInput");
+  textInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter")  { e.preventDefault(); confirmTextEdit(); }
+    if (e.key === "Escape") {
+      document.getElementById("textOverlay").style.display = "none";
+      editingShapeId = null;
+    }
+  });
+  textInput.addEventListener("blur", function () {
+    // Small delay to allow click on modal-confirm etc.
+    setTimeout(confirmTextEdit, 100);
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (document.activeElement.tagName === "INPUT") return;
+    if (e.key === "Delete" || e.key === "Backspace") deleteSelected();
+    if (e.key === "Escape") {
+      arrowSrcId = null;
+      document.getElementById("tempArrow").style.display = "none";
+      setTool("select");
+    }
+  });
+}
+// L'init sera appelée par le routeur de navigation
+
+// ── admin.js (inline) ──
+var chkLS = document.getElementById("checkLocalStorage");
+      var btn = document.getElementById("btnExecute");
+      var feedback = document.getElementById("adminFeedback");
+
+      // Highlight active language button (only if on admin page)
+      (function () {
+        var btnFr = document.getElementById("btnLangFr");
+        var btnEn = document.getElementById("btnLangEn");
+        if (!btnFr || !btnEn) return;
+        var lang = localStorage.getItem("lang") || "fr";
+        (lang === "en" ? btnEn : btnFr).classList.add("active");
+      })();
+
+      function setLang(lang) {
+        localStorage.setItem("lang", lang);
+        window.location.reload();
+      }
+
+      function updateBtn() {
+        if (btn && chkLS) btn.disabled = !chkLS.checked;
+      }
+      if (chkLS) chkLS.addEventListener("change", updateBtn);
+
+      function executer() {
+        if (chkLS.checked) {
+          localStorage.clear();
+          // Restore lang setting so the page stays in the right language
+          var lang = window.t === i18n_en ? "en" : "fr";
+          localStorage.setItem("lang", lang);
+          chkLS.checked = false;
+          updateBtn();
+          feedback.textContent = window.t.admin_feedback_ls + " " + window.t.admin_feedback_return;
+          feedback.className = "admin-feedback success";
+          feedback.style.display = "block";
+        }
+      }
+
+      // Export data
+      function exportData() {
+        var data = {
+          taches: JSON.parse(localStorage.getItem("mes_taches") || "[]"),
+          notes: JSON.parse(localStorage.getItem("mes_notes") || "[]"),
+          liens: JSON.parse(localStorage.getItem("mes_liens") || "[]"),
+          diagrammes: JSON.parse(localStorage.getItem("mes_diagrammes") || "[]")
+        };
+        var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "doc-survival-kit-backup.json";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // Import data
+      function importData(file) {
+        if (!file) return;
+        if (!confirm(window.t.admin_import_confirm)) {
+          document.getElementById("importFile").value = "";
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            var data = JSON.parse(e.target.result);
+            if (data.taches) localStorage.setItem("mes_taches", JSON.stringify(data.taches));
+            if (data.notes) localStorage.setItem("mes_notes", JSON.stringify(data.notes));
+            if (data.liens) localStorage.setItem("mes_liens", JSON.stringify(data.liens));
+            if (data.diagrammes) localStorage.setItem("mes_diagrammes", JSON.stringify(data.diagrammes));
+            alert(window.t.admin_import_success);
+            window.location.reload();
+          } catch (err) {
+            alert(window.t.admin_import_error);
+            document.getElementById("importFile").value = "";
+          }
+        };
+        reader.readAsText(file);
+      }
+
+
+// ══════════════════════════════════════
+//  Routeur de navigation
+// ══════════════════════════════════════
+
+var _currentView = "index";
+
+function navigateTo(view) {
+  // Masquer toutes les vues
+  document.querySelectorAll(".view").forEach(function (v) {
+    v.classList.remove("active");
+  });
+
+  // Afficher la vue demandée
+  var el = document.getElementById("view-" + view);
+  if (el) {
+    el.classList.add("active");
+  }
+
+  // Gérer la classe body pour diagram
+  document.body.classList.toggle("diagram-page", view === "diagram");
+
+  // Mettre à jour l'URL (sans recharger)
+  if (view !== _currentView) {
+    history.pushState(null, "", "#" + view);
+  }
+  _currentView = view;
+
+  // Initialiser diagram.js si nécessaire
+  if (view === "diagram" && typeof initDiagramView === "function") {
+    initDiagramView();
+  }
+
+  // Réappliquer les traductions pour la vue
+  if (typeof applyI18n === "function") {
+    applyI18n();
+  }
+}
+
+// Écouter les changements de hash
+window.addEventListener("hashchange", function () {
+  var view = location.hash.slice(1) || "index";
+  if (view !== _currentView) {
+    navigateTo(view);
+  }
+});
+
+// Initialisation au chargement
+window.addEventListener("load", function () {
+  var view = location.hash.slice(1) || "index";
+  navigateTo(view);
+});
+
+  </script>
+</body>
+</html>

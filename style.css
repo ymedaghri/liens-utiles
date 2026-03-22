@@ -544,8 +544,7 @@ section {
 
 /* ── Bouton mode édition + bouton ajouter catégorie (styles communs) ── */
 .btn-add-cat,
-.btn-edit-mode,
-.btn-save {
+.btn-edit-mode {
   font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
   font-size: 0.65rem;
   letter-spacing: 0.1em;
@@ -577,16 +576,18 @@ section {
   border-color: #292524;
   color: #292524;
 }
-.btn-save {
-  display: none;
-  background: #047857;
-  border: 1px solid #047857;
-  color: #fff;
+
+/* ── Indicateur de sauvegarde automatique (style Google Docs) ── */
+.save-indicator {
+  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
+  font-size: 0.7rem;
+  color: #059669;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
-.btn-save:hover {
-  background: #059669;
-  border-color: #059669;
-  color: #fff;
+.save-indicator.visible {
+  opacity: 1;
 }
 
 /* ── Mode édition : rendre tous les boutons d'action visibles ── */
@@ -1080,24 +1081,6 @@ section {
   min-width: 38px;
   text-align: center;
 }
-.diagram-btn-save {
-  font-family: "Cascadia Code", "SF Mono", Consolas, monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 5px 12px;
-  border-radius: 6px;
-  background: #047857;
-  border: 1px solid #047857;
-  color: #fff;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.15s;
-  display: inline-flex;
-  align-items: center;
-}
-.diagram-btn-save:hover { background: #059669; }
-
 /* ── Canvas SVG ── */
 .diagram-canvas {
   position: fixed;

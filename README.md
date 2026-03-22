@@ -11,7 +11,7 @@ This is one of the dashboard's greatest strengths. Here is why it poses **no ris
 | Network requests | **None** — no CDN, no API, no tracking                                        |
 | External deps    | **None** — plain HTML, CSS and Vanilla JavaScript only                        |
 | Server required  | **No** — opens directly via `file://` in the browser                          |
-| Data sent        | **Never** — everything stays on your machine (`localStorage` and local files) |
+| Data sent        | **Never** — everything stays on your machine (`localStorage` only)            |
 | Installation     | **None** — no executable, no package manager, no admin rights                 |
 | Auditable code   | **Yes** — a handful of readable files, nothing minified or obfuscated         |
 
@@ -76,27 +76,24 @@ A lightweight SVG diagram editor accessible via the diagram icon (top-right of t
 - **Resize** shapes by dragging the bottom-right handle
 - **Pan** by dragging on the canvas background; **zoom** with the mouse wheel or toolbar buttons
 - Manage multiple diagrams from the ☰ panel
-- Saves directly to `diagrammes.js` on disk (same File System Access API mechanism as notes and links)
 
 ---
 
 ## Data persistence
 
-Everything is saved in the browser's `localStorage` — your content survives browser restarts.
+Everything is saved automatically in the browser's `localStorage` — your content survives browser restarts.
 
-To avoid losing data when you clear the cache or switch machines, each panel has a **"save changes"** button that overwrites the source file (`mesLiens.js` or `mesNotes.js`) directly on your disk, using the **File System Access API** (Chrome and Edge Chromium only).
-
-> **First save**: a modal asks you to select the project folder. The file is then updated directly on every subsequent save, with no dialog.
+- **Auto-save**: every change is saved instantly with a brief "✓ Saved" indicator (Google Docs style)
+- **Export/Import**: optional JSON backup via the administration page — download all your data or restore from a previous backup
 
 ## Administration page
 
 The ⚙ icon in the top-right corner of the dashboard opens `admin.html`. It lets you:
 
 - **Choose the language** — switch between Français and English (saved in localStorage)
-- **Clear localStorage** — resets to the default data from `mesLiens.js` and `mesNotes.js` on next load
-- **Delete IndexedDB** — clears the stored file handle; the next save will ask you to select the folder again
-
-The two reset actions are independent, can be checked separately, and are executed via a single button. The page explains the consequences before acting.
+- **Export (JSON)** — download all your data (tasks, notes, links, diagrams) as a backup file
+- **Import (JSON)** — restore data from a previously exported backup
+- **Clear localStorage** — resets to the default sample data on next load
 
 ## Internationalisation
 
@@ -114,6 +111,10 @@ Translations live in the `i18n/` folder:
 
 ## Quick start
 
+### Standalone file (simplest)
+
+Download `dist/doc-survival-kit-{version}.html` from this repository and open it in Chrome or Edge. That's it — everything is bundled in a single file.
+
 ### Via npx (recommended)
 
 ```bash
@@ -122,7 +123,7 @@ npx doc-survival-kit
 
 Creates a `doc-survival-kit/` folder in the current directory and opens the application automatically in the browser. Subsequent runs simply open the application without overwriting anything.
 
-> Requires Node.js >= 16.7. Use Chrome or Edge for file saving.
+> Requires Node.js >= 16.7. Works best in Chrome or Edge.
 
 ### Without any tool
 
@@ -164,14 +165,24 @@ start index.html  # Windows
 
 ## Tech stack
 
-| Technology         | Detail                                                  |
-| ------------------ | ------------------------------------------------------- |
-| HTML               | Semantic structure, no framework                        |
-| CSS                | Separate styles in `style.css`, no framework            |
-| JavaScript         | Vanilla, no third-party library                         |
-| Local storage      | Browser `localStorage`                                  |
-| File storage       | File System Access API (`showDirectoryPicker`)          |
-| Handle persistence | `IndexedDB` — file handle is remembered across sessions |
+| Technology    | Detail                                       |
+| ------------- | -------------------------------------------- |
+| HTML          | Semantic structure, no framework             |
+| CSS           | Separate styles in `style.css`, no framework |
+| JavaScript    | Vanilla, no third-party library              |
+| Local storage | Browser `localStorage` (auto-save)           |
+
+---
+
+## Build
+
+To generate a standalone HTML file from the source:
+
+```bash
+npm run build
+```
+
+This creates `dist/doc-survival-kit-{version}.html` — a single file containing all three pages (dashboard, admin, diagrams) with hash-based navigation. The standalone file works identically to the multi-file version.
 
 ---
 
