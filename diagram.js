@@ -66,7 +66,8 @@ function measureText(str, fontSize, fontWeight) {
   return ctx.measureText(str).width;
 }
 
-function wrapPostitLines(text, maxWidth) {
+function wrapPostitLines(text, maxWidth, fontSize) {
+  var fs = fontSize || 12;
   var result = [];
   (text || "").split("\n").forEach(function (line) {
     if (line === "") { result.push(""); return; }
@@ -74,7 +75,7 @@ function wrapPostitLines(text, maxWidth) {
     var current = "";
     words.forEach(function (word) {
       var test = current ? current + " " + word : word;
-      if (current && measureText(test, 12, "600") > maxWidth) {
+      if (current && measureText(test, fs, "600") > maxWidth) {
         result.push(current);
         current = word;
       } else {
@@ -468,15 +469,16 @@ function renderShape(shape) {
   txt.setAttribute("y", textCy);
   txt.setAttribute("text-anchor", "middle");
   txt.setAttribute("dominant-baseline", "middle");
+  var fs = shape.fontSize || (shape.type === "text" ? 13 : 12);
   txt.setAttribute("fill", shape.type === "text" ? "#292524" : c.text);
-  txt.setAttribute("font-size", shape.type === "text" ? "13" : "12");
+  txt.setAttribute("font-size", fs);
   txt.setAttribute("font-family", '"Segoe UI",system-ui,sans-serif');
   txt.setAttribute("font-weight", shape.type === "text" ? "400" : "600");
   txt.setAttribute("pointer-events", "none");
   if (shape.type === "postit") {
     var pad = 14; // marge gauche + droite
-    var lines = wrapPostitLines(shape.text || "", shape.w - pad * 2);
-    var lineH = 17;
+    var lines = wrapPostitLines(shape.text || "", shape.w - pad * 2, fs);
+    var lineH = Math.round(fs * 1.42);
     var firstY = shape.y + (shape.h - lines.length * lineH) / 2 + lineH * 0.5;
     txt.setAttribute("y", firstY);
     txt.removeAttribute("dominant-baseline");
@@ -484,6 +486,21 @@ function renderShape(shape) {
       var ts = createSVGEl("tspan");
       ts.setAttribute("x", shape.x + shape.w / 2);
       if (i > 0) ts.setAttribute("dy", lineH + "px");
+      ts.textContent = line || " ";
+      txt.appendChild(ts);
+    });
+  } else if (shape.type === "rect" || shape.type === "rounded" || shape.type === "db" || shape.type === "cloud") {
+    var wpad = shape.type === "cloud" ? Math.round(shape.w * 0.2) : 12;
+    var wlines = wrapPostitLines(shape.text || "", shape.w - wpad * 2, fs);
+    var wlineH = Math.round(fs * 1.33);
+    var wcenterY = shape.type === "db" ? shape.y + shape.h * 0.62 : shape.y + shape.h / 2;
+    var wfirstY = wcenterY - wlines.length * wlineH / 2 + wlineH * 0.5;
+    txt.setAttribute("y", wfirstY);
+    txt.removeAttribute("dominant-baseline");
+    wlines.forEach(function (line, i) {
+      var ts = createSVGEl("tspan");
+      ts.setAttribute("x", shape.x + shape.w / 2);
+      if (i > 0) ts.setAttribute("dy", wlineH + "px");
       ts.textContent = line || " ";
       txt.appendChild(ts);
     });
@@ -782,6 +799,20 @@ function setShapeColor(color) {
   selectedIds.forEach(function (id) {
     var shape = diag.shapes.find(function (s) { return s.id === id; });
     if (shape) shape.color = color;
+  });
+  saveDiagrammes();
+  renderAll();
+  document.getElementById("colorPanel").style.display = "flex";
+}
+
+function changeShapeFontSize(delta) {
+  if (selectedIds.length === 0) return;
+  var diag = getCurrentDiagram();
+  selectedIds.forEach(function (id) {
+    var shape = diag.shapes.find(function (s) { return s.id === id; });
+    if (!shape) return;
+    var current = shape.fontSize || (shape.type === "text" ? 13 : 12);
+    shape.fontSize = Math.max(8, Math.min(28, current + delta));
   });
   saveDiagrammes();
   renderAll();
