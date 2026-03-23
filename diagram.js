@@ -12,7 +12,8 @@ var selectedType = null;   // "shape" | "arrow"
 var selectedIds = [];      // multi-sélection (ids de formes)
 var rubberBandState = null; // { sx, sy } pendant le lasso
 var clipboard = [];        // formes copiées (Ctrl+C / Ctrl+V)
-var pendingImageBlob = null; // image en attente de sélection du dossier
+var pendingImageBlob = null;    // image en attente de sélection du dossier
+var pendingNewDiagram = false;  // true pendant la saisie du nom d'un nouveau diagramme
 var dragState = null;
 var panStart = null;
 var arrowSrcId = null;
@@ -53,6 +54,36 @@ function escDiag(s) {
 
 function createSVGEl(tag) {
   return document.createElementNS("http://www.w3.org/2000/svg", tag);
+}
+
+// Découpe le texte d'un post-it en lignes qui tiennent dans maxWidth px.
+// Respecte les \n explicites, puis fait du word-wrap sur les mots.
+var _measureCanvas = null;
+function measureText(str, fontSize, fontWeight) {
+  if (!_measureCanvas) _measureCanvas = document.createElement("canvas");
+  var ctx = _measureCanvas.getContext("2d");
+  ctx.font = (fontWeight || "600") + " " + (fontSize || 12) + "px \"Segoe UI\",system-ui,sans-serif";
+  return ctx.measureText(str).width;
+}
+
+function wrapPostitLines(text, maxWidth) {
+  var result = [];
+  (text || "").split("\n").forEach(function (line) {
+    if (line === "") { result.push(""); return; }
+    var words = line.split(" ");
+    var current = "";
+    words.forEach(function (word) {
+      var test = current ? current + " " + word : word;
+      if (current && measureText(test, 12, "600") > maxWidth) {
+        result.push(current);
+        current = word;
+      } else {
+        current = test;
+      }
+    });
+    if (current !== "") result.push(current);
+  });
+  return result;
 }
 
 function getCurrentDiagram() {
@@ -424,7 +455,8 @@ function renderShape(shape) {
   txt.setAttribute("font-weight", shape.type === "text" ? "400" : "600");
   txt.setAttribute("pointer-events", "none");
   if (shape.type === "postit") {
-    var lines = (shape.text || "").split("\n");
+    var pad = 14; // marge gauche + droite
+    var lines = wrapPostitLines(shape.text || "", shape.w - pad * 2);
     var lineH = 17;
     var firstY = shape.y + (shape.h - lines.length * lineH) / 2 + lineH * 0.5;
     txt.setAttribute("y", firstY);
@@ -599,6 +631,7 @@ function renderDiagramList() {
 // ── Gestion des diagrammes ──
 function selectDiagramme(idx) {
   currentDiagramIdx = idx;
+  localStorage.setItem("current_diagram_idx", idx);
   selectedId = null;  selectedType = null;
   selectedIds = [];
   viewTransform = { x: 60, y: 60, scale: 1 };
@@ -607,21 +640,42 @@ function selectDiagramme(idx) {
 }
 
 function creerDiagramme() {
-  var d = {
-    id: Date.now(),
-    titre: window.t ? window.t.diag_new_diagram : "Nouveau diagramme",
-    shapes: [],
-    arrows: [],
-  };
+  pendingNewDiagram = true;
+  var input = document.getElementById("diagramTitle");
+  input.value = "";
+  input.placeholder = window.t ? window.t.diag_new_diagram : "Nouveau diagramme";
+  input.focus();
+  input.select();
+}
+
+function confirmerNouveauDiagramme() {
+  if (!pendingNewDiagram) return;
+  pendingNewDiagram = false;
+  var input = document.getElementById("diagramTitle");
+  var titre = input.value.trim() || (window.t ? window.t.diag_new_diagram : "Nouveau diagramme");
+  input.placeholder = "";
+  var d = { id: Date.now(), titre: titre, shapes: [], arrows: [] };
   diagramsList.push(d);
   saveDiagrammes();
   selectDiagramme(diagramsList.length - 1);
+  document.getElementById("diagramTitle").blur();
+}
+
+function annulerNouveauDiagramme() {
+  if (!pendingNewDiagram) return;
+  pendingNewDiagram = false;
+  var diag = getCurrentDiagram();
+  var input = document.getElementById("diagramTitle");
+  input.value = diag ? diag.titre : "";
+  input.placeholder = "";
+  input.blur();
 }
 
 function supprimerDiagramme(idx) {
   if (diagramsList.length <= 1) return;
   diagramsList.splice(idx, 1);
   if (currentDiagramIdx >= diagramsList.length) currentDiagramIdx = diagramsList.length - 1;
+  localStorage.setItem("current_diagram_idx", currentDiagramIdx);
   saveDiagrammes();
   renderAll();
 }
@@ -863,6 +917,7 @@ function createArrow(fromId, toId) {
 
 // ── Renommer le diagramme ──
 function onTitleChange() {
+  if (pendingNewDiagram) return;
   var diag = getCurrentDiagram();
   if (!diag) return;
   diag.titre = document.getElementById("diagramTitle").value || "Diagramme";
@@ -1127,6 +1182,10 @@ function pasteShapes() {
 document.addEventListener("DOMContentLoaded", function () {
   diagramsList = loadDiagrammes();
   if (!localStorage.getItem("mes_diagrammes")) saveDiagrammes();
+  var savedIdx = parseInt(localStorage.getItem("current_diagram_idx"), 10);
+  if (!isNaN(savedIdx) && savedIdx >= 0 && savedIdx < diagramsList.length) {
+    currentDiagramIdx = savedIdx;
+  }
   checkDiffDiagrammes();
   renderAll();
 
@@ -1139,6 +1198,14 @@ document.addEventListener("DOMContentLoaded", function () {
   var titleInput = document.getElementById("diagramTitle");
   titleInput.addEventListener("change", onTitleChange);
   titleInput.addEventListener("blur",   onTitleChange);
+  titleInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (pendingNewDiagram) confirmerNouveauDiagramme();
+      else titleInput.blur();
+    }
+    if (e.key === "Escape" && pendingNewDiagram) annulerNouveauDiagramme();
+  });
 
   var textInput = document.getElementById("shapeTextInput");
   textInput.addEventListener("keydown", function (e) {
@@ -1212,5 +1279,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("modalPremiereSauvegardeDiag").addEventListener("click", function (e) {
     if (e.target === this) this.classList.remove("open");
+  });
+
+  document.addEventListener("mousedown", function (e) {
+    var panel = document.getElementById("diagramListPanel");
+    if (!panel.classList.contains("open")) return;
+    var burgerBtn = document.querySelector(".diagram-tool[onclick=\"toggleDiagramList()\"]");
+    if (!panel.contains(e.target) && (!burgerBtn || !burgerBtn.contains(e.target))) {
+      panel.classList.remove("open");
+    }
   });
 });

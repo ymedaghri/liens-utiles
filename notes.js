@@ -2,7 +2,9 @@
 //  mesNotes — CRUD notes (localStorage + fichier)
 // ══════════════════════════════════════
 
-var expandedNoteIds = {};
+var expandedNoteIds = (function () {
+  try { return JSON.parse(localStorage.getItem("expanded_note_ids")) || {}; } catch (e) { return {}; }
+})();
 var noteIdxASupprimer = null;
 var noteIdxEnEdition = null;
 var noteBlocNoteIdx = null;
@@ -167,6 +169,7 @@ function toggleNote(noteId) {
   } else {
     expandedNoteIds[noteId] = true;
   }
+  localStorage.setItem("expanded_note_ids", JSON.stringify(expandedNoteIds));
   renderNotes();
 }
 
@@ -178,6 +181,7 @@ function toggleAllNotes() {
   } else {
     notes.forEach(function (n) { expandedNoteIds[n.id] = true; });
   }
+  localStorage.setItem("expanded_note_ids", JSON.stringify(expandedNoteIds));
   renderNotes();
 }
 

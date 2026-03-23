@@ -1,6 +1,8 @@
 // ── Données des liens ────────────────────────────────────────────────
 const LIENS_KEY = "mes_liens";
-var expandedCatTitres = {};
+var expandedCatTitres = (function () {
+  try { return JSON.parse(localStorage.getItem("expanded_cat_titres")) || {}; } catch (e) { return {}; }
+})();
 
 function loadLiens() {
   try {
@@ -132,6 +134,7 @@ function toggleCat(titre) {
   } else {
     expandedCatTitres[titre] = true;
   }
+  localStorage.setItem("expanded_cat_titres", JSON.stringify(expandedCatTitres));
   renderLiens();
 }
 
@@ -143,6 +146,7 @@ function toggleAllLiens() {
   } else {
     data.forEach(function (c) { expandedCatTitres[c.titre] = true; });
   }
+  localStorage.setItem("expanded_cat_titres", JSON.stringify(expandedCatTitres));
   renderLiens();
 }
 
