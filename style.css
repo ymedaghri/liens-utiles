@@ -854,6 +854,33 @@ section {
   color: #fff;
 }
 
+/* ── Toggle collapse note ── */
+.btn-toggle-note {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a8a29e;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-toggle-note:hover {
+  color: #292524;
+  background: rgba(0, 0, 0, 0.05);
+}
+.btn-toggle-note svg {
+  transition: transform 0.2s;
+}
+.note.collapsed .btn-toggle-note svg {
+  transform: rotate(-90deg);
+}
+.note.collapsed .note-content,
+.note.collapsed .note-footer {
+  display: none !important;
+}
+
 /* Couleurs des notes par thème */
 .note.t-green {
   border-color: #d1fae5;

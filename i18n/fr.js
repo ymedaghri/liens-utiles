@@ -34,6 +34,8 @@ var i18n_fr = {
   notes_btn_edit_bloc: "modifier",
   notes_btn_add_bloc: "+ ajouter un bloc",
   notes_btn_edit_note: "modifier",
+  notes_btn_expand: "Développer",
+  notes_btn_collapse: "Réduire",
 
   // mesLiens
   liens_subtitle: "tout ce que je ne veux pas perdre",

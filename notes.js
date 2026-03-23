@@ -2,6 +2,7 @@
 //  mesNotes — CRUD notes (localStorage + fichier)
 // ══════════════════════════════════════
 
+var expandedNoteIds = {};
 var noteIdxASupprimer = null;
 var noteIdxEnEdition = null;
 var noteBlocNoteIdx = null;
@@ -160,6 +161,15 @@ function ecrireFichierNotes(handle) {
     });
 }
 
+function toggleNote(noteId) {
+  if (expandedNoteIds[noteId]) {
+    delete expandedNoteIds[noteId];
+  } else {
+    expandedNoteIds[noteId] = true;
+  }
+  renderNotes();
+}
+
 function renderNotes() {
   var notes = loadNotes();
   var container = document.getElementById("notesContainer");
@@ -230,9 +240,11 @@ function renderNotes() {
           })
           .join("");
 
+        var isCollapsed = !expandedNoteIds[note.id];
         return (
           '<div class="note ' +
           esc(note.theme) +
+          (isCollapsed ? " collapsed" : "") +
           '">' +
           '<div class="note-header">' +
           "<h2>" +
@@ -247,7 +259,15 @@ function renderNotes() {
           '<button class="btn-del-note" onclick="ouvrirConfirmSupprNote(' +
           nIdx +
           ')">×</button>' +
-          "</div></div>" +
+          "</div>" +
+          '<button class="btn-toggle-note" onclick="toggleNote(' +
+          note.id +
+          ')" title="' +
+          (isCollapsed ? window.t.notes_btn_expand : window.t.notes_btn_collapse) +
+          '">' +
+          '<svg viewBox="0 0 10 6" width="10" height="6"><path d="M1 1 L5 5 L9 1" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          "</button>" +
+          "</div>" +
           '<div class="note-content">' +
           (blocsHtml || "") +
           "</div>" +
@@ -361,14 +381,14 @@ function updateBlocPlaceholder() {
   var type = document.getElementById("blocType").value;
   var ta = document.getElementById("blocContent");
   var inp = document.getElementById("blocContentInput");
-  var useInput = type === "b" || type === "p";
+  var useInput = type === "b";
   inp.style.display = useInput ? "" : "none";
   ta.style.display = useInput ? "none" : "";
   if (type === "ul") ta.placeholder = window.t.modal_bloc_placeholder_ul;
   else if (type === "pre") ta.placeholder = window.t.modal_bloc_placeholder_pre;
   else if (type === "table") ta.placeholder = window.t.modal_bloc_placeholder_table;
-  else if (type === "b") inp.placeholder = window.t.modal_bloc_placeholder_b;
-  else inp.placeholder = window.t.modal_bloc_placeholder_p;
+  else if (type === "p") ta.placeholder = window.t.modal_bloc_placeholder_p;
+  else inp.placeholder = window.t.modal_bloc_placeholder_b;
 }
 
 function ouvrirModalBloc(noteIdx) {
@@ -382,7 +402,7 @@ function ouvrirModalBloc(noteIdx) {
   updateBlocPlaceholder();
   document.getElementById("modalBloc").classList.add("open");
   setTimeout(function () {
-    document.getElementById("blocContentInput").focus();
+    document.getElementById("blocContent").focus();
   }, 50);
 }
 
@@ -393,7 +413,7 @@ function ouvrirModalEditBloc(noteIdx, blocIdx) {
   document.getElementById("modalBlocTitre").textContent =
     window.t.modal_bloc_edit;
   document.getElementById("blocType").value = bloc.type;
-  var useInput = bloc.type === "b" || bloc.type === "p";
+  var useInput = bloc.type === "b";
   document.getElementById("blocContentInput").value = useInput
     ? bloc.content
     : "";
@@ -421,7 +441,7 @@ function fermerModalBloc() {
 
 function confirmerBloc() {
   var type = document.getElementById("blocType").value;
-  var useInput = type === "b" || type === "p";
+  var useInput = type === "b";
   var raw = document.getElementById(
     useInput ? "blocContentInput" : "blocContent",
   ).value;
