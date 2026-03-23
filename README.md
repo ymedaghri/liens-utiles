@@ -55,6 +55,7 @@ Everything you need to remember, organised as notes made of freely stackable blo
   - **List** — bullet points
   - **Table** — columns separated by `|`, first line = headers
 - Each note has a customisable colour
+- Notes are **collapsed by default** — click the chevron to expand; use the toolbar button to expand/collapse all at once
 - Add, edit and delete notes and blocks in edit mode
 
 ### myLinks. — Useful link directory
@@ -62,6 +63,7 @@ Everything you need to remember, organised as notes made of freely stackable blo
 Your links organised by category, accessible in one click.
 
 - Customisable categories with a colour of your choice
+- Categories are **collapsed by default** — click the chevron to expand; use the toolbar button to expand/collapse all at once
 - Displayed with name and description
 - Add, edit and delete in edit mode
 
@@ -70,8 +72,8 @@ Your links organised by category, accessible in one click.
 A lightweight SVG diagram editor accessible via the diagram icon (top-right of the dashboard).
 
 - Five shape types: **Rectangle**, **Rounded rectangle**, **Database** (cylinder), **Cloud** (external service), **Free text**
-- Draw **arrows** between shapes by clicking source → target, or by dragging from a connection dot
-- **Double-click** on any shape (or use the ✎ button) to edit its label inline
+- Draw **arrows** between shapes by clicking source → target, or by dragging from a connection dot — the label input opens automatically
+- **Double-click** on any shape or arrow (or use the ✎ button) to edit its label inline
 - **Colour** each shape with the six theme colours
 - **Resize** shapes by dragging the bottom-right handle
 - **Pan** by dragging on the canvas background; **zoom** with the mouse wheel or toolbar buttons

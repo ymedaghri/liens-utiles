@@ -453,6 +453,32 @@ section {
   color: #5eead4;
 }
 
+/* ── Toggle collapse section liens ── */
+.btn-toggle-cat {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a8a29e;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-toggle-cat:hover {
+  color: #292524;
+  background: rgba(0, 0, 0, 0.05);
+}
+.btn-toggle-cat svg {
+  transition: transform 0.2s;
+}
+section.collapsed .btn-toggle-cat svg {
+  transform: rotate(-90deg);
+}
+section.collapsed .links {
+  display: none;
+}
+
 /* ── Header catégorie avec corbeille ── */
 .cat-header {
   display: flex;

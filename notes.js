@@ -170,6 +170,25 @@ function toggleNote(noteId) {
   renderNotes();
 }
 
+function toggleAllNotes() {
+  var notes = loadNotes();
+  var allExpanded = notes.length > 0 && notes.every(function (n) { return expandedNoteIds[n.id]; });
+  if (allExpanded) {
+    expandedNoteIds = {};
+  } else {
+    notes.forEach(function (n) { expandedNoteIds[n.id] = true; });
+  }
+  renderNotes();
+}
+
+function updateToggleAllBtn() {
+  var btn = document.getElementById("btnToggleAllNotes");
+  if (!btn) return;
+  var notes = loadNotes();
+  var allExpanded = notes.length > 0 && notes.every(function (n) { return expandedNoteIds[n.id]; });
+  btn.textContent = allExpanded ? window.t.notes_btn_collapse_all : window.t.notes_btn_expand_all;
+}
+
 function renderNotes() {
   var notes = loadNotes();
   var container = document.getElementById("notesContainer");
@@ -284,6 +303,7 @@ function renderNotes() {
   }
 
   if (hadEditMode) container.classList.add("edit-mode");
+  updateToggleAllBtn();
 }
 
 // ── Toggle mode édition ──

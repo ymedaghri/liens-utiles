@@ -1,5 +1,6 @@
 // ── Données des liens ────────────────────────────────────────────────
 const LIENS_KEY = "mes_liens";
+var expandedCatTitres = {};
 
 function loadLiens() {
   try {
@@ -125,19 +126,52 @@ document
     if (e.target === this) fermerModalPremiereSauvegarde();
   });
 
+function toggleCat(titre) {
+  if (expandedCatTitres[titre]) {
+    delete expandedCatTitres[titre];
+  } else {
+    expandedCatTitres[titre] = true;
+  }
+  renderLiens();
+}
+
+function toggleAllLiens() {
+  const data = loadLiens();
+  const allExpanded = data.length > 0 && data.every(function (c) { return expandedCatTitres[c.titre]; });
+  if (allExpanded) {
+    expandedCatTitres = {};
+  } else {
+    data.forEach(function (c) { expandedCatTitres[c.titre] = true; });
+  }
+  renderLiens();
+}
+
+function updateToggleAllLiensBtn() {
+  const btn = document.getElementById("btnToggleAllLiens");
+  if (!btn) return;
+  const data = loadLiens();
+  const allExpanded = data.length > 0 && data.every(function (c) { return expandedCatTitres[c.titre]; });
+  btn.textContent = allExpanded ? window.t.liens_btn_collapse_all : window.t.liens_btn_expand_all;
+}
+
 function renderLiens() {
   const data = loadLiens();
   const container = document.getElementById("linksContainer");
   container.innerHTML = data
     .map(
-      (cat, idx) => `
-      <section class="${cat.theme}">
+      (cat, idx) => {
+        const isCollapsed = !expandedCatTitres[cat.titre];
+        return `
+      <section class="${cat.theme}${isCollapsed ? " collapsed" : ""}">
         <div class="cat-header">
           <h2>${cat.titre}</h2>
           <div class="cat-actions">
             <button class="btn-add-link" onclick="ouvrirModalLien(${idx})" title="${window.t.liens_add_link_title}">＋</button>
             <button class="btn-del-cat" onclick="ouvrirConfirmSupprCat(${idx})" title="${window.t.liens_del_cat_title}">✕</button>
           </div>
+          <button class="btn-toggle-cat" onclick="toggleCat('${cat.titre.replace(/'/g, "\\'")}')" title="${isCollapsed ? window.t.liens_btn_expand : window.t.liens_btn_collapse}">
+            <svg viewBox="0 0 10 6" width="10" height="6"><path d="M1 1 L5 5 L9 1" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
         <div class="links">
           ${cat.liens
@@ -157,10 +191,12 @@ function renderLiens() {
             )
             .join("")}
         </div>
-      </section>`,
+      </section>`;
+      },
     )
     .join("");
   checkDiff();
+  updateToggleAllLiensBtn();
 }
 
 if (!localStorage.getItem(LIENS_KEY)) {

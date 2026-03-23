@@ -128,12 +128,12 @@ Sauvegarde également dans le fichier `mesNotes.js` via la File System Access AP
 | Type      | Balise rendue         | Saisie dans la modale                                                              |
 | --------- | --------------------- | ---------------------------------------------------------------------------------- |
 | `b`       | `<b>` (display:block) | `<input>` monoligne (`#blocContentInput`)                                          |
-| `p`       | `<p>`                 | `<input>` monoligne (`#blocContentInput`)                                          |
+| `p`       | `<p>`                 | `<textarea>` (`#blocContent`), texte libre multiligne                              |
 | `pre`     | `<pre>`               | `<textarea>` (`#blocContent`), prend toute la largeur                              |
 | `ul`      | `<ul><li>…`           | `<textarea>` (`#blocContent`), un élément par ligne                                |
 | `table`   | `<table>`             | `<textarea>` (`#blocContent`), colonnes séparées par `\|`, 1re ligne = en-têtes   |
 
-La modale `#modalBloc` contient les deux éléments (`#blocContentInput` et `#blocContent`). `updateBlocPlaceholder()` affiche le bon champ via `display` et masque l'autre selon le type sélectionné.
+La modale `#modalBloc` contient les deux éléments (`#blocContentInput` et `#blocContent`). `updateBlocPlaceholder()` affiche `#blocContentInput` (input) uniquement pour le type `b`, et `#blocContent` (textarea) pour tous les autres types (`p`, `pre`, `ul`, `table`).
 
 Les blocs `pre` sont enveloppés dans un `.pre-wrapper` (position: relative) qui contient le `<pre>` et un bouton `.btn-copy-pre` positionné en absolu en haut à droite. Ce bouton est visible au survol du `.pre-wrapper`, appelle `copierBloc(btn)`, copie le contenu dans le clipboard et affiche temporairement "copié ✓" (classe `.copied`, fond vert) pendant 1,5 s. Il est indépendant des `.bloc-actions` et visible hors mode édition.
 
@@ -162,8 +162,11 @@ En mode édition, un `padding-right: 72px` est ajouté au `.bloc-wrapper` pour �
 | `confirmerBloc()`                          | Ajoute ou modifie un bloc                                                                                                          |
 | `ouvrirConfirmSupprBloc(noteIdx, blocIdx)` | Ouvre la confirmation de suppression de bloc                                                                                       |
 | `supprimerBloc()`                          | Supprime le bloc à `supprBlocNoteIdx / supprBlocBlocIdx`                                                                           |
-| `updateBlocPlaceholder()`                  | Affiche `#blocContentInput` (input) pour les types `b`/`p`, `#blocContent` (textarea) pour `pre`/`ul`/`table` ; met à jour le placeholder  |
+| `updateBlocPlaceholder()`                  | Affiche `#blocContentInput` (input) pour le type `b` uniquement, `#blocContent` (textarea) pour tous les autres ; met à jour le placeholder |
 | `copierBloc(btn)`                          | Copie dans le clipboard le `textContent` du `<pre>` frère dans `.pre-wrapper` ; affiche "copié ✓" + classe `.copied` pendant 1,5 s |
+| `toggleNote(noteId)`                       | Bascule l'état collapsed/expanded d'une note (via `expandedNoteIds`) + `renderNotes()`                                            |
+| `toggleAllNotes()`                         | Si toutes les notes sont expanded → collapse tout ; sinon → expand tout                                                           |
+| `updateToggleAllBtn()`                     | Met à jour le libellé du bouton `#btnToggleAllNotes` selon l'état global                                                          |
 
 ---
 
@@ -202,7 +205,7 @@ Au premier chargement, si la clé est absente, on initialise avec `mesLiensDefau
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `loadLiens()`                                 | Lit le tableau depuis localStorage (fallback sur `mesLiensDefaut`)                                 |
 | `saveLiens(data)`                             | Persiste le tableau dans localStorage                                                              |
-| `renderLiens()`                               | Génère tout le HTML des sections + appelle `checkDiff()`                                           |
+| `renderLiens()`                               | Génère tout le HTML des sections + appelle `checkDiff()` + `updateToggleAllLiensBtn()`             |
 | `checkDiff()`                                 | Compare localStorage avec `mesLiensDefaut` en mémoire — affiche/masque `#btnSave`                  |
 | `enregistrerModifications()`                  | Récupère le handle IndexedDB ; si absent, ouvre la modale d'instruction                            |
 | `ouvrirSelecteurFichier()`                    | Ouvre `showDirectoryPicker`, récupère `mesLiens.js` par nom, stocke le handle, écrit               |
@@ -218,6 +221,9 @@ Au premier chargement, si la clé est absente, on initialise avec `mesLiensDefau
 | `ouvrirModalEditLien(event, catIdx, lienIdx)` | Ouvre la modale d'édition pré-remplie                                                              |
 | `confirmerEditLien()`                         | Sauvegarde les modifications du lien édité                                                         |
 | `toggleEditMode()`                            | Active / désactive le mode édition                                                                 |
+| `toggleCat(titre)`                            | Bascule l'état collapsed/expanded d'une section (via `expandedCatTitres`, clé = `cat.titre`)       |
+| `toggleAllLiens()`                            | Si toutes les sections sont expanded → collapse tout ; sinon → expand tout                         |
+| `updateToggleAllLiensBtn()`                   | Met à jour le libellé du bouton `#btnToggleAllLiens` selon l'état global                           |
 
 ### Thèmes de catégories / notes (classes CSS)
 
@@ -431,8 +437,9 @@ Toutes les formes ont : fond coloré (classe CSS du thème), trait `#a8a29e`, te
 |---|---|
 | Sélectionner / déplacer | Outil `select` + clic/drag sur une forme |
 | Créer une forme | Outil `rect`/`rounded`/`db`/`cloud`/`text` + clic sur le canvas |
-| Créer une flèche | Outil `arrow` + clic source → clic cible, **ou** drag depuis un conn-dot (tout outil) |
-| Éditer le texte | Double-clic sur une forme **ou** bouton ✎ de la palette couleurs (forme sélectionnée) |
+| Créer une flèche | Outil `arrow` + clic source → clic cible, **ou** drag depuis un conn-dot (tout outil) — la saisie du label s'ouvre automatiquement |
+| Éditer le texte d'une forme | Double-clic sur une forme **ou** bouton ✎ de la palette couleurs (forme sélectionnée) |
+| Éditer le label d'une flèche | Double-clic sur la flèche **ou** bouton ✎ (flèche sélectionnée) |
 | Changer la couleur | Palette couleurs (visible quand une forme est sélectionnée) |
 | Redimensionner | Drag de la poignée bas-droit (carré orange) |
 | Supprimer | Outil ✕ ou touche `Del` |
@@ -441,16 +448,24 @@ Toutes les formes ont : fond coloré (classe CSS du thème), trait `#a8a29e`, te
 
 ### Double-clic — implémentation
 
-Le `dblclick` natif ne fonctionne pas sur les formes SVG car `renderAll()` remplace les éléments DOM entre les deux clics, détachant la cible. Solution : détection manuelle par timestamp dans `onMouseDown` :
+Le `dblclick` natif ne fonctionne pas sur les formes/flèches SVG car `renderAll()` remplace les éléments DOM entre les deux clics, détachant la cible. Solution : détection manuelle par timestamp dans `onMouseDown`, avec deux paires de variables — une pour les formes, une pour les flèches :
 
 ```js
+// Formes
 var now = Date.now();
 if (now - lastClickTime < 350 && lastClickShapeId === shape.id) {
   lastClickTime = 0; lastClickShapeId = null;
-  startTextEdit(shape.id);
-  return;
+  startTextEdit(shape.id); return;
 }
-lastClickTime = now; lastClickShapeId = shape.id;
+lastClickTime = now; lastClickShapeId = shape.id; lastClickArrowId = null;
+
+// Flèches
+var now2 = Date.now();
+if (now2 - lastClickTime < 350 && lastClickArrowId === aid) {
+  lastClickTime = 0; lastClickArrowId = null;
+  startArrowTextEdit(aid); return;
+}
+lastClickTime = now2; lastClickArrowId = aid;
 ```
 
 `input.focus()` est différé via `setTimeout(..., 10)` pour éviter que le blur sur le mouseup ne ferme immédiatement l'overlay.
@@ -470,7 +485,9 @@ lastClickTime = now; lastClickShapeId = shape.id;
 | `setShapeColor(color)` | Applique une classe de thème à la forme sélectionnée |
 | `deleteSelected()` | Supprime la forme ou la flèche sélectionnée |
 | `startTextEdit(shapeId)` | Positionne l'overlay `#shapeTextInput` sur la forme et lui donne le focus |
-| `confirmTextEdit()` | Sauvegarde le texte saisi et masque l'overlay |
+| `startArrowTextEdit(arrowId)` | Positionne l'overlay au milieu de la flèche pour éditer son label |
+| `confirmTextEdit()` | Sauvegarde le texte saisi (forme ou flèche selon `editingShapeId` / `editingArrowId`) et masque l'overlay |
+| `createArrow(fromId, toId)` | Crée une flèche et ouvre immédiatement `startArrowTextEdit` pour saisir le label |
 | `creerDiagramme()` | Ajoute un nouveau diagramme vide et le sélectionne |
 | `toggleDiagramList()` | Affiche / masque le panneau liste des diagrammes |
 | `enregistrerDiagrammes()` | Sauvegarde dans `diagrammes.js` via File System Access API |
@@ -491,7 +508,8 @@ lastClickTime = now; lastClickShapeId = shape.id;
 | `selectedId` / `selectedType` | Id et type (`"shape"` ou `"arrow"`) de l'élément sélectionné |
 | `dragState` | État du drag en cours (`null` ou objet de contexte) |
 | `arrowSrcId` | Id de la forme source lors du dessin d'une flèche (outil arrow) |
-| `lastClickTime` / `lastClickShapeId` | Détection du double-clic manuel |
+| `lastClickTime` / `lastClickShapeId` / `lastClickArrowId` | Détection du double-clic manuel (formes et flèches) |
+| `editingShapeId` / `editingArrowId` | Id de l'élément dont le texte est en cours d'édition |
 
 ---
 
