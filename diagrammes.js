@@ -176,12 +176,23 @@ var diagrammesDefaut = [
       {
         "id": "s1774269591962",
         "type": "postit",
-        "x": 301,
-        "y": 647,
+        "x": 618,
+        "y": 758,
         "w": 402,
         "h": 183,
         "text": "GOLDEN FEATURE !\n\nCOLLER VOS IMAGES (CAPTURES D'ECRAN)\nDIRECTEMENT DANS CE BOARD !!!!",
         "color": "t-rose"
+      },
+      {
+        "id": "s1774270331736",
+        "type": "image",
+        "x": 976,
+        "y": 643,
+        "w": 181,
+        "h": 280,
+        "text": "",
+        "color": "",
+        "src": "images/img_1774270331723.png"
       }
     ],
     "arrows": [
