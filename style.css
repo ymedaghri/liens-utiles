@@ -1393,6 +1393,11 @@ section.collapsed .links {
   font-weight: 700;
   letter-spacing: -.02em;
 }
+.diagram-pick-active {
+  background: #f97316;
+  color: #fff;
+  border-color: #f97316;
+}
 
 /* ── Bouton diagramme dans index.html ── */
 .btn-diagram {
