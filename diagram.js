@@ -637,6 +637,7 @@ function selectDiagramme(idx) {
   viewTransform = { x: 60, y: 60, scale: 1 };
   document.getElementById("colorPanel").style.display = "none";
   renderAll();
+  document.getElementById("diagramListPanel").classList.remove("open");
 }
 
 function creerDiagramme() {
