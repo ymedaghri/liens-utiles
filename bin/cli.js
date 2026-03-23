@@ -18,6 +18,7 @@ const APP_FILES = [
 ];
 const DATA_FILES = ["mesLiens.js", "mesNotes.js", "diagrammes.js"];
 const I18N_FILES = ["i18n/fr.js", "i18n/en.js", "i18n/i18n.js"];
+const IMAGES_FILES = ["images/img_1774270331723.png"];
 
 function openBrowser(filePath) {
   const url = "file://" + filePath;
@@ -52,6 +53,12 @@ if (fs.existsSync(DEST_DIR)) {
   // Fichiers i18n (toujours copiés)
   fs.mkdirSync(path.join(DEST_DIR, "i18n"), { recursive: true });
   for (const file of I18N_FILES) {
+    fs.copyFileSync(path.join(SRC_DIR, file), path.join(DEST_DIR, file));
+  }
+
+  // Fichiers images (toujours copiés pour la démo)
+  fs.mkdirSync(path.join(DEST_DIR, "images"), { recursive: true });
+  for (const file of IMAGES_FILES) {
     fs.copyFileSync(path.join(SRC_DIR, file), path.join(DEST_DIR, file));
   }
 
