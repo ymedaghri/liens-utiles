@@ -48,7 +48,10 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, color 0.15s, transform 0.3s;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    transform 0.3s;
   line-height: 1;
 }
 .btn-admin:hover {
@@ -331,11 +334,15 @@ section {
   font-size: 0.875rem;
   font-weight: 600;
   transition: color 0.15s;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 .link-desc {
   font-size: 0.875rem;
   color: #a8a29e;
   margin-left: 8px;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 .arrow {
   opacity: 0;
@@ -544,6 +551,7 @@ section {
 
 /* ── Bouton mode édition + bouton ajouter catégorie (styles communs) ── */
 .btn-add-cat,
+.btn-add-note,
 .btn-edit-mode,
 .btn-save {
   font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
@@ -692,19 +700,9 @@ section {
    ══════════════════════════════════════ */
 
 .btn-add-note {
-  font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 7px 14px;
-  border-radius: 8px;
   border: 1px dashed #d6d3d1;
   color: #a8a29e;
   display: none;
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    color 0.15s;
 }
 .inner:has(#notesContainer.edit-mode) .btn-add-note {
   display: flex;
@@ -752,11 +750,15 @@ section {
   font-size: 0.9rem;
   font-weight: 700;
   color: #292524;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 .note-content p {
   font-size: 0.875rem;
   line-height: 1.6;
   color: #292524;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 .note-content pre {
   font-family: "Cascadia Code", "SF Mono", "Consolas", monospace;
@@ -772,6 +774,8 @@ section {
   padding-left: 18px;
   font-size: 0.875rem;
   line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 .bloc-wrapper {
   position: relative;
@@ -816,35 +820,7 @@ section {
   border-color: #f97316;
   color: #fff;
 }
-.btn-edit-note {
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 5px;
-  background: #fff7ed;
-  color: #f97316;
-  transition:
-    background 0.15s,
-    color 0.15s;
-}
-.btn-edit-note:hover {
-  background: #f97316;
-  color: #fff;
-}
-.btn-del-note {
-  font-size: 0.8rem;
-  padding: 3px 6px;
-  border-radius: 5px;
-  background: #fef2f2;
-  color: #ef4444;
-  transition:
-    background 0.15s,
-    color 0.15s;
-}
-.btn-del-note:hover {
-  background: #ef4444;
-  color: #fff;
-}
+.btn-edit-note,
 .btn-edit-bloc {
   font-size: 0.72rem;
   font-weight: 700;
@@ -856,10 +832,12 @@ section {
     background 0.15s,
     color 0.15s;
 }
+.btn-edit-note:hover,
 .btn-edit-bloc:hover {
   background: #f97316;
   color: #fff;
 }
+.btn-del-note,
 .btn-del-bloc {
   font-size: 0.8rem;
   padding: 3px 6px;
@@ -870,6 +848,7 @@ section {
     background 0.15s,
     color 0.15s;
 }
+.btn-del-note:hover,
 .btn-del-bloc:hover {
   background: #ef4444;
   color: #fff;
@@ -1010,7 +989,9 @@ section {
 /* ── Barre d'outils ── */
 .diagram-topbar {
   position: fixed;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 48px;
   background: #fff;
   border-bottom: 1px solid #e7e5e4;
@@ -1019,7 +1000,7 @@ section {
   padding: 0 10px;
   gap: 4px;
   z-index: 20;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 .diagram-topbar-back {
   position: fixed;
@@ -1032,12 +1013,21 @@ section {
   background: #f5f5f4;
   border: 1px solid #e7e5e4;
   border-radius: 7px;
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s, color 0.15s;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.15s,
+    color 0.15s;
   line-height: 1;
 }
-.diagram-topbar-back:hover { background: #292524; color: #fff; border-color: #292524; }
+.diagram-topbar-back:hover {
+  background: #292524;
+  color: #fff;
+  border-color: #292524;
+}
 .diagram-tool {
   font-size: 0.95rem;
   padding: 5px 9px;
@@ -1046,14 +1036,33 @@ section {
   color: #78716c;
   background: none;
   cursor: pointer;
-  transition: background 0.1s, color 0.1s, border-color 0.1s;
-  display: flex; align-items: center; justify-content: center;
-  min-width: 32px; height: 32px;
+  transition:
+    background 0.1s,
+    color 0.1s,
+    border-color 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
   flex-shrink: 0;
 }
-.diagram-tool:hover  { background: #f5f5f4; color: #292524; border-color: #e7e5e4; }
-.diagram-tool.active { background: #292524; color: #fff; border-color: #292524; }
-.diagram-sep { color: #d6d3d1; font-size: 1rem; padding: 0 1px; flex-shrink: 0; }
+.diagram-tool:hover {
+  background: #f5f5f4;
+  color: #292524;
+  border-color: #e7e5e4;
+}
+.diagram-tool.active {
+  background: #292524;
+  color: #fff;
+  border-color: #292524;
+}
+.diagram-sep {
+  color: #d6d3d1;
+  font-size: 1rem;
+  padding: 0 1px;
+  flex-shrink: 0;
+}
 .diagram-title-input {
   flex: 1;
   min-width: 60px;
@@ -1069,10 +1078,17 @@ section {
   outline: none;
   text-align: center;
   color: #292524;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
-.diagram-title-input:hover { border-color: #e7e5e4; }
-.diagram-title-input:focus { border-color: #f97316; background: #fff; }
+.diagram-title-input:hover {
+  border-color: #e7e5e4;
+}
+.diagram-title-input:focus {
+  border-color: #f97316;
+  background: #fff;
+}
 .zoom-level {
   font-family: "Cascadia Code", "SF Mono", Consolas, monospace;
   font-size: 0.62rem;
@@ -1096,12 +1112,15 @@ section {
   display: inline-flex;
   align-items: center;
 }
-.diagram-btn-save:hover { background: #059669; }
+.diagram-btn-save:hover {
+  background: #059669;
+}
 
 /* ── Canvas SVG ── */
 .diagram-canvas {
   position: fixed;
-  top: 48px; left: 0;
+  top: 48px;
+  left: 0;
   width: 100vw;
   height: calc(100vh - 48px);
   background: #fafaf9;
@@ -1114,22 +1133,40 @@ section {
 .diagram-canvas[data-tool="rounded"],
 .diagram-canvas[data-tool="db"],
 .diagram-canvas[data-tool="cloud"],
-.diagram-canvas[data-tool="text"]  { cursor: cell; }
-.diagram-canvas[data-tool="arrow"] { cursor: crosshair; }
+.diagram-canvas[data-tool="text"] {
+  cursor: cell;
+}
+.diagram-canvas[data-tool="arrow"] {
+  cursor: crosshair;
+}
 
 /* ── Formes ── */
-.shape-group { cursor: grab; }
-.shape-group:active { cursor: grabbing; }
+.shape-group {
+  cursor: grab;
+}
+.shape-group:active {
+  cursor: grabbing;
+}
 .conn-dot {
   opacity: 0;
   transition: opacity 0.12s;
   cursor: crosshair;
 }
-.shape-group:hover .conn-dot { opacity: 1; }
-.diagram-canvas[data-tool="arrow"] .conn-dot { opacity: 0.4; }
-.diagram-canvas[data-tool="arrow"] .shape-group:hover .conn-dot { opacity: 1; }
-.resize-grip { cursor: se-resize; }
-.arrow-group { cursor: pointer; }
+.shape-group:hover .conn-dot {
+  opacity: 1;
+}
+.diagram-canvas[data-tool="arrow"] .conn-dot {
+  opacity: 0.4;
+}
+.diagram-canvas[data-tool="arrow"] .shape-group:hover .conn-dot {
+  opacity: 1;
+}
+.resize-grip {
+  cursor: se-resize;
+}
+.arrow-group {
+  cursor: pointer;
+}
 
 /* ── Panneau liste des diagrammes ── */
 .diagram-list-panel {
@@ -1144,9 +1181,11 @@ section {
   display: flex;
   flex-direction: column;
   transition: left 0.2s ease;
-  box-shadow: 3px 0 10px rgba(0,0,0,0.06);
+  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.06);
 }
-.diagram-list-panel.open { left: 0; }
+.diagram-list-panel.open {
+  left: 0;
+}
 .diagram-list-header {
   display: flex;
   align-items: center;
@@ -1168,10 +1207,19 @@ section {
   font-weight: 600;
   cursor: pointer;
   border: none;
-  transition: background 0.1s, color 0.1s;
+  transition:
+    background 0.1s,
+    color 0.1s;
 }
-.diagram-list-header button:hover { background: #f97316; color: #fff; }
-#diagramList { flex: 1; overflow-y: auto; padding: 8px; }
+.diagram-list-header button:hover {
+  background: #f97316;
+  color: #fff;
+}
+#diagramList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
 .diagram-list-item {
   display: flex;
   align-items: center;
@@ -1182,8 +1230,12 @@ section {
   margin-bottom: 2px;
   transition: background 0.1s;
 }
-.diagram-list-item:hover { background: #f5f5f4; }
-.diagram-list-item.active { background: #fff7ed; }
+.diagram-list-item:hover {
+  background: #f5f5f4;
+}
+.diagram-list-item.active {
+  background: #fff7ed;
+}
 .diagram-list-name {
   font-size: 0.8rem;
   flex: 1;
@@ -1202,10 +1254,17 @@ section {
   cursor: pointer;
   border: none;
   flex-shrink: 0;
-  transition: opacity 0.1s, background 0.1s;
+  transition:
+    opacity 0.1s,
+    background 0.1s;
 }
-.diagram-list-item:hover .diagram-list-del { opacity: 1; }
-.diagram-list-del:hover { background: #ef4444; color: #fff; }
+.diagram-list-item:hover .diagram-list-del {
+  opacity: 1;
+}
+.diagram-list-del:hover {
+  background: #ef4444;
+  color: #fff;
+}
 
 /* ── Palette de couleurs ── */
 .diagram-color-panel {
@@ -1220,36 +1279,60 @@ section {
   display: flex;
   gap: 7px;
   z-index: 30;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 .color-dot {
-  width: 20px; height: 20px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid rgba(255,255,255,0.6);
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.12);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
   transition: transform 0.1s;
 }
-.color-dot:hover { transform: scale(1.25); }
-.color-dot.t-green  { background: #059669; }
-.color-dot.t-violet { background: #7c3aed; }
-.color-dot.t-amber  { background: #d97706; }
-.color-dot.t-sky    { background: #0284c7; }
-.color-dot.t-rose   { background: #e11d48; }
-.color-dot.t-teal   { background: #0d9488; }
+.color-dot:hover {
+  transform: scale(1.25);
+}
+.color-dot.t-green {
+  background: #059669;
+}
+.color-dot.t-violet {
+  background: #7c3aed;
+}
+.color-dot.t-amber {
+  background: #d97706;
+}
+.color-dot.t-sky {
+  background: #0284c7;
+}
+.color-dot.t-rose {
+  background: #e11d48;
+}
+.color-dot.t-teal {
+  background: #0d9488;
+}
 .diagram-color-edit {
   font-size: 1rem;
-  width: 24px; height: 24px;
+  width: 24px;
+  height: 24px;
   border-radius: 6px;
   border: 1px solid #e7e5e4;
   background: #f5f5f4;
   color: #78716c;
   cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.1s, color 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.1s,
+    color 0.1s;
   flex-shrink: 0;
 }
-.diagram-color-edit:hover { background: #292524; color: #fff; border-color: #292524; }
+.diagram-color-edit:hover {
+  background: #292524;
+  color: #fff;
+  border-color: #292524;
+}
 
 /* ── Bouton diagramme dans index.html ── */
 .btn-diagram {
@@ -1263,12 +1346,21 @@ section {
   background: #f5f5f4;
   border: 1px solid #e7e5e4;
   border-radius: 8px;
-  width: 40px; height: 40px;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s, color 0.15s;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.15s,
+    color 0.15s;
   line-height: 1;
 }
-.btn-diagram:hover { background: #292524; color: #fff; border-color: #292524; }
+.btn-diagram:hover {
+  background: #292524;
+  color: #fff;
+  border-color: #292524;
+}
 
 /* ── Swatch couleur dans le select ── */
 .color-preview {
