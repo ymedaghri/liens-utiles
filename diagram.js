@@ -957,13 +957,14 @@ function renderShape(shape) {
   // ── Texte non rendu pour les images ──
   if (shape.type === "image") return g;
 
-  // ── Indicateur de lien (diagramme enfant) ──
-  if (shape.linkedDiagramId && shape.type !== "image") {
+  // ── Indicateur de lien (diagramme enfant ou lien externe) ──
+  if ((shape.linkedDiagramId || shape.externalUrl) && shape.type !== "image") {
+    var lnkColor = shape.externalUrl ? "#0284c7" : "#f97316";
     var lnkCirc = createSVGEl("circle");
     lnkCirc.setAttribute("cx", shape.x + shape.w - 5);
     lnkCirc.setAttribute("cy", shape.y + 5);
     lnkCirc.setAttribute("r", 6);
-    lnkCirc.setAttribute("fill", "#f97316");
+    lnkCirc.setAttribute("fill", lnkColor);
     lnkCirc.setAttribute("stroke", "#fff");
     lnkCirc.setAttribute("stroke-width", 1.5);
     lnkCirc.setAttribute("pointer-events", "none");
@@ -1761,9 +1762,12 @@ function syncColorPanel() {
       btn.classList.add("active");
       var linked = findDiagramById(shape.linkedDiagramId, diagramsList);
       btn.title = linked ? "Lié à : " + linked.titre + " (cliquer pour délier)" : "Supprimer le lien";
+    } else if (shape && shape.externalUrl) {
+      btn.classList.add("active");
+      btn.title = "Lien externe : " + shape.externalUrl + " (cliquer pour délier)";
     } else {
       btn.classList.remove("active");
-      btn.title = "Lier à un diagramme enfant";
+      btn.title = "Lier à un diagramme enfant ou URL externe";
     }
     btn.style.display = "";
   } else {
@@ -1777,9 +1781,10 @@ function toggleShapeLink() {
   var diag = getCurrentDiagram();
   var shape = diag ? diag.shapes.find(function (s) { return s.id === selectedIds[0]; }) : null;
   if (!shape) return;
-  if (shape.linkedDiagramId) {
+  if (shape.linkedDiagramId || shape.externalUrl) {
     pushHistory();
     delete shape.linkedDiagramId;
+    delete shape.externalUrl;
     saveDiagrammes();
     renderAll();
     syncColorPanel();
@@ -1803,8 +1808,48 @@ function showLinkPicker() {
     return '<div class="link-picker-item" onclick="lierForme(\'' + d.id + '\')">' + escDiag(d.titre) + '</div>';
   }).join("");
   html += '<div class="link-picker-new" onclick="creerEnfantEtLier()">+ Nouveau diagramme enfant</div>';
+  html += '<div class="link-picker-new link-picker-ext-toggle" onclick="showExternalLinkInput()" style="display:flex;align-items:center;gap:6px;">'
+        + '<svg width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="#0284c7" stroke="#fff" stroke-width="1.5"/><text x="7" y="10.5" text-anchor="middle" font-size="8" font-weight="bold" fill="#fff">\u2197</text></svg>'
+        + 'Lien externe (URL)</div>';
+  html += '<div id="linkPickerExtRow" style="display:none;padding:6px 8px;border-top:1px solid #e7e5e4;">'
+        + '<input id="linkPickerExtUrl" type="text" placeholder="https://..." '
+        + 'style="width:100%;box-sizing:border-box;padding:4px 6px;border:1px solid #d4d4d4;border-radius:4px;font-size:12px;" '
+        + 'onkeydown="if(event.key===\'Enter\')lierFormeExterne()">'
+        + '<div id="linkPickerExtErr" style="color:#e11d48;font-size:11px;margin-top:3px;display:none;">URL invalide (http://, https:// ou file://)</div>'
+        + '</div>';
   document.getElementById("linkPickerList").innerHTML = html;
   panel.style.display = "block";
+}
+
+function showExternalLinkInput() {
+  var row = document.getElementById("linkPickerExtRow");
+  if (!row) return;
+  row.style.display = "block";
+  var input = document.getElementById("linkPickerExtUrl");
+  if (input) setTimeout(function () { input.focus(); }, 10);
+}
+
+function lierFormeExterne() {
+  var input = document.getElementById("linkPickerExtUrl");
+  if (!input) return;
+  var url = input.value.trim();
+  var err = document.getElementById("linkPickerExtErr");
+  if (!/^(https?|file):\/\//i.test(url)) {
+    if (err) err.style.display = "block";
+    return;
+  }
+  if (err) err.style.display = "none";
+  if (selectedIds.length !== 1) return;
+  var diag = getCurrentDiagram();
+  var shape = diag ? diag.shapes.find(function (s) { return s.id === selectedIds[0]; }) : null;
+  if (!shape) return;
+  pushHistory();
+  shape.externalUrl = url;
+  delete shape.linkedDiagramId;
+  hideLinkPicker();
+  saveDiagrammes();
+  renderAll();
+  syncColorPanel();
 }
 
 function hideLinkPicker() {
@@ -1819,6 +1864,7 @@ function lierForme(diagId) {
   if (!shape) return;
   pushHistory();
   shape.linkedDiagramId = String(diagId);
+  delete shape.externalUrl;
   hideLinkPicker();
   saveDiagrammes();
   renderAll();
@@ -2190,6 +2236,31 @@ function onMouseMove(e) {
 function onMouseUp(e) {
   var pt = svgPoint(e.clientX, e.clientY);
 
+  // En mode verrouillé : détecter un clic (sans déplacement) sur une forme liée
+  if (boardLocked && panStart) {
+    var movedPx = Math.abs(e.clientX - panStart.cx) + Math.abs(e.clientY - panStart.cy);
+    if (movedPx < 5 && !e.shiftKey) {
+      var shape = shapeAt(pt.x, pt.y);
+      if (shape && shape.linkedDiagramId) {
+        var target = findDiagramById(shape.linkedDiagramId, diagramsList);
+        if (target) {
+          hideLinkPicker();
+          diagNavStack.push(currentDiagramId);
+          if (diagNavStack.length > 30) diagNavStack.shift();
+          panStart = null;
+          selectDiagramme(shape.linkedDiagramId);
+          return;
+        }
+      } else if (shape && shape.externalUrl) {
+        panStart = null;
+        window.open(shape.externalUrl, "_blank");
+        return;
+      }
+    }
+    panStart = null;
+    return;
+  }
+
   // Fin de tracé de flèche via conn-dot
   if (arrowSrcId && !dragState) {
     document.getElementById("tempArrow").style.display = "none";
@@ -2245,6 +2316,9 @@ function onMouseUp(e) {
           selectDiagramme(clickedShape.linkedDiagramId);
           return;
         }
+      } else if (clickedShape && clickedShape.externalUrl) {
+        window.open(clickedShape.externalUrl, "_blank");
+        return;
       }
     }
   }
@@ -2405,9 +2479,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (boardLocked) return;
     if (e.key === "Delete" || e.key === "Backspace") deleteSelected();
     if (e.key === "Escape") {
+      hideLinkPicker();
       arrowSrcId = null;
       document.getElementById("tempArrow").style.display = "none";
       setTool("select");
+      selectedIds = []; selectedId = null; selectedType = null;
+      document.getElementById("colorPanel").style.display = "none";
+      renderAll();
     }
     if ((e.ctrlKey || e.metaKey) && e.key === "x") {
       e.preventDefault();

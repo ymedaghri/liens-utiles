@@ -59,7 +59,8 @@ var diagrammesDefaut = [
         "h": 179,
         "text": "Welcome in Diagrams !\n\nA drawing app by \nYoussef Medaghri-Alaoui\n\nwww.craftskillz.com",
         "color": "t-amber",
-        "fontSize": 15
+        "fontSize": 15,
+        "externalUrl": "https://www.craftskillz.com/posts/stay-secure-and-productive"
       },
       {
         "id": "s1774708954487",
