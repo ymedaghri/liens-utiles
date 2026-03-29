@@ -52,15 +52,23 @@ function undoAction() {
 function checkDiffDiagrammes() {
   var stored = localStorage.getItem("mes_diagrammes");
   var diff = stored !== JSON.stringify(diagrammesDefaut);
-  document.getElementById("btnSaveDiagram").style.display = diff ? "inline-flex" : "none";
+  document.getElementById("btnSaveDiagram").style.display = diff
+    ? "inline-flex"
+    : "none";
 }
 
 // ── Verrouillage par diagramme ──
-var LOCK_OPEN_SVG   = '<svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="12" height="8" rx="2"/><path d="M4 7V4.5a3 3 0 0 1 6 0"/></svg>';
-var LOCK_CLOSED_SVG = '<svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="12" height="8" rx="2"/><path d="M4 7V5a3 3 0 0 1 6 0v2"/></svg>';
+var LOCK_OPEN_SVG =
+  '<svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="12" height="8" rx="2"/><path d="M4 7V4.5a3 3 0 0 1 6 0"/></svg>';
+var LOCK_CLOSED_SVG =
+  '<svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="12" height="8" rx="2"/><path d="M4 7V5a3 3 0 0 1 6 0v2"/></svg>';
 
 function getLockMap() {
-  try { return JSON.parse(localStorage.getItem("diagrammes_lock") || "{}"); } catch(e) { return {}; }
+  try {
+    return JSON.parse(localStorage.getItem("diagrammes_lock") || "{}");
+  } catch (e) {
+    return {};
+  }
 }
 function saveCurrentLock() {
   var diag = getCurrentDiagram();
@@ -79,7 +87,8 @@ function toggleBoardLock() {
   boardLocked = !boardLocked;
   saveCurrentLock();
   if (boardLocked) {
-    selectedId = null; selectedType = null;
+    selectedId = null;
+    selectedType = null;
     selectedIds = [];
     document.getElementById("colorPanel").style.display = "none";
     renderAll();
@@ -90,13 +99,19 @@ function updateLockBtn() {
   var btn = document.getElementById("btnLock");
   if (!btn) return;
   btn.innerHTML = boardLocked ? LOCK_CLOSED_SVG : LOCK_OPEN_SVG;
-  btn.title = boardLocked ? "Déverrouiller le diagramme" : "Verrouiller le diagramme";
+  btn.title = boardLocked
+    ? window.t["diag_tool_unlock"]
+    : window.t["diag_tool_lock"];
   btn.classList.toggle("active", boardLocked);
 }
 
 // ── Zoom par diagramme ──
 function getZoomMap() {
-  try { return JSON.parse(localStorage.getItem("diagrammes_zoom") || "{}"); } catch(e) { return {}; }
+  try {
+    return JSON.parse(localStorage.getItem("diagrammes_zoom") || "{}");
+  } catch (e) {
+    return {};
+  }
 }
 function saveCurrentZoom() {
   var diag = getCurrentDiagram();
@@ -114,7 +129,7 @@ function restoreZoomForDiagram(diagId) {
 
 // ── File System Access API ──
 var IDB_KEY_DIAG = "diagrammes";
-var IDB_KEY_DIR  = "diagrammes_dir";
+var IDB_KEY_DIR = "diagrammes_dir";
 
 function ouvrirDB_Diag() {
   return new Promise(function (resolve, reject) {
@@ -122,8 +137,12 @@ function ouvrirDB_Diag() {
     req.onupgradeneeded = function (e) {
       e.target.result.createObjectStore("fileHandles");
     };
-    req.onsuccess = function (e) { resolve(e.target.result); };
-    req.onerror  = function (e) { reject(e.target.error); };
+    req.onsuccess = function (e) {
+      resolve(e.target.result);
+    };
+    req.onerror = function (e) {
+      reject(e.target.error);
+    };
   });
 }
 
@@ -133,7 +152,9 @@ function sauvegarderHandle_Diag(handle) {
       var tx = db.transaction("fileHandles", "readwrite");
       tx.objectStore("fileHandles").put(handle, IDB_KEY_DIAG);
       tx.oncomplete = resolve;
-      tx.onerror = function (e) { reject(e.target.error); };
+      tx.onerror = function (e) {
+        reject(e.target.error);
+      };
     });
   });
 }
@@ -143,8 +164,12 @@ function recupererHandle_Diag() {
     return new Promise(function (resolve, reject) {
       var tx = db.transaction("fileHandles", "readonly");
       var req = tx.objectStore("fileHandles").get(IDB_KEY_DIAG);
-      req.onsuccess = function (e) { resolve(e.target.result || null); };
-      req.onerror  = function (e) { reject(e.target.error); };
+      req.onsuccess = function (e) {
+        resolve(e.target.result || null);
+      };
+      req.onerror = function (e) {
+        reject(e.target.error);
+      };
     });
   });
 }
@@ -155,7 +180,9 @@ function sauvegarderDirHandle(handle) {
       var tx = db.transaction("fileHandles", "readwrite");
       tx.objectStore("fileHandles").put(handle, IDB_KEY_DIR);
       tx.oncomplete = resolve;
-      tx.onerror = function (e) { reject(e.target.error); };
+      tx.onerror = function (e) {
+        reject(e.target.error);
+      };
     });
   });
 }
@@ -165,8 +192,12 @@ function recupererDirHandle() {
     return new Promise(function (resolve, reject) {
       var tx = db.transaction("fileHandles", "readonly");
       var req = tx.objectStore("fileHandles").get(IDB_KEY_DIR);
-      req.onsuccess = function (e) { resolve(e.target.result || null); };
-      req.onerror  = function (e) { reject(e.target.error); };
+      req.onsuccess = function (e) {
+        resolve(e.target.result || null);
+      };
+      req.onerror = function (e) {
+        reject(e.target.error);
+      };
     });
   });
 }
@@ -176,7 +207,9 @@ function enregistrerDiagrammes() {
   recupererHandle_Diag().then(function (handle) {
     if (!handle) {
       document.getElementById("erreurFichierDiag").style.display = "none";
-      document.getElementById("modalPremiereSauvegardeDiag").classList.add("open");
+      document
+        .getElementById("modalPremiereSauvegardeDiag")
+        .classList.add("open");
     } else {
       ecrireFichierDiag(handle);
     }
@@ -184,13 +217,16 @@ function enregistrerDiagrammes() {
 }
 
 function fermerModalSauvegardeDiag() {
-  document.getElementById("modalPremiereSauvegardeDiag").classList.remove("open");
+  document
+    .getElementById("modalPremiereSauvegardeDiag")
+    .classList.remove("open");
 }
 
 function ouvrirSelecteurFichierDiag() {
   fermerModalSauvegardeDiag();
   var capturedDir = null;
-  window.showDirectoryPicker()
+  window
+    .showDirectoryPicker()
     .then(function (dir) {
       capturedDir = dir;
       sauvegarderDirHandle(dir);
@@ -198,20 +234,24 @@ function ouvrirSelecteurFichierDiag() {
     })
     .then(function (handle) {
       document.getElementById("erreurFichierDiag").style.display = "none";
-      return sauvegarderHandle_Diag(handle).then(function () {
-        return ecrireFichierDiag(handle);
-      }).then(function () {
-        if (pendingImageBlob && capturedDir) {
-          var blob = pendingImageBlob;
-          pendingImageBlob = null;
-          enregistrerImageDansBoard(blob, capturedDir);
-        }
-      });
+      return sauvegarderHandle_Diag(handle)
+        .then(function () {
+          return ecrireFichierDiag(handle);
+        })
+        .then(function () {
+          if (pendingImageBlob && capturedDir) {
+            var blob = pendingImageBlob;
+            pendingImageBlob = null;
+            enregistrerImageDansBoard(blob, capturedDir);
+          }
+        });
     })
     .catch(function (err) {
       if (err.name === "NotFoundError") {
         document.getElementById("erreurFichierDiag").style.display = "block";
-        document.getElementById("modalPremiereSauvegardeDiag").classList.add("open");
+        document
+          .getElementById("modalPremiereSauvegardeDiag")
+          .classList.add("open");
       } else if (err.name !== "AbortError") {
         console.error(err);
       }
@@ -219,22 +259,34 @@ function ouvrirSelecteurFichierDiag() {
 }
 
 function ecrireFichierDiag(handle) {
-  return handle.queryPermission({ mode: "readwrite" })
+  return handle
+    .queryPermission({ mode: "readwrite" })
     .then(function (p) {
-      if (p !== "granted") return handle.requestPermission({ mode: "readwrite" });
+      if (p !== "granted")
+        return handle.requestPermission({ mode: "readwrite" });
       return p;
     })
     .then(function (p) {
       if (p !== "granted") return;
-      var content = "var diagrammesDefaut = " + JSON.stringify(diagramsList, null, 2) + ";\n";
-      return handle.createWritable().then(function (w) {
-        return w.write(content).then(function () { return w.close(); });
-      }).then(function () {
-        diagrammesDefaut = JSON.parse(JSON.stringify(diagramsList));
-        checkDiffDiagrammes();
-      });
+      var content =
+        "var diagrammesDefaut = " +
+        JSON.stringify(diagramsList, null, 2) +
+        ";\n";
+      return handle
+        .createWritable()
+        .then(function (w) {
+          return w.write(content).then(function () {
+            return w.close();
+          });
+        })
+        .then(function () {
+          diagrammesDefaut = JSON.parse(JSON.stringify(diagramsList));
+          checkDiffDiagrammes();
+        });
     })
-    .catch(function (err) { console.error(err); });
+    .catch(function (err) {
+      console.error(err);
+    });
 }
 
 // ── Image paste ──
@@ -243,14 +295,24 @@ function handleImagePaste(blob) {
     if (!dirHandle) {
       pendingImageBlob = blob;
       document.getElementById("erreurFichierDiag").style.display = "none";
-      document.getElementById("modalPremiereSauvegardeDiag").classList.add("open");
+      document
+        .getElementById("modalPremiereSauvegardeDiag")
+        .classList.add("open");
     } else {
-      dirHandle.queryPermission({ mode: "readwrite" }).then(function (p) {
-        if (p !== "granted") return dirHandle.requestPermission({ mode: "readwrite" }).then(function (p2) { return p2; });
-        return p;
-      }).then(function (p) {
-        if (p === "granted") enregistrerImageDansBoard(blob, dirHandle);
-      });
+      dirHandle
+        .queryPermission({ mode: "readwrite" })
+        .then(function (p) {
+          if (p !== "granted")
+            return dirHandle
+              .requestPermission({ mode: "readwrite" })
+              .then(function (p2) {
+                return p2;
+              });
+          return p;
+        })
+        .then(function (p) {
+          if (p === "granted") enregistrerImageDansBoard(blob, dirHandle);
+        });
     }
   });
 }
@@ -258,13 +320,16 @@ function handleImagePaste(blob) {
 function enregistrerImageDansBoard(blob, dirHandle) {
   var filename = "img_" + Date.now() + ".png";
   var src = "images/" + filename;
-  dirHandle.getDirectoryHandle("images", { create: true })
+  dirHandle
+    .getDirectoryHandle("images", { create: true })
     .then(function (imagesDir) {
       return imagesDir.getFileHandle(filename, { create: true });
     })
     .then(function (fileHandle) {
       return fileHandle.createWritable().then(function (w) {
-        return w.write(blob).then(function () { return w.close(); });
+        return w.write(blob).then(function () {
+          return w.close();
+        });
       });
     })
     .then(function () {
@@ -279,17 +344,35 @@ function enregistrerImageDansBoard(blob, dirHandle) {
         // Centrer sur la vue courante
         var svg = document.getElementById("canvas");
         var r = svg.getBoundingClientRect();
-        var cx = Math.round((r.width  / 2 - viewTransform.x) / viewTransform.scale - w / 2);
-        var cy = Math.round((r.height / 2 - viewTransform.y) / viewTransform.scale - h / 2);
+        var cx = Math.round(
+          (r.width / 2 - viewTransform.x) / viewTransform.scale - w / 2,
+        );
+        var cy = Math.round(
+          (r.height / 2 - viewTransform.y) / viewTransform.scale - h / 2,
+        );
         var diag = getCurrentDiagram();
-        var shape = { id: "s" + Date.now(), type: "image", x: cx, y: cy, w: w, h: h, text: "", color: "", src: src };
+        var shape = {
+          id: "s" + Date.now(),
+          type: "image",
+          x: cx,
+          y: cy,
+          w: w,
+          h: h,
+          text: "",
+          color: "",
+          src: src,
+        };
         diag.shapes.push(shape);
-        selectedIds = [shape.id];  selectedId = shape.id;  selectedType = "shape";
+        selectedIds = [shape.id];
+        selectedId = shape.id;
+        selectedType = "shape";
         saveDiagrammes();
         renderAll();
         document.getElementById("colorPanel").style.display = "none";
       };
       img.src = url;
     })
-    .catch(function (err) { console.error("Image paste error:", err); });
+    .catch(function (err) {
+      console.error("Image paste error:", err);
+    });
 }
