@@ -223,6 +223,35 @@ start index.html  # Windows
 
 ---
 
+## Publishing to npm
+
+Publishing is fully automated via **GitHub Actions** and **npm Trusted Publishing** (OIDC). No npm token is needed — GitHub and npm authenticate directly via OpenID Connect.
+
+### How it works
+
+A GitHub Actions workflow (`.github/workflows/publish.yml`) is triggered whenever a version tag (`v*`) is pushed. It checks out the code, installs Node.js, and runs `npm publish --provenance`. The `--provenance` flag generates a signed attestation proving the package was built from this repository.
+
+### Releasing a new version
+
+The project uses [just](https://github.com/casey/just) as a command runner. To publish a new version:
+
+```bash
+just publish patch   # 4.0.0 → 4.0.1
+just publish minor   # 4.0.0 → 4.1.0
+just publish major   # 4.0.0 → 5.0.0
+```
+
+This bumps the version in `package.json`, creates a git tag, and pushes everything. The GitHub Actions workflow takes it from there.
+
+### Initial setup (already done)
+
+For reference, here is what was configured once:
+
+1. **npm side** — on npmjs.com → package Settings → Trusted Publisher → GitHub Actions: repository owner `ymedaghri`, repository name `doc-survival-kit`, workflow filename `publish.yml`.
+2. **GitHub side** — the workflow file `.github/workflows/publish.yml` with `permissions: id-token: write` to enable OIDC authentication.
+
+---
+
 ## Tech stack
 
 | Technology         | Detail                                                  |
@@ -233,6 +262,8 @@ start index.html  # Windows
 | Local storage      | Browser `localStorage`                                  |
 | File storage       | File System Access API (`showDirectoryPicker`)          |
 | Handle persistence | `IndexedDB` — file handle is remembered across sessions |
+| Publishing         | npm Trusted Publishing via GitHub Actions (OIDC)        |
+| Task runner        | [just](https://github.com/casey/just)                   |
 
 ---
 
