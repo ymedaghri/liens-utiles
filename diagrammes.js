@@ -10,7 +10,7 @@ var diagrammesDefaut = [
         "y": 486,
         "w": 229,
         "h": 177,
-        "text": "(5)\n\nLe bouton 'enregistrer' apparaît dès qu'il y a des modifications.",
+        "text": "(5)\n\nThe 'Save' appear as soon as changes are made",
         "color": "t-white",
         "fontSize": 15,
         "textValign": "top"
@@ -454,7 +454,7 @@ var diagrammesDefaut = [
         "w": 79,
         "h": 50,
         "text": "",
-        "color": "t-sky",
+        "color": "t-rose",
         "rotation": 90
       },
       {
@@ -476,7 +476,7 @@ var diagrammesDefaut = [
         "w": 79,
         "h": 50,
         "text": "",
-        "color": "t-sky",
+        "color": "t-rose",
         "rotation": 120
       },
       {
@@ -498,7 +498,7 @@ var diagrammesDefaut = [
         "w": 79,
         "h": 50,
         "text": "",
-        "color": "t-sky",
+        "color": "t-teal",
         "rotation": 150
       },
       {
@@ -520,7 +520,7 @@ var diagrammesDefaut = [
         "w": 79,
         "h": 50,
         "text": "",
-        "color": "t-sky",
+        "color": "t-green",
         "rotation": 120
       },
       {
@@ -542,7 +542,7 @@ var diagrammesDefaut = [
         "w": 79,
         "h": 50,
         "text": "",
-        "color": "t-sky",
+        "color": "t-amber",
         "rotation": 90
       },
       {
@@ -564,7 +564,7 @@ var diagrammesDefaut = [
         "w": 79,
         "h": 50,
         "text": "",
-        "color": "t-sky",
+        "color": "t-violet",
         "rotation": 60
       },
       {
@@ -586,7 +586,7 @@ var diagrammesDefaut = [
         "w": 79,
         "h": 50,
         "text": "",
-        "color": "t-sky",
+        "color": "t-violet",
         "rotation": 30
       },
       {
@@ -608,7 +608,7 @@ var diagrammesDefaut = [
         "w": 79,
         "h": 50,
         "text": "",
-        "color": "t-sky",
+        "color": "t-green",
         "rotation": 15
       },
       {
@@ -621,17 +621,6 @@ var diagrammesDefaut = [
         "text": "",
         "color": "t-sky",
         "rotation": 0
-      },
-      {
-        "id": "s1774711114096",
-        "type": "image",
-        "x": 18,
-        "y": 604,
-        "w": 152,
-        "h": 41,
-        "text": "",
-        "color": "",
-        "src": "images/img_1774711114086.png"
       },
       {
         "id": "s1774711412963",
@@ -662,6 +651,17 @@ var diagrammesDefaut = [
         "textValign": "top",
         "rotation": 0,
         "linkedDiagramId": "1774711967648"
+      },
+      {
+        "id": "s1774817912298",
+        "type": "image",
+        "x": 7,
+        "y": 592,
+        "w": 153,
+        "h": 50,
+        "text": "",
+        "color": "",
+        "src": "images/img_1774817912280.png"
       }
     ],
     "arrows": [
